@@ -10,14 +10,14 @@ import { createHash, BinaryToTextEncoding, randomBytes } from 'node:crypto'
  */
 export function encryptPassword(
   password: string,
+  salt?: string,
   algorithm: string = 'sha256',
   encoding: BinaryToTextEncoding = 'hex',
-  salt?: string,
 ) {
   const hash = createHash(algorithm) // 創建哈希對象
   const saltValue = salt || randomBytes(16).toString('hex') // 鹽值
 
-  hash.update(salt + password)
+  hash.update(saltValue + password)
 
   return {
     hashedPassword: hash.digest(encoding),

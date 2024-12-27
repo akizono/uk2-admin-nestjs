@@ -5,7 +5,6 @@ import { SystemUserEntity } from './entity/system.user.entity'
 import { CreateSystemUserDto } from './dto/create-system-user.dto'
 import { UpdateSystemUserDto } from './dto/update-system-user.dto'
 import { encryptPassword } from '@/utils/crypto'
-import * as md5 from 'md5'
 
 @Injectable()
 export class SystemUserService {
@@ -76,7 +75,7 @@ export class SystemUserService {
 
     if (rest.password) {
       const { hashedPassword, salt } = encryptPassword(rest.password)
-      rest.password = md5(hashedPassword)
+      rest.password = hashedPassword
       rest.salt = salt
     }
     await this.systemUserRepository.update(id, rest)
