@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { getEnvFilePath, configuration } from './utils/env'
 
 import { SystemUserModule } from './modules/system.user/system.user.module'
+import { SystemAuthModule } from './modules/system.auth/system.auth.module'
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SystemUserModule } from './modules/system.user/system.user.module'
       inject: [ConfigService],
     }),
     SystemUserModule,
+    SystemAuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

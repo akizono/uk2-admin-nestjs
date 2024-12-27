@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Param, Get, Post, Put, ParseIntPipe, UseInterceptors } from '@nestjs/common'
 import { SystemUserService } from './system.user.service'
 import { CreateSystemUserDto } from './dto/create-system-user.dto'
-import { TransformInterceptor } from '../../interceptors/transform.interceptor'
-import { ResponseMessage } from '../../decorators/response-message.decorator'
+import { TransformInterceptor } from '../../common/interceptors/transform.interceptor'
+import { ResponseMessage } from '../../common/decorators/response-message.decorator'
 import { UpdateSystemUserDto } from './dto/update-system-user.dto'
 
 @Controller('/system/user')
