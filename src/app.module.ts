@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { ConfigModule, ConfigService } from '@nestjs/config'
-import { getEnvFilePath, configuration } from './utils/env'
+import { ConfigModule } from '@nestjs/config'
+import { EnvHelper } from './utils/env-helper'
 
 import { SystemUserModule } from './modules/system.user/system.user.module'
 import { SystemAuthModule } from './modules/system.auth/system.auth.module'
@@ -12,25 +12,24 @@ import { SystemAuthModule } from './modules/system.auth/system.auth.module'
   imports: [
     /* 全局環境變數 */
     ConfigModule.forRoot({
-      envFilePath: getEnvFilePath(),
-      load: [configuration],
+      envFilePath: EnvHelper.getEnvFilePath(),
       isGlobal: true,
     }),
     /* 資料庫連結 */
     TypeOrmModule.forRootAsync({
-      useFactory: (config: ConfigService) => ({
-        type: config.get<'mysql' | 'postgres' | 'mariadb'>('database.type'),
-        host: config.get<string>('database.host'),
-        port: config.get<number>('database.port'),
-        username: config.get<string>('database.username'),
-        password: config.get<string>('database.password'),
-        database: config.get<string>('database.name'),
-        poolSize: 10,
-        autoLoadEntities: true,
-        connectorPackage: 'mysql2',
-        synchronize: true,
+      useFactory: () => ({
+        type: EnvHelper.getString('DB_TYPE') as 'mysql',
+        host: EnvHelper.getString('DB_HOST'),
+        port: EnvHelper.getNumber('DB_PORT'),
+        database: EnvHelper.getString('DB_NAME'),
+        username: EnvHelper.getString('DB_USERNAME'),
+        password: EnvHelper.getString('DB_PASSWORD'),
+
+        poolSize: EnvHelper.getNumber('DB_POOL_SIZE'),
+        autoLoadEntities: EnvHelper.getBoolean('DB_AUTO_LOAD_ENTITIES'),
+        connectorPackage: EnvHelper.getString('DB_CONNECTOR_PACKAGE') as 'mysql' | 'mysql2',
+        synchronize: EnvHelper.getBoolean('DB_SYNCHRONIZE'),
       }),
-      inject: [ConfigService],
     }),
     SystemUserModule,
     SystemAuthModule,
