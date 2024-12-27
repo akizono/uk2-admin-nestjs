@@ -14,7 +14,7 @@ export class SystemUserService {
   ) {}
 
   // 定義共用的 select 欄位
-  private readonly commonSelect = {
+  private readonly select = {
     id: true,
     username: true,
     nickname: true,
@@ -29,19 +29,42 @@ export class SystemUserService {
     updateTime: true,
   } as const
 
+  private readonly selectFields = ['password', 'salt'] as const
+
   // 查詢所有用戶
-  async findAll(): Promise<Omit<SystemUserEntity, 'password'>[]> {
+  async findAll(): Promise<Omit<SystemUserEntity, (typeof this.selectFields)[number]>[]> {
     const users = await this.systemUserRepository.find({
-      select: this.commonSelect,
+      select: this.select,
     })
     return users
   }
 
-  // 查詢單一用戶
-  async findOne(id: number): Promise<Omit<SystemUserEntity, 'password'>> {
+  // 根據id查詢單一用戶
+  async findOneById(id: number): Promise<Omit<SystemUserEntity, (typeof this.selectFields)[number]>> {
     const user = await this.systemUserRepository.findOne({
-      select: this.commonSelect,
+      select: this.select,
       where: { id },
+    })
+
+    if (!user) throw new NotFoundException('用戶不存在')
+    return user
+  }
+
+  // 根據username查詢單一用戶
+  async findOneByUsername(
+    username: string,
+    isShowPassword = false,
+  ): Promise<
+    Partial<Pick<SystemUserEntity, (typeof this.selectFields)[number]>> &
+      Omit<SystemUserEntity, (typeof this.selectFields)[number]>
+  > {
+    const user = await this.systemUserRepository.findOne({
+      select: {
+        password: isShowPassword,
+        salt: isShowPassword,
+        ...this.select,
+      },
+      where: { username },
     })
 
     if (!user) throw new NotFoundException('用戶不存在')

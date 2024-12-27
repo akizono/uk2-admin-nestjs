@@ -16,10 +16,17 @@ export class SystemUserController {
     return this.systemUserService.findAll()
   }
 
-  @Get('/:id')
+  @Get('/id/:id')
   @ResponseMessage('获取用户详情成功')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    const user = await this.systemUserService.findOne(id)
+    const user = await this.systemUserService.findOneById(id)
+    return user
+  }
+
+  @Get('/username/:username')
+  @ResponseMessage('获取用户详情成功')
+  async findOneByUsername(@Param('username') username: string) {
+    const user = await this.systemUserService.findOneByUsername(username)
     return user
   }
 

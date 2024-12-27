@@ -9,5 +9,6 @@ import { SystemUserService } from './system.user.service'
   imports: [TypeOrmModule.forFeature([SystemUserEntity])],
   controllers: [SystemUserController],
   providers: [SystemUserService],
+  exports: [SystemUserService],
 })
 export class SystemUserModule {}
