@@ -18,7 +18,7 @@ export class AuthService {
 
   // 驗證密碼
   async validateUser(username: string, password: string): Promise<UserWithPassword | null> {
-    const user = await this.userService.findOneByUsername(username, true)
+    const { user } = await this.userService.findOneByUsername(username, true)
     const { hashedPassword } = encryptPassword(password, user.salt)
     if (user.password === hashedPassword) {
       return user
@@ -31,7 +31,6 @@ export class AuthService {
   async generateToken(user: UserWithPassword, type: 'access' | 'refresh') {
     const payload = {
       sub: user.id,
-      username: user.username,
       type,
       jti: uuidv4(),
       iat: Math.floor(Date.now() / 1000),

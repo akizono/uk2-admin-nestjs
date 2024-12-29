@@ -29,34 +29,31 @@ export class UserService {
     updateTime: true,
   } as const
 
-  private readonly selectFields = ['password', 'salt'] as const
-
   // 查詢所有用戶
-  async findAll(): Promise<Omit<UserEntity, (typeof this.selectFields)[number]>[]> {
+  async findAll() {
     const users = await this.userRepository.find({
       select: this.select,
     })
-    return users
+
+    return users.map(user => ({ user: user }))
   }
 
   // 根據id查詢單一用戶
-  async findOneById(id: number): Promise<Omit<UserEntity, (typeof this.selectFields)[number]>> {
+  async findOneById(id: number) {
     const user = await this.userRepository.findOne({
       select: this.select,
       where: { id },
     })
 
     if (!user) throw new NotFoundException('用戶不存在')
-    return user
+
+    return {
+      user,
+    }
   }
 
   // 根據username查詢單一用戶
-  async findOneByUsername(
-    username: string,
-    isShowPassword = false,
-  ): Promise<
-    Partial<Pick<UserEntity, (typeof this.selectFields)[number]>> & Omit<UserEntity, (typeof this.selectFields)[number]>
-  > {
+  async findOneByUsername(username: string, isShowPassword = false) {
     const user = await this.userRepository.findOne({
       select: {
         password: isShowPassword,
@@ -67,7 +64,10 @@ export class UserService {
     })
 
     if (!user) throw new NotFoundException('用戶不存在')
-    return user
+
+    return {
+      user,
+    }
   }
 
   // 創建用戶
