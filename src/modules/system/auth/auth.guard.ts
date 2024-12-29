@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt'
 import { EnvHelper } from '@/utils/env-helper'
 
 @Injectable()
-export class SystemAuthGuard implements CanActivate {
+export class AuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly reflector: Reflector,

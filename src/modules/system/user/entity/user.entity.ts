@@ -1,7 +1,7 @@
 import { Entity, Column, Unique, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('system_user')
-export class SystemUserEntity {
+export class UserEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: number
 

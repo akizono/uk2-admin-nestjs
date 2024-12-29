@@ -5,8 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
 import { EnvHelper } from './utils/env-helper'
 
-import { SystemUserModule } from './modules/system.user/system.user.module'
-import { SystemAuthModule } from './modules/system.auth/system.auth.module'
+import { UserModule } from './modules/system/user/user.module'
+import { AuthModule } from './modules/system/auth/auth.module'
 
 @Module({
   imports: [
@@ -31,8 +31,8 @@ import { SystemAuthModule } from './modules/system.auth/system.auth.module'
         synchronize: EnvHelper.getBoolean('DB_SYNCHRONIZE'),
       }),
     }),
-    SystemUserModule,
-    SystemAuthModule,
+    UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

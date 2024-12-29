@@ -1,25 +1,24 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { SystemUserService } from '@/modules/system.user/system.user.service'
+import { UserService } from '../user/user.service'
 import { LoginDto } from './dto/login.dto'
 import { encryptPassword } from '@/utils/crypto'
 import { JwtService } from '@nestjs/jwt'
 import { EnvHelper } from '@/utils/env-helper'
 import { v4 as uuidv4 } from 'uuid'
-import { SystemUserEntity } from '../system.user/entity/system.user.entity'
+import { UserEntity } from '../user/entity/user.entity'
 
-type UserWithPassword = Partial<Pick<SystemUserEntity, 'password' | 'salt'>> &
-  Omit<SystemUserEntity, 'password' | 'salt'>
+type UserWithPassword = Partial<Pick<UserEntity, 'password' | 'salt'>> & Omit<UserEntity, 'password' | 'salt'>
 
 @Injectable()
-export class SystemAuthService {
+export class AuthService {
   constructor(
-    private readonly systemUserService: SystemUserService,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
   // 驗證密碼
   async validateUser(username: string, password: string): Promise<UserWithPassword | null> {
-    const user = await this.systemUserService.findOneByUsername(username, true)
+    const user = await this.userService.findOneByUsername(username, true)
     const { hashedPassword } = encryptPassword(password, user.salt)
     if (user.password === hashedPassword) {
       return user

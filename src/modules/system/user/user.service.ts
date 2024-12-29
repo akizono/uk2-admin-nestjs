@@ -1,16 +1,16 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { SystemUserEntity } from './entity/system.user.entity'
-import { CreateSystemUserDto } from './dto/create-system-user.dto'
-import { UpdateSystemUserDto } from './dto/update-system-user.dto'
+import { UserEntity } from './entity/user.entity'
+import { CreateUserDto } from './dto/create-user.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
 import { encryptPassword } from '@/utils/crypto'
 
 @Injectable()
-export class SystemUserService {
+export class UserService {
   constructor(
-    @InjectRepository(SystemUserEntity)
-    private readonly systemUserRepository: Repository<SystemUserEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   // 定義共用的 select 欄位
@@ -32,16 +32,16 @@ export class SystemUserService {
   private readonly selectFields = ['password', 'salt'] as const
 
   // 查詢所有用戶
-  async findAll(): Promise<Omit<SystemUserEntity, (typeof this.selectFields)[number]>[]> {
-    const users = await this.systemUserRepository.find({
+  async findAll(): Promise<Omit<UserEntity, (typeof this.selectFields)[number]>[]> {
+    const users = await this.userRepository.find({
       select: this.select,
     })
     return users
   }
 
   // 根據id查詢單一用戶
-  async findOneById(id: number): Promise<Omit<SystemUserEntity, (typeof this.selectFields)[number]>> {
-    const user = await this.systemUserRepository.findOne({
+  async findOneById(id: number): Promise<Omit<UserEntity, (typeof this.selectFields)[number]>> {
+    const user = await this.userRepository.findOne({
       select: this.select,
       where: { id },
     })
@@ -55,10 +55,9 @@ export class SystemUserService {
     username: string,
     isShowPassword = false,
   ): Promise<
-    Partial<Pick<SystemUserEntity, (typeof this.selectFields)[number]>> &
-      Omit<SystemUserEntity, (typeof this.selectFields)[number]>
+    Partial<Pick<UserEntity, (typeof this.selectFields)[number]>> & Omit<UserEntity, (typeof this.selectFields)[number]>
   > {
-    const user = await this.systemUserRepository.findOne({
+    const user = await this.userRepository.findOne({
       select: {
         password: isShowPassword,
         salt: isShowPassword,
@@ -72,28 +71,28 @@ export class SystemUserService {
   }
 
   // 創建用戶
-  async create(createSystemUserDto: CreateSystemUserDto) {
-    const { username, password, ...rest } = createSystemUserDto
+  async create(createUserDto: CreateUserDto) {
+    const { username, password, ...rest } = createUserDto
 
-    const existUser = await this.systemUserRepository.findOne({ where: { username } })
+    const existUser = await this.userRepository.findOne({ where: { username } })
     if (existUser) throw new ConflictException('用戶已存在')
 
     const { hashedPassword, salt } = encryptPassword(password)
 
-    const newSystemUser = this.systemUserRepository.create({
+    const newUser = this.userRepository.create({
       ...rest,
       username,
       password: hashedPassword,
       salt,
     })
-    await this.systemUserRepository.save(newSystemUser)
+    await this.userRepository.save(newUser)
   }
 
   // 更新用戶
-  async update(updateSystemUserDto: UpdateSystemUserDto) {
-    const { id, ...rest } = updateSystemUserDto
+  async update(updateUserDto: UpdateUserDto) {
+    const { id, ...rest } = updateUserDto
 
-    const existUser = await this.systemUserRepository.findOne({ where: { id } })
+    const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('用戶不存在')
 
     if (rest.password) {
@@ -101,14 +100,14 @@ export class SystemUserService {
       rest.password = hashedPassword
       rest.salt = salt
     }
-    await this.systemUserRepository.update(id, rest)
+    await this.userRepository.update(id, rest)
   }
 
   // 刪除用戶
   async delete(id: number) {
-    const existUser = await this.systemUserRepository.findOne({ where: { id } })
+    const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('用戶不存在')
 
-    await this.systemUserRepository.update(id, { isDeleted: 1 })
+    await this.userRepository.update(id, { isDeleted: 1 })
   }
 }
