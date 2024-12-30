@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Param, Get, Post, Put, ParseIntPipe, UseInter
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { TransformInterceptor } from '../../../common/interceptors/transform.interceptor'
-import { ResponseMessage } from '../../../common/decorators/response-message.decorator'
+import { ResponseMessage } from '@/common/decorators/'
 import { UpdateUserDto } from './dto/update-user.dto'
 
 @Controller('/user')

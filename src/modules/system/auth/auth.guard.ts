@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator'
+import { IS_PUBLIC_KEY } from '@/common/decorators/'
 import { JwtService } from '@nestjs/jwt'
 import { EnvHelper } from '@/utils/env-helper'
 

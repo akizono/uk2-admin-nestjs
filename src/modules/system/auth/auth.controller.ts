@@ -1,8 +1,7 @@
 import { Body, Controller, Post, UseInterceptors, Headers } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
-import { Public } from '@/common/decorators/public.decorator'
-import { ResponseMessage } from '@/common/decorators/response-message.decorator'
+import { Public, ResponseMessage } from '@/common/decorators/'
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 
 @Controller('/auth')
