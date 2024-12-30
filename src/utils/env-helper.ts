@@ -14,7 +14,7 @@ export class EnvHelper {
         envFilePath.unshift('.env.test')
         break
       default:
-        envFilePath.unshift('.env.dev') // 默認使用開發環境配置
+        envFilePath.unshift('.env.dev') // 預設使用開發環境配置
     }
     return envFilePath
   }

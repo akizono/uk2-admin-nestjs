@@ -11,33 +11,33 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/')
-  @ResponseMessage('获取用户列表成功')
+  @ResponseMessage('獲取用戶列表成功')
   findAll() {
     return this.userService.findAll()
   }
 
   @Get('/id/:id')
-  @ResponseMessage('获取用户详情成功')
+  @ResponseMessage('獲取用戶詳情成功')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const user = await this.userService.findOneById(id)
     return user
   }
 
   @Get('/username/:username')
-  @ResponseMessage('获取用户详情成功')
+  @ResponseMessage('獲取用戶詳情成功')
   async findOneByUsername(@Param('username') username: string) {
     const user = await this.userService.findOneByUsername(username)
     return user
   }
 
   @Post('/create')
-  @ResponseMessage('创建用户成功')
+  @ResponseMessage('創建用戶成功')
   createOne(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto)
   }
 
   @Put('/update')
-  @ResponseMessage('更新用户成功')
+  @ResponseMessage('更新用戶成功')
   updateOne(@Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(updateUserDto)
   }

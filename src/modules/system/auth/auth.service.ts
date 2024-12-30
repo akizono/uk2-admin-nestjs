@@ -16,7 +16,6 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // 驗證密碼
   async validateUser(username: string, password: string): Promise<UserWithPassword | null> {
     const { user } = await this.userService.findOneByUsername(username, true)
     const { hashedPassword } = encryptPassword(password, user.salt)
@@ -27,13 +26,19 @@ export class AuthService {
     }
   }
 
-  // 產生 token
-  async generateToken(user: UserWithPassword, type: 'access' | 'refresh') {
+  async validateToken(token: string) {
+    try {
+      return this.jwtService.verify(token)
+    } catch {
+      return null
+    }
+  }
+
+  async generateToken(userId: number, type: 'access' | 'refresh') {
     const payload = {
-      sub: user.id,
+      sub: userId,
       type,
       jti: uuidv4(),
-      iat: Math.floor(Date.now() / 1000),
     }
 
     let expiresIn: string | number
@@ -43,6 +48,7 @@ export class AuthService {
     return this.jwtService.signAsync(payload, { expiresIn })
   }
 
+  // 登入
   async login(loginDto: LoginDto) {
     const user = await this.validateUser(loginDto.username, loginDto.password)
     if (!user) throw new UnauthorizedException('密碼錯誤')
@@ -50,9 +56,31 @@ export class AuthService {
     return {
       user,
       token: {
-        accessToken: await this.generateToken(user, 'access'),
-        refreshToken: await this.generateToken(user, 'refresh'),
+        accessToken: await this.generateToken(user.id, 'access'),
+        refreshToken: await this.generateToken(user.id, 'refresh'),
       },
+    }
+  }
+
+  // 刷新 Token
+  async refreshToken(accessToken: string, refreshToken: string) {
+    // 驗證 token 的有效性
+    const accessPayload = await this.validateToken(accessToken)
+    const refreshPayload = await this.validateToken(refreshToken)
+
+    if (!accessPayload || accessPayload.type !== 'access') throw new UnauthorizedException('權限校驗未通過')
+    if (!refreshPayload || refreshPayload.type !== 'refresh') throw new UnauthorizedException('權限校驗未通過')
+
+    if (accessPayload.sub !== refreshPayload.sub) throw new UnauthorizedException('權限校驗未通過')
+
+    // 如果 accessToken 的有效期不足30分鐘，則生成新的 accessToken，否則返回原 accessToken。
+    const generateIfExpired = async (payload: any, token: string) => {
+      return payload.iat + 30 * 60 < Date.now() / 1000 ? await this.generateToken(payload.sub, payload.type) : token
+    }
+
+    return {
+      accessToken: await generateIfExpired(accessPayload, accessToken),
+      refreshToken: await generateIfExpired(refreshPayload, refreshToken),
     }
   }
 }
