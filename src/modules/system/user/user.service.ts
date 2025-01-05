@@ -35,26 +35,26 @@ export class UserService {
       select: this.select,
     })
 
-    return users.map(user => ({ user: user }))
+    return users.map(user => ({ userInfo: user }))
   }
 
   // 根據id查詢單一用戶
   async findOneById(id: number) {
-    const user = await this.userRepository.findOne({
+    const userInfo = await this.userRepository.findOne({
       select: this.select,
       where: { id },
     })
 
-    if (!user) throw new NotFoundException('用戶不存在')
+    if (!userInfo) throw new NotFoundException('用戶不存在')
 
     return {
-      user,
+      userInfo,
     }
   }
 
   // 根據username查詢單一用戶
   async findOneByUsername(username: string, isShowPassword = false) {
-    const user = await this.userRepository.findOne({
+    const userInfo = await this.userRepository.findOne({
       select: {
         password: isShowPassword,
         salt: isShowPassword,
@@ -63,10 +63,10 @@ export class UserService {
       where: { username },
     })
 
-    if (!user) throw new NotFoundException('用戶不存在')
+    if (!userInfo) throw new NotFoundException('用戶不存在')
 
     return {
-      user,
+      userInfo,
     }
   }
 

@@ -17,10 +17,10 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, password: string): Promise<UserWithPassword | null> {
-    const { user } = await this.userService.findOneByUsername(username, true)
-    const { hashedPassword } = encryptPassword(password, user.salt)
-    if (user.password === hashedPassword) {
-      return user
+    const { userInfo } = await this.userService.findOneByUsername(username, true)
+    const { hashedPassword } = encryptPassword(password, userInfo.salt)
+    if (userInfo.password === hashedPassword) {
+      return userInfo
     } else {
       return null
     }
@@ -50,14 +50,14 @@ export class AuthService {
 
   // 登入
   async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto.username, loginDto.password)
-    if (!user) throw new UnauthorizedException('密碼錯誤')
+    const userInfo = await this.validateUser(loginDto.username, loginDto.password)
+    if (!userInfo) throw new UnauthorizedException('密碼錯誤')
 
     return {
-      user,
+      userInfo,
       token: {
-        accessToken: await this.generateToken(user.id, 'access'),
-        refreshToken: await this.generateToken(user.id, 'refresh'),
+        accessToken: await this.generateToken(userInfo.id, 'access'),
+        refreshToken: await this.generateToken(userInfo.id, 'refresh'),
       },
     }
   }
