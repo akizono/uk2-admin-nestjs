@@ -31,11 +31,13 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, password: string): Promise<UserWithPassword | null> {
+  async validateUser(username: string, inputPassword: string): Promise<UserWithPassword | null> {
     const { userInfo } = await this.userService.findOneByUsername(username, true)
-    const { hashedPassword } = encryptPassword(password, userInfo.salt)
+    const { hashedPassword } = encryptPassword(inputPassword, userInfo.salt)
     if (userInfo.password === hashedPassword) {
-      return userInfo
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, salt, ...userInfoFilter } = userInfo
+      return userInfoFilter
     } else {
       return null
     }
