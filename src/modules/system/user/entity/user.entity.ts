@@ -3,7 +3,7 @@ import { Entity, Column, Unique, PrimaryGeneratedColumn } from 'typeorm'
 @Entity('system_user')
 export class UserEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
-  id: number
+  id: string
 
   @Unique(['username'])
   @Column({ length: 55, comment: '帳號' })
@@ -17,6 +17,9 @@ export class UserEntity {
 
   @Column({ length: 55, nullable: true, comment: '暱稱' })
   nickname: string
+
+  @Column({ type: 'tinyint', nullable: true, comment: '年齡' })
+  age: number
 
   @Column({ length: 255, nullable: true, comment: '備註' })
   remark: string

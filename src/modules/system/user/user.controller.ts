@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Get, Post, Put, ParseIntPipe, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Delete, Param, Get, Post, Put, UseInterceptors } from '@nestjs/common'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { TransformInterceptor } from '../../../common/interceptors/transform.interceptor'
@@ -18,7 +18,7 @@ export class UserController {
 
   @Get('/id/:id')
   @ResponseMessage('獲取用戶詳情成功')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id') id: string) {
     const user = await this.userService.findOneById(id)
     return user
   }
@@ -38,13 +38,13 @@ export class UserController {
 
   @Put('/update')
   @ResponseMessage('更新用戶成功')
-  updateOne(@Body() updateUserDto: UpdateUserDto) {
+  update(@Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(updateUserDto)
   }
 
   @Delete('/delete/:id')
   @ResponseMessage('刪除用戶成功')
-  deleteOne(@Param('id', ParseIntPipe) id: number) {
+  delete(@Param('id') id: string) {
     return this.userService.delete(id)
   }
 }

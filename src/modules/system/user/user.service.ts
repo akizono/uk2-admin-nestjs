@@ -39,7 +39,7 @@ export class UserService {
   }
 
   // 根據id查詢單一用戶
-  async findOneById(id: number) {
+  async findOneById(id: string) {
     const userInfo = await this.userRepository.findOne({
       select: this.select,
       where: { id },
@@ -104,7 +104,7 @@ export class UserService {
   }
 
   // 刪除用戶
-  async delete(id: number) {
+  async delete(id: string) {
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('用戶不存在')
 
