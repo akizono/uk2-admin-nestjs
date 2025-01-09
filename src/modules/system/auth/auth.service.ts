@@ -9,6 +9,21 @@ import { UserEntity } from '../user/entity/user.entity'
 
 type UserWithPassword = Partial<Pick<UserEntity, 'password' | 'salt'>> & Omit<UserEntity, 'password' | 'salt'>
 
+interface Payload {
+  sub: string
+  type: 'access' | 'refresh'
+  jti: string
+  iat: number
+  exp: number
+}
+
+export interface JwtRequest extends Request {
+  accessPayload?: Payload
+  refreshPayload?: Payload
+  accessToken?: string
+  refreshToken?: string
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -26,15 +41,7 @@ export class AuthService {
     }
   }
 
-  async validateToken(token: string) {
-    try {
-      return this.jwtService.verify(token)
-    } catch {
-      return null
-    }
-  }
-
-  async generateToken(userId: number, type: 'access' | 'refresh') {
+  async generateToken(userId: string, type: 'access' | 'refresh') {
     const payload = {
       sub: userId,
       type,
@@ -63,18 +70,11 @@ export class AuthService {
   }
 
   // 刷新 Token
-  async refreshToken(accessToken: string, refreshToken: string) {
-    // 驗證 token 的有效性
-    const accessPayload = await this.validateToken(accessToken)
-    const refreshPayload = await this.validateToken(refreshToken)
+  async refreshTokenMethod(request: JwtRequest) {
+    const { accessPayload, refreshPayload, accessToken, refreshToken } = request
 
-    if (!accessPayload || accessPayload.type !== 'access') throw new UnauthorizedException('權限校驗未通過')
-    if (!refreshPayload || refreshPayload.type !== 'refresh') throw new UnauthorizedException('權限校驗未通過')
-
-    if (accessPayload.sub !== refreshPayload.sub) throw new UnauthorizedException('權限校驗未通過')
-
-    // 如果 accessToken 的有效期不足30分鐘，則生成新的 accessToken，否則返回原 accessToken。
-    const generateIfExpired = async (payload: any, token: string) => {
+    // 檢查 Token 的剩餘有效期，如果小於 30 分鐘則重新生成，否則保持原有 Token
+    const generateIfExpired = async (payload: Payload, token: string) => {
       return payload.iat + 30 * 60 < Date.now() / 1000 ? await this.generateToken(payload.sub, payload.type) : token
     }
 

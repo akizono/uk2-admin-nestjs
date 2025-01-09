@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseInterceptors, Headers } from '@nestjs/common'
+import { Body, Controller, Post, UseInterceptors, Req } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { Public, ResponseMessage } from '@/common/decorators/'
@@ -16,12 +16,9 @@ export class AuthController {
     return await this.authService.login(loginDto)
   }
 
-  @Post('/refresh')
-  @ResponseMessage('刷新成功')
-  async refreshToken(@Headers() headers: Record<string, string>) {
-    const accessToken = headers['authorization']?.replace('Bearer ', '')
-    const refreshToken = headers['refresh-token']?.replace('Bearer ', '')
-
-    return await this.authService.refreshToken(accessToken, refreshToken)
+  @Post('/refreshTokenMethod') // 注意：此端點路徑與 auth.guard.ts:validateRefreshToken() 存在耦合關係
+  @ResponseMessage('成功刷新Token')
+  async refreshTokenMethod(@Req() request) {
+    return await this.authService.refreshTokenMethod(request)
   }
 }
