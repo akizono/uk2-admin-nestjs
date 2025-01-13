@@ -1,0 +1,58 @@
+import { Entity, Column, PrimaryColumn } from 'typeorm'
+
+@Entity('system_token_blacklist')
+export class TokenBlacklistEntity {
+  @PrimaryColumn({
+    name: 'jwt_id',
+    type: 'varchar',
+    length: 36,
+    comment: 'JWT唯一標識符',
+  })
+  jwtId: string
+
+  @Column({
+    name: 'user_id',
+    type: 'bigint',
+    comment: '用戶ID',
+  })
+  userId: string
+
+  @Column({
+    name: 'type',
+    type: 'varchar',
+    length: 7,
+    comment: '類型',
+  })
+  type: string
+
+  @Column({
+    name: 'expired_at',
+    type: 'datetime',
+    comment: '過期時間',
+  })
+  expiredAt: Date
+
+  @Column({
+    name: 'issued_at',
+    type: 'datetime',
+    comment: '發行時間',
+  })
+  issuedAt: Date
+
+  @Column({
+    name: 'create_time',
+    type: 'datetime',
+    default: () => 'CURRENT_TIMESTAMP',
+    comment: '創建時間',
+  })
+  createTime: Date
+
+  @Column({
+    name: 'update_time',
+    type: 'datetime',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+    comment: '更新時間',
+  })
+  updateTime: Date
+}

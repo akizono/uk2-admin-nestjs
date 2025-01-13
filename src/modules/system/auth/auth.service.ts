@@ -1,34 +1,19 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { UserService } from '../user/user.service'
+import { TokenBlacklistService } from '../token-blacklist/token-blacklist.service'
 import { LoginDto } from './dto/login.dto'
 import { encryptPassword } from '@/utils/crypto'
 import { JwtService } from '@nestjs/jwt'
 import { EnvHelper } from '@/utils/env-helper'
 import { v4 as uuidv4 } from 'uuid'
-import { UserEntity } from '../user/entity/user.entity'
-
-type UserWithPassword = Partial<Pick<UserEntity, 'password' | 'salt'>> & Omit<UserEntity, 'password' | 'salt'>
-
-interface Payload {
-  sub: string
-  type: 'access' | 'refresh'
-  jti: string
-  iat: number
-  exp: number
-}
-
-export interface JwtRequest extends Request {
-  accessPayload?: Payload
-  refreshPayload?: Payload
-  accessToken?: string
-  refreshToken?: string
-}
+import { JwtRequest, UserWithPassword, Payload } from './types'
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly tokenBlacklistService: TokenBlacklistService,
   ) {}
 
   async validateUser(username: string, inputPassword: string): Promise<UserWithPassword | null> {
@@ -50,11 +35,13 @@ export class AuthService {
       jti: uuidv4(),
     }
 
-    let expiresIn: string | number
+    // 設定 Token 過期時間
+    let expiresIn: number
     if (type === 'access') expiresIn = eval(EnvHelper.getString('JWT_ACCESS_TOKEN_EXPIRES_IN'))
     if (type === 'refresh') expiresIn = eval(EnvHelper.getString('JWT_REFRESH_TOKEN_EXPIRES_IN'))
 
-    return this.jwtService.signAsync(payload, { expiresIn })
+    // 返回Token
+    return await this.jwtService.signAsync(payload, { expiresIn })
   }
 
   // 登入
@@ -75,14 +62,22 @@ export class AuthService {
   async refreshTokenMethod(request: JwtRequest) {
     const { accessPayload, refreshPayload, accessToken, refreshToken } = request
 
-    // 檢查 Token 的剩餘有效期，如果小於 30 分鐘則重新生成，否則保持原有 Token
-    const generateIfExpired = async (payload: Payload, token: string) => {
-      return payload.iat + 30 * 60 < Date.now() / 1000 ? await this.generateToken(payload.sub, payload.type) : token
+    // 如果過期則更新 Token 否則返回原 Token
+    const renewTokenIfExpiringSoon = async (payload: Payload, token: string) => {
+      // 計算當前時間到過期時間的剩餘秒數
+      const timeUntilExpiry = payload.exp - Math.floor(Date.now() / 1000)
+
+      // 如果剩餘時間小於 1800秒
+      if (timeUntilExpiry < 1800) {
+        if (timeUntilExpiry > 0) await this.tokenBlacklistService.create(payload) // 將未過期的 Token 加入黑名單
+        return await this.generateToken(payload.sub, payload.type) // 返回新的 Token
+      }
+      return token
     }
 
     return {
-      accessToken: await generateIfExpired(accessPayload, accessToken),
-      refreshToken: await generateIfExpired(refreshPayload, refreshToken),
+      accessToken: await renewTokenIfExpiringSoon(accessPayload, accessToken),
+      refreshToken: await renewTokenIfExpiringSoon(refreshPayload, refreshToken),
     }
   }
 }

@@ -1,9 +1,9 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { IS_PUBLIC_KEY } from '@/common/decorators/'
-import { AuthService } from './auth.service'
 import { JwtService } from '@nestjs/jwt'
-import { JwtRequest } from './auth.service'
+import { JwtRequest } from './types'
+import { TokenBlacklistService } from '@/modules/system/token-blacklist/token-blacklist.service'
 
 function getToken(request, tokenType: 'authorization' | 'refresh-token') {
   const [type, token] = request.headers[tokenType]?.split(' ') ?? []
@@ -15,7 +15,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly reflector: Reflector,
-    private readonly authService: AuthService,
+    private readonly tokenBlacklistService: TokenBlacklistService,
   ) {}
 
   private isPublicRoute(context: ExecutionContext): boolean {
@@ -29,17 +29,23 @@ export class AuthGuard implements CanActivate {
         return false
       }
 
-      // 驗證 refreshToken
+      // 驗證 refreshToken 是否有效
       const refreshToken = getToken(request, 'refresh-token')
       const refreshPayload = await this.jwtService.verifyAsync(refreshToken)
       if (refreshPayload.type !== 'refresh') throw new UnauthorizedException()
 
-      // 解碼並驗證 accessToken
+      // 驗證 refreshToken 是否在黑名單中
+      const isRefreshTokenBlacklisted = await this.tokenBlacklistService.findByJwtId(refreshPayload.jti)
+      if (isRefreshTokenBlacklisted) throw new UnauthorizedException()
+
+      // 解碼並驗證 accessToken 是否有效
       const accessToken = getToken(request, 'authorization')
       const accessPayload = this.jwtService.decode(accessToken)
-      if (!accessPayload?.type || accessPayload.type !== 'access') {
-        throw new UnauthorizedException()
-      }
+      if (!accessPayload?.type || accessPayload.type !== 'access') throw new UnauthorizedException()
+
+      // 驗證 accessToken 是否在黑名單中
+      const isAccessTokenBlacklisted = await this.tokenBlacklistService.findByJwtId(accessPayload.jti)
+      if (isAccessTokenBlacklisted) throw new UnauthorizedException()
 
       // 驗證兩個令牌的sub'是否相同
       if (accessPayload.sub !== refreshPayload.sub) throw new UnauthorizedException()
@@ -60,7 +66,14 @@ export class AuthGuard implements CanActivate {
 
   private async validateAccessToken(request: Request): Promise<boolean> {
     try {
+      // 驗證 accessToken 是否有效
       const accessPayload = await this.jwtService.verifyAsync(getToken(request, 'authorization') ?? '')
+
+      // 驗證 accessToken 是否在黑名單中
+      const isAccessTokenBlacklisted = await this.tokenBlacklistService.findByJwtId(accessPayload.jti)
+      if (isAccessTokenBlacklisted) throw new UnauthorizedException()
+
+      // 將驗證後的資料附加到 request 上
       request['user'] = accessPayload
       return true
     } catch {
@@ -82,7 +95,7 @@ export class AuthGuard implements CanActivate {
         return true
       }
 
-      // 判斷是否是刷新 token 的介面
+      // 判斷是否是刷新 token 的介面，如果是則驗證 refreshToken 和 accessToken
       if (await this.validateRefreshToken(request)) {
         return true
       }
