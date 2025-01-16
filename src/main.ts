@@ -1,5 +1,7 @@
 import { ValidationPipe, PayloadTooLargeException } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import * as express from 'express'
+
 import { AppModule } from './app.module'
 import { EnvHelper } from './utils/env-helper'
 import { HttpExceptionFilter } from '@/common/filters/http-exception.filter'
@@ -50,7 +52,19 @@ async function bootstrap() {
     next()
   })
 
-  // 跨源资源共享
+  // 加入全局驗證管道
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // 移除未定義在 DTO 中的屬性
+      transform: true, // 自動轉換輸入資料型別
+      forbidNonWhitelisted: true, // 當收到未定義的屬性時拋出錯誤
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    }),
+  )
+
+  // 跨源資源共享
   app.enableCors({
     origin: EnvHelper.getString('CORS_ORIGIN'),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

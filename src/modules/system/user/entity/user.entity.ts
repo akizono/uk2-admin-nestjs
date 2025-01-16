@@ -1,12 +1,11 @@
-import { Entity, Column, Unique, PrimaryGeneratedColumn } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('system_user')
 export class UserEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: string
 
-  @Unique(['username'])
-  @Column({ length: 55, comment: '帳號' })
+  @Column({ length: 55, unique: true, comment: '帳號' })
   username: string
 
   @Column({ length: 64, comment: '密碼' })
