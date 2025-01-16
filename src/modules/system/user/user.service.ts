@@ -74,7 +74,7 @@ export class UserService {
 
   // 創建用戶
   async create(createUserDto: CreateUserDto) {
-    const { username, password, ...rest } = createUserDto
+    const { username, password, ...remain } = createUserDto
 
     const existUser = await this.userRepository.findOne({ where: { username } })
     if (existUser) throw new ConflictException('用戶已存在')
@@ -82,7 +82,7 @@ export class UserService {
     const { hashedPassword, salt } = encryptPassword(password)
 
     const newUser = this.userRepository.create({
-      ...rest,
+      ...remain,
       username,
       password: hashedPassword,
       salt,
@@ -92,17 +92,20 @@ export class UserService {
 
   // 更新用戶
   async update(updateUserDto: UpdateUserDto) {
-    const { id, ...rest } = updateUserDto
+    const { id, ...remain } = updateUserDto
 
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('用戶不存在')
 
-    if (rest.password) {
-      const { hashedPassword, salt } = encryptPassword(rest.password)
-      rest.password = hashedPassword
-      rest.salt = salt
+    // 將 remain 轉換為 Partial<UserEntity> 型別
+    const updateData: Partial<UserEntity> = { ...remain }
+    if (updateData.password) {
+      const { hashedPassword, salt } = encryptPassword(updateData.password)
+      updateData.password = hashedPassword
+      updateData.salt = salt
     }
-    await this.userRepository.update(id, rest)
+
+    await this.userRepository.update(id, updateData)
   }
 
   // 刪除用戶
