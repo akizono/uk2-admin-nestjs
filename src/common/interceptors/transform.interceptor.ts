@@ -2,7 +2,7 @@ import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nes
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { Reflector } from '@nestjs/core'
-import { RESPONSE_MESSAGE } from '../decorators/'
+import { RESPONSE_MESSAGE } from '@/common/decorators/response-message.decorator'
 
 export interface Response<T> {
   data: T

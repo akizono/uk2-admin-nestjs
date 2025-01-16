@@ -1,8 +1,9 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { IS_PUBLIC_KEY } from '@/common/decorators/'
 import { JwtService } from '@nestjs/jwt'
+
 import { JwtRequest } from './types'
+import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator'
 import { TokenBlacklistService } from '@/modules/system/token-blacklist/token-blacklist.service'
 
 function getToken(request, tokenType: 'authorization' | 'refresh-token') {

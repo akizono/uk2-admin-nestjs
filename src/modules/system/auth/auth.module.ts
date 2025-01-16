@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common'
-import { AuthController } from './auth.controller'
-import { AuthService } from './auth.service'
-import { APP_GUARD } from '@nestjs/core'
 import { JwtModule } from '@nestjs/jwt'
+
+import { APP_GUARD } from '@nestjs/core'
 import { EnvHelper } from '@/utils/env-helper'
 
-import { AuthGuard } from './auth.guard'
 import { UserModule } from '@/modules/system/user/user.module'
 import { TokenBlacklistModule } from '@/modules/system/token-blacklist/token-blacklist.module'
+import { AuthGuard } from './auth.guard'
+import { AuthController } from './auth.controller'
+import { AuthService } from './auth.service'
 
 @Module({
   imports: [

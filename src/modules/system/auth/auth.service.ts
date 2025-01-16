@@ -1,12 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { UserService } from '../user/user.service'
-import { TokenBlacklistService } from '../token-blacklist/token-blacklist.service'
-import { LoginDto } from './dto/login.dto'
-import { encryptPassword } from '@/utils/crypto'
 import { JwtService } from '@nestjs/jwt'
-import { EnvHelper } from '@/utils/env-helper'
+
 import { v4 as uuidv4 } from 'uuid'
+import { encryptPassword } from '@/utils/crypto'
+import { EnvHelper } from '@/utils/env-helper'
+
+import { LoginDto } from './dto/login.dto'
 import { JwtRequest, UserWithPassword, Payload } from './types'
+import { UserService } from '@/modules/system/user/user.service'
+import { TokenBlacklistService } from '@/modules/system/token-blacklist/token-blacklist.service'
 
 @Injectable()
 export class AuthService {
