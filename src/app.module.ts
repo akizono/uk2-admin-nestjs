@@ -8,6 +8,7 @@ import { EnvHelper } from './utils/env-helper'
 import { UserModule } from './modules/system/user/user.module'
 import { AuthModule } from './modules/system/auth/auth.module'
 import { TokenBlacklistModule } from './modules/system/token-blacklist/token-blacklist.module'
+import { RoleModule } from './modules/system/role/role.module'
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { TokenBlacklistModule } from './modules/system/token-blacklist/token-bla
     UserModule,
     AuthModule,
     TokenBlacklistModule,
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
