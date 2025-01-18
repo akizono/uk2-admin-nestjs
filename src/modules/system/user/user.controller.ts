@@ -31,7 +31,7 @@ export class UserController {
   }
 
   @Post('/create')
-  @ResponseMessage('創建用戶成功')
+  @ResponseMessage('建立用戶成功')
   createOne(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto)
   }

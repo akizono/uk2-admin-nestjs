@@ -18,7 +18,6 @@ export class TokenBlacklistEntity {
   userId: string
 
   @Column({
-    name: 'type',
     type: 'varchar',
     length: 7,
     comment: '類型',
@@ -40,19 +39,16 @@ export class TokenBlacklistEntity {
   issuedAt: Date
 
   @Column({
+    type: 'bigint',
+    comment: '建立人',
+  })
+  creator: string
+
+  @Column({
     name: 'create_time',
     type: 'datetime',
     default: () => 'CURRENT_TIMESTAMP',
-    comment: '創建時間',
+    comment: '建立時間',
   })
   createTime: Date
-
-  @Column({
-    name: 'update_time',
-    type: 'datetime',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
-    comment: '更新時間',
-  })
-  updateTime: Date
 }

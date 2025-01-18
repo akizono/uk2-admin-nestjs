@@ -5,6 +5,7 @@ import * as express from 'express'
 import { AppModule } from './app.module'
 import { EnvHelper } from './utils/env-helper'
 import { HttpExceptionFilter } from '@/common/filters/http-exception.filter'
+import { requestContext } from './utils/request-context'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -69,6 +70,13 @@ async function bootstrap() {
     origin: EnvHelper.getString('CORS_ORIGIN'),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: EnvHelper.getBoolean('CORS_CREDENTIALS'),
+  })
+
+  // 將上下文注入到請求中
+  app.use((req: Request, res: Response, next) => {
+    requestContext.run({ request: req }, () => {
+      next()
+    })
   })
 
   await app.listen(EnvHelper.getNumber('SERVER_PORT'))

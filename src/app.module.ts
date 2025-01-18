@@ -9,6 +9,7 @@ import { UserModule } from './modules/system/user/user.module'
 import { AuthModule } from './modules/system/auth/auth.module'
 import { TokenBlacklistModule } from './modules/system/token-blacklist/token-blacklist.module'
 import { RoleModule } from './modules/system/role/role.module'
+import { GlobalSubscriber } from './common/subscribers/global.subscriber'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RoleModule } from './modules/system/role/role.module'
       envFilePath: EnvHelper.getEnvFilePath(),
       isGlobal: true,
     }),
+
     /* 資料庫連結 */
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
@@ -38,7 +40,9 @@ import { RoleModule } from './modules/system/role/role.module'
     TokenBlacklistModule,
     RoleModule,
   ],
+
   controllers: [AppController],
-  providers: [AppService],
+
+  providers: [AppService, GlobalSubscriber],
 })
 export class AppModule {}

@@ -12,7 +12,7 @@ export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
   @Post('/create')
-  @ResponseMessage('創建角色成功')
+  @ResponseMessage('建立角色成功')
   create(@Body() createRoleDto: CreateRoleDto) {
     return this.roleService.create(createRoleDto)
   }

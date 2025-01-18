@@ -72,7 +72,7 @@ export class UserService {
     }
   }
 
-  // 創建用戶
+  // 建立用戶
   async create(createUserDto: CreateUserDto) {
     const { username, password, ...remain } = createUserDto
 
