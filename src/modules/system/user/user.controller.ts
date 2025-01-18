@@ -12,7 +12,13 @@ import { UpdateUserDto } from './dto/update-user.dto'
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('/')
+  @Post('/create')
+  @ResponseMessage('建立用戶成功')
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto)
+  }
+
+  @Get()
   @ResponseMessage('獲取用戶列表成功')
   findAll() {
     return this.userService.findAll()
@@ -20,7 +26,7 @@ export class UserController {
 
   @Get('/id/:id')
   @ResponseMessage('獲取用戶詳情成功')
-  async findOne(@Param('id') id: string) {
+  async findOneById(@Param('id') id: string) {
     return await this.userService.findOneById(id)
   }
 
@@ -28,12 +34,6 @@ export class UserController {
   @ResponseMessage('獲取用戶詳情成功')
   async findOneByUsername(@Param('username') username: string) {
     return await this.userService.findOneByUsername(username)
-  }
-
-  @Post('/create')
-  @ResponseMessage('建立用戶成功')
-  createOne(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto)
   }
 
   @Put('/update')

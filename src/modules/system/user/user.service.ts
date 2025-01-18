@@ -31,6 +31,24 @@ export class UserService {
     updateTime: true,
   } as const
 
+  // 建立用戶
+  async create(createUserDto: CreateUserDto) {
+    const { username, password, ...remain } = createUserDto
+
+    const existUser = await this.userRepository.findOne({ where: { username } })
+    if (existUser) throw new ConflictException('用戶已存在')
+
+    const { hashedPassword, salt } = encryptPassword(password)
+
+    const newUser = this.userRepository.create({
+      ...remain,
+      username,
+      password: hashedPassword,
+      salt,
+    })
+    await this.userRepository.save(newUser)
+  }
+
   // 查詢所有用戶
   async findAll() {
     const users = await this.userRepository.find({
@@ -70,24 +88,6 @@ export class UserService {
     return {
       userInfo,
     }
-  }
-
-  // 建立用戶
-  async create(createUserDto: CreateUserDto) {
-    const { username, password, ...remain } = createUserDto
-
-    const existUser = await this.userRepository.findOne({ where: { username } })
-    if (existUser) throw new ConflictException('用戶已存在')
-
-    const { hashedPassword, salt } = encryptPassword(password)
-
-    const newUser = this.userRepository.create({
-      ...remain,
-      username,
-      password: hashedPassword,
-      salt,
-    })
-    await this.userRepository.save(newUser)
   }
 
   // 更新用戶
