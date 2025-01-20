@@ -3,10 +3,10 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 @Entity('system_role')
 export class RoleEntity {
   @PrimaryGeneratedColumn({
-    type: 'int',
+    type: 'bigint',
     comment: '主鍵ID',
   })
-  id: number
+  id: string
 
   @Column({
     length: 50,
