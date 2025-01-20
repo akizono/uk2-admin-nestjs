@@ -10,6 +10,7 @@ import { AuthModule } from './modules/system/auth/auth.module'
 import { TokenBlacklistModule } from './modules/system/token-blacklist/token-blacklist.module'
 import { RoleModule } from './modules/system/role/role.module'
 import { GlobalSubscriber } from './common/subscribers/global.subscriber'
+import { UserRoleModule } from './modules/system/user-role/user-role.module'
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { GlobalSubscriber } from './common/subscribers/global.subscriber'
     AuthModule,
     TokenBlacklistModule,
     RoleModule,
+    UserRoleModule,
   ],
 
   controllers: [AppController],

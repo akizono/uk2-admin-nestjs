@@ -53,9 +53,20 @@ export class UserService {
   async findAll() {
     const users = await this.userRepository.find({
       select: this.select,
+      relations: {
+        userRoles: {
+          role: true,
+        },
+      },
     })
 
-    return users.map(user => ({ userInfo: user }))
+    return users.map(user => {
+      const { userRoles, ...remain } = user
+      return {
+        userInfo: remain,
+        role: userRoles?.map(item => item.role.code),
+      }
+    })
   }
 
   // 根據id查詢單一使用者
@@ -63,12 +74,19 @@ export class UserService {
     const userInfo = await this.userRepository.findOne({
       select: this.select,
       where: { id },
+      relations: {
+        userRoles: {
+          role: true,
+        },
+      },
     })
 
     if (!userInfo) throw new NotFoundException('使用者不存在')
 
+    const { userRoles, ...remain } = userInfo
     return {
-      userInfo,
+      userInfo: remain,
+      role: userRoles?.map(item => item.role.code),
     }
   }
 
@@ -81,12 +99,19 @@ export class UserService {
         ...this.select,
       },
       where: { username },
+      relations: {
+        userRoles: {
+          role: true,
+        },
+      },
     })
 
     if (!userInfo) throw new NotFoundException('使用者不存在')
 
+    const { userRoles, ...remain } = userInfo
     return {
-      userInfo,
+      userInfo: remain,
+      role: userRoles?.map(item => item.role.code),
     }
   }
 

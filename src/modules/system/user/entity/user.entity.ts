@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
+import { UserRoleEntity } from '@/modules/system/user-role/entity/user-role.entity'
 
 @Entity('system_user')
 export class UserEntity {
@@ -121,4 +122,7 @@ export class UserEntity {
     comment: '更新時間',
   })
   updateTime: Date
+
+  @OneToMany(() => UserRoleEntity, userRole => userRole.user)
+  userRoles: UserRoleEntity[]
 }

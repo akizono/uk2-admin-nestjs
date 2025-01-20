@@ -6,7 +6,7 @@ import { encryptPassword } from '@/utils/crypto'
 import { EnvHelper } from '@/utils/env-helper'
 
 import { LoginDto } from './dto/login.dto'
-import { JwtRequest, UserWithPassword, Payload } from './types'
+import { JwtRequest, AuthenticatedUser, Payload } from './types'
 import { UserService } from '@/modules/system/user/user.service'
 import { TokenBlacklistService } from '@/modules/system/token-blacklist/token-blacklist.service'
 
@@ -18,13 +18,16 @@ export class AuthService {
     private readonly tokenBlacklistService: TokenBlacklistService,
   ) {}
 
-  async validateUser(username: string, inputPassword: string): Promise<UserWithPassword | null> {
-    const { userInfo } = await this.userService.findOneByUsername(username, true)
+  async validateUser(username: string, inputPassword: string): Promise<AuthenticatedUser | null> {
+    const { userInfo, role } = await this.userService.findOneByUsername(username, true)
     const { hashedPassword } = encryptPassword(inputPassword, userInfo.salt)
     if (userInfo.password === hashedPassword) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, salt, ...userInfoFilter } = userInfo
-      return userInfoFilter
+      return {
+        userInfo: userInfoFilter,
+        role,
+      }
     } else {
       return null
     }
@@ -48,11 +51,12 @@ export class AuthService {
 
   // 登入
   async login(loginDto: LoginDto) {
-    const userInfo = await this.validateUser(loginDto.username, loginDto.password)
+    const { userInfo, role } = await this.validateUser(loginDto.username, loginDto.password)
     if (!userInfo) throw new UnauthorizedException('密碼錯誤')
 
     return {
       userInfo,
+      role,
       token: {
         accessToken: await this.generateToken(userInfo.id, 'access'),
         refreshToken: await this.generateToken(userInfo.id, 'refresh'),
