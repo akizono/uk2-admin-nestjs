@@ -33,23 +33,38 @@ export class AuthGuard implements CanActivate {
       // 驗證 refreshToken 是否有效
       const refreshToken = getToken(request, 'refresh-token')
       const refreshPayload = await this.jwtService.verifyAsync(refreshToken)
-      if (refreshPayload.type !== 'refresh') throw new UnauthorizedException()
+      if (refreshPayload.type !== 'refresh') {
+        console.log('認證失敗：refresh token 類型不正確')
+        throw new UnauthorizedException()
+      }
 
       // 驗證 refreshToken 是否在黑名單中
       const isRefreshTokenBlacklisted = await this.tokenBlacklistService.findByJwtId(refreshPayload.jti)
-      if (isRefreshTokenBlacklisted) throw new UnauthorizedException()
+      if (isRefreshTokenBlacklisted) {
+        console.log('認證失敗：refresh token 已被加入黑名單')
+        throw new UnauthorizedException()
+      }
 
       // 解碼並驗證 accessToken 是否有效
       const accessToken = getToken(request, 'authorization')
       const accessPayload = this.jwtService.decode(accessToken)
-      if (!accessPayload?.type || accessPayload.type !== 'access') throw new UnauthorizedException()
+      if (!accessPayload?.type || accessPayload.type !== 'access') {
+        console.log('認證失敗：access token 類型不正確')
+        throw new UnauthorizedException()
+      }
 
       // 驗證 accessToken 是否在黑名單中
       const isAccessTokenBlacklisted = await this.tokenBlacklistService.findByJwtId(accessPayload.jti)
-      if (isAccessTokenBlacklisted) throw new UnauthorizedException()
+      if (isAccessTokenBlacklisted) {
+        console.log('認證失敗：access token 已被加入黑名單')
+        throw new UnauthorizedException()
+      }
 
       // 驗證兩個令牌的sub'是否相同
-      if (accessPayload.sub !== refreshPayload.sub) throw new UnauthorizedException()
+      if (accessPayload.sub !== refreshPayload.sub) {
+        console.log('認證失敗：access token 與 refresh token 的用戶不匹配')
+        throw new UnauthorizedException()
+      }
 
       // 將驗證後的資料附加到 request 上
       Object.assign(request, {
@@ -60,7 +75,10 @@ export class AuthGuard implements CanActivate {
       })
 
       return true
-    } catch {
+    } catch (error) {
+      if (!(error instanceof UnauthorizedException)) {
+        console.log('認證失敗：refresh token 驗證過程發生未知錯誤')
+      }
       throw new UnauthorizedException()
     }
   }
@@ -72,12 +90,18 @@ export class AuthGuard implements CanActivate {
 
       // 驗證 accessToken 是否在黑名單中
       const isAccessTokenBlacklisted = await this.tokenBlacklistService.findByJwtId(accessPayload.jti)
-      if (isAccessTokenBlacklisted) throw new UnauthorizedException()
+      if (isAccessTokenBlacklisted) {
+        console.log('認證失敗：access token 已被加入黑名單')
+        throw new UnauthorizedException()
+      }
 
       // 將驗證後的資料附加到 request 上
       request['user'] = accessPayload
       return true
-    } catch {
+    } catch (error) {
+      if (!(error instanceof UnauthorizedException)) {
+        console.log('認證失敗：access token 驗證過程發生未知錯誤')
+      }
       throw new UnauthorizedException()
     }
   }
