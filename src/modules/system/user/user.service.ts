@@ -31,12 +31,12 @@ export class UserService {
     updateTime: true,
   } as const
 
-  // 建立用戶
+  // 建立使用者
   async create(createUserDto: CreateUserDto) {
     const { username, password, ...remain } = createUserDto
 
     const existUser = await this.userRepository.findOne({ where: { username } })
-    if (existUser) throw new ConflictException('用戶已存在')
+    if (existUser) throw new ConflictException('使用者已存在')
 
     const { hashedPassword, salt } = encryptPassword(password)
 
@@ -49,7 +49,7 @@ export class UserService {
     await this.userRepository.save(newUser)
   }
 
-  // 查詢所有用戶
+  // 查詢所有使用者
   async findAll() {
     const users = await this.userRepository.find({
       select: this.select,
@@ -58,21 +58,21 @@ export class UserService {
     return users.map(user => ({ userInfo: user }))
   }
 
-  // 根據id查詢單一用戶
+  // 根據id查詢單一使用者
   async findOneById(id: string) {
     const userInfo = await this.userRepository.findOne({
       select: this.select,
       where: { id },
     })
 
-    if (!userInfo) throw new NotFoundException('用戶不存在')
+    if (!userInfo) throw new NotFoundException('使用者不存在')
 
     return {
       userInfo,
     }
   }
 
-  // 根據username查詢單一用戶
+  // 根據username查詢單一使用者
   async findOneByUsername(username: string, isShowPassword = false) {
     const userInfo = await this.userRepository.findOne({
       select: {
@@ -83,19 +83,19 @@ export class UserService {
       where: { username },
     })
 
-    if (!userInfo) throw new NotFoundException('用戶不存在')
+    if (!userInfo) throw new NotFoundException('使用者不存在')
 
     return {
       userInfo,
     }
   }
 
-  // 更新用戶
+  // 更新使用者
   async update(updateUserDto: UpdateUserDto) {
     const { id, ...remain } = updateUserDto
 
     const existUser = await this.userRepository.findOne({ where: { id } })
-    if (!existUser) throw new NotFoundException('用戶不存在')
+    if (!existUser) throw new NotFoundException('使用者不存在')
 
     // 將 remain 轉換為 Partial<UserEntity> 型別
     const updateData: Partial<UserEntity> = { ...remain }
@@ -108,10 +108,10 @@ export class UserService {
     await this.userRepository.update(id, updateData)
   }
 
-  // 刪除用戶
+  // 刪除使用者
   async delete(id: string) {
     const existUser = await this.userRepository.findOne({ where: { id } })
-    if (!existUser) throw new NotFoundException('用戶不存在')
+    if (!existUser) throw new NotFoundException('使用者不存在')
 
     await this.userRepository.update(id, { isDeleted: 1 })
   }

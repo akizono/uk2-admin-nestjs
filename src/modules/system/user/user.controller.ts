@@ -13,37 +13,37 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('/create')
-  @ResponseMessage('建立用戶成功')
+  @ResponseMessage('建立使用者成功')
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto)
   }
 
   @Get()
-  @ResponseMessage('獲取用戶列表成功')
+  @ResponseMessage('獲取使用者列表成功')
   findAll() {
     return this.userService.findAll()
   }
 
   @Get('/id/:id')
-  @ResponseMessage('獲取用戶詳情成功')
+  @ResponseMessage('獲取使用者詳情成功')
   async findOneById(@Param('id') id: string) {
     return await this.userService.findOneById(id)
   }
 
   @Get('/username/:username')
-  @ResponseMessage('獲取用戶詳情成功')
+  @ResponseMessage('獲取使用者詳情成功')
   async findOneByUsername(@Param('username') username: string) {
     return await this.userService.findOneByUsername(username)
   }
 
   @Put('/update')
-  @ResponseMessage('更新用戶成功')
+  @ResponseMessage('更新使用者成功')
   update(@Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(updateUserDto)
   }
 
   @Delete('/delete/:id')
-  @ResponseMessage('刪除用戶成功')
+  @ResponseMessage('刪除使用者成功')
   delete(@Param('id') id: string) {
     return this.userService.delete(id)
   }

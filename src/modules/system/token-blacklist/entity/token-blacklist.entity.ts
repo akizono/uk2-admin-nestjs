@@ -13,7 +13,7 @@ export class TokenBlacklistEntity {
   @Column({
     name: 'user_id',
     type: 'bigint',
-    comment: '用戶ID',
+    comment: '使用者ID',
   })
   userId: string
 
