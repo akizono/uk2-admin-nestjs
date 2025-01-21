@@ -95,6 +95,7 @@ export class UserEntity {
 
   @Column({
     type: 'bigint',
+    nullable: true,
     comment: '建立人',
   })
   creator: string

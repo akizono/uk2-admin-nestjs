@@ -14,9 +14,9 @@ export function encryptPassword(
   algorithm: string = 'sha256',
   encoding: BinaryToTextEncoding = 'hex',
 ) {
-  const hash = createHash(algorithm) // 建立哈希對象
   const saltValue = salt || randomBytes(16).toString('hex') // 鹽值
 
+  const hash = createHash(algorithm) // 建立哈希對象
   hash.update(saltValue + password)
 
   return {
