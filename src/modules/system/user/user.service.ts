@@ -7,6 +7,7 @@ import { encryptPassword } from '@/utils/crypto'
 import { UserEntity } from './entity/user.entity'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { FindUserDto } from './dto/find-user.dto'
 
 @Injectable()
 export class UserService {
@@ -31,7 +32,6 @@ export class UserService {
     updateTime: true,
   } as const
 
-  // 建立使用者
   async create(createUserDto: CreateUserDto) {
     const { username, password, ...remain } = createUserDto
 
@@ -49,73 +49,42 @@ export class UserService {
     await this.userRepository.save(newUser)
   }
 
-  // 查詢所有使用者
-  async findAll() {
-    const users = await this.userRepository.find({
-      select: this.select,
+  async find(findUserDto: FindUserDto, isShowPassword = false) {
+    const { pageSize = 10, currentPage = 1, ...remain } = findUserDto
+
+    const skip = (currentPage - 1) * pageSize
+    const conditions = Object.keys(remain).length > 0 ? remain : undefined
+
+    const [users, total] = await this.userRepository.findAndCount({
+      select: {
+        password: isShowPassword,
+        salt: isShowPassword,
+        ...this.select,
+      },
+      where: conditions,
       relations: {
         userRoles: {
           role: true,
         },
       },
+      skip,
+      take: pageSize,
     })
 
-    return users.map(user => {
+    const list = users.map(user => {
       const { userRoles, ...remain } = user
       return {
         userInfo: remain,
         role: userRoles?.map(item => item.role.code),
       }
     })
-  }
 
-  // 根據id查詢單一使用者
-  async findOneById(id: string) {
-    const userInfo = await this.userRepository.findOne({
-      select: this.select,
-      where: { id },
-      relations: {
-        userRoles: {
-          role: true,
-        },
-      },
-    })
-
-    if (!userInfo) throw new NotFoundException('使用者不存在')
-
-    const { userRoles, ...remain } = userInfo
     return {
-      userInfo: remain,
-      role: userRoles?.map(item => item.role.code),
+      total,
+      list,
     }
   }
 
-  // 根據username查詢單一使用者
-  async findOneByUsername(username: string, isShowPassword = false) {
-    const userInfo = await this.userRepository.findOne({
-      select: {
-        password: isShowPassword,
-        salt: isShowPassword,
-        ...this.select,
-      },
-      where: { username },
-      relations: {
-        userRoles: {
-          role: true,
-        },
-      },
-    })
-
-    if (!userInfo) throw new NotFoundException('使用者不存在')
-
-    const { userRoles, ...remain } = userInfo
-    return {
-      userInfo: remain,
-      role: userRoles?.map(item => item.role.code),
-    }
-  }
-
-  // 更新使用者
   async update(updateUserDto: UpdateUserDto) {
     const { id, ...remain } = updateUserDto
 
@@ -133,7 +102,7 @@ export class UserService {
     await this.userRepository.update(id, updateData)
   }
 
-  // 刪除使用者
+  // 邏輯刪除
   async delete(id: string) {
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')

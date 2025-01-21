@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 
 import { v4 as uuidv4 } from 'uuid'
@@ -19,7 +19,10 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, inputPassword: string): Promise<AuthenticatedUser | null> {
-    const { userInfo, role } = await this.userService.findOneByUsername(username, true)
+    const { list } = await this.userService.find({ username }, true)
+    if (list.length === 0) throw new NotFoundException('使用者名稱或密碼錯誤')
+
+    const { userInfo, role } = list[0]
     const { hashedPassword } = encryptPassword(inputPassword, userInfo.salt)
     if (userInfo.password === hashedPassword) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -49,7 +52,7 @@ export class AuthService {
     return await this.jwtService.signAsync(payload, { expiresIn })
   }
 
-  // 登入
+  /** 登入 */
   async login(loginDto: LoginDto) {
     const { userInfo, role } = await this.validateUser(loginDto.username, loginDto.password)
     if (!userInfo) throw new UnauthorizedException('密碼錯誤')
@@ -64,7 +67,7 @@ export class AuthService {
     }
   }
 
-  // 刷新 Token
+  /** 刷新 Token */
   async refreshTokenMethod(request: JwtRequest) {
     const { accessPayload, refreshPayload, accessToken, refreshToken } = request
 

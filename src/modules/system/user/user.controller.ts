@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Get, Post, Put, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Delete, Param, Get, Post, Put, UseInterceptors, Query } from '@nestjs/common'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
@@ -6,6 +6,7 @@ import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { FindUserDto } from './dto/find-user.dto'
 
 @Controller('/user')
 @UseInterceptors(TransformInterceptor)
@@ -20,20 +21,8 @@ export class UserController {
 
   @Get()
   @ResponseMessage('獲取使用者列表成功')
-  findAll() {
-    return this.userService.findAll()
-  }
-
-  @Get('/id/:id')
-  @ResponseMessage('獲取使用者詳情成功')
-  async findOneById(@Param('id') id: string) {
-    return await this.userService.findOneById(id)
-  }
-
-  @Get('/username/:username')
-  @ResponseMessage('獲取使用者詳情成功')
-  async findOneByUsername(@Param('username') username: string) {
-    return await this.userService.findOneByUsername(username)
+  find(@Query() findUserDto: FindUserDto) {
+    return this.userService.find(findUserDto)
   }
 
   @Put('/update')
