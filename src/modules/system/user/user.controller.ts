@@ -37,4 +37,16 @@ export class UserController {
   delete(@Param('id', ParseBigIntPipe) id: string) {
     return this.userService.delete(id)
   }
+
+  @Put('/block/:id')
+  @ResponseMessage('封鎖使用者成功')
+  block(@Param('id', ParseBigIntPipe) id: string) {
+    return this.userService.block(id)
+  }
+
+  @Put('/unblock/:id')
+  @ResponseMessage('解封使用者成功')
+  unblock(@Param('id', ParseBigIntPipe) id: string) {
+    return this.userService.unblock(id)
+  }
 }

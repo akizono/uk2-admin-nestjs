@@ -109,5 +109,18 @@ export class UserService {
 
     await this.userRepository.update({ id }, { isDeleted: 1 })
   }
+
+  // 封鎖使用者
+  async block(id: string) {
+    const existUser = await this.userRepository.findOne({ where: { id } })
+    if (!existUser) throw new NotFoundException('使用者不存在')
+    await this.userRepository.update({ id }, { status: 0 })
+  }
+
+  // 解封使用者
+  async unblock(id: string) {
+    const existUser = await this.userRepository.findOne({ where: { id } })
+    if (!existUser) throw new NotFoundException('使用者不存在')
+    await this.userRepository.update({ id }, { status: 1 })
   }
 }
