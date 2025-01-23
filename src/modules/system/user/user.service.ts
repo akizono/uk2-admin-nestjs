@@ -99,7 +99,7 @@ export class UserService {
       updateData.salt = salt
     }
 
-    await this.userRepository.update(id, updateData)
+    await this.userRepository.update({ id }, updateData)
   }
 
   // 邏輯刪除
@@ -107,6 +107,7 @@ export class UserService {
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')
 
-    await this.userRepository.update(id, { isDeleted: 1 })
+    await this.userRepository.update({ id }, { isDeleted: 1 })
+  }
   }
 }

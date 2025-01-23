@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Param, Get, Post, Put, UseInterceptors, Query
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
+import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user.dto'
@@ -33,7 +34,7 @@ export class UserController {
 
   @Delete('/delete/:id')
   @ResponseMessage('刪除使用者成功')
-  delete(@Param('id') id: string) {
+  delete(@Param('id', ParseBigIntPipe) id: string) {
     return this.userService.delete(id)
   }
 }

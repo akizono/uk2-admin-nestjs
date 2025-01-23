@@ -1,15 +1,34 @@
-import { PartialType } from '@nestjs/mapped-types'
-import { IsNotEmpty, IsOptional } from 'class-validator'
+import { PartialType } from '@nestjs/swagger'
+import { IsNotEmpty, IsOptional, Max, Min } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
 
 import { CreateRoleDto } from './create-role.dto'
 
+const MAX_PAGE_SIZE = 999999
+const MAX_PAGE_NUMBER = 999999
+
 export class FindRoleDto extends PartialType(CreateRoleDto) {
+  @ApiProperty({
+    description: '分頁大小',
+    example: 10,
+    required: false,
+  })
   @IsNotEmpty()
+  @Min(1, { message: '分頁大小最少需要 1' })
+  @Max(MAX_PAGE_SIZE, { message: `分頁大小最多只能 ${MAX_PAGE_SIZE}` })
   pageSize?: number = 10
 
+  @ApiProperty({
+    description: '分頁頁碼',
+    example: 1,
+    required: false,
+  })
   @IsNotEmpty()
+  @Min(1, { message: '分頁頁碼最少需要 1' })
+  @Max(MAX_PAGE_NUMBER, { message: `分頁頁碼最多只能 ${MAX_PAGE_NUMBER}` })
   currentPage?: number = 1
 
+  @ApiProperty({ description: '角色 ID', required: false })
   @IsOptional()
   id?: string
 }

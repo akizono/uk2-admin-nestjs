@@ -1,6 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
 
 import { JwtRequest } from './types'
 import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator'
@@ -17,6 +18,7 @@ export class AuthGuard implements CanActivate {
     private readonly jwtService: JwtService,
     private readonly reflector: Reflector,
     private readonly tokenBlacklistService: TokenBlacklistService,
+    private readonly configService: ConfigService,
   ) {}
 
   private isPublicRoute(context: ExecutionContext): boolean {
@@ -85,6 +87,13 @@ export class AuthGuard implements CanActivate {
 
   private async validateAccessToken(request: Request): Promise<boolean> {
     try {
+      // 如果是開發環境，且是 Swagger UI 的請求，則不進行驗證
+      const currentEnv = this.configService.get<string>('NODE_ENV')
+      const isSwagger = request.headers['referer']?.indexOf('/api-docs') > -1
+      if (currentEnv === 'dev' && isSwagger) {
+        return true
+      }
+
       // 驗證 accessToken 是否有效
       const accessPayload = await this.jwtService.verifyAsync(getToken(request, 'authorization') ?? '')
 

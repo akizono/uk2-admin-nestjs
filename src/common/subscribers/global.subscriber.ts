@@ -35,7 +35,7 @@ export class GlobalSubscriber implements EntitySubscriberInterface<BaseEntity & 
     const currentUserId = this.getCurrentUserId()
     const metadata = event.metadata
     const hasColumn = metadata.columns.some(column => column.propertyName === columnName)
-    if (hasColumn) {
+    if (hasColumn && currentUserId) {
       event.entity[columnName] = currentUserId
     }
   }

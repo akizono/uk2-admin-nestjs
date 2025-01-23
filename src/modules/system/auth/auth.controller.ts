@@ -6,6 +6,7 @@ import { TransformInterceptor } from '@/common/interceptors/transform.intercepto
 
 import { LoginDto } from './dto/login.dto'
 import { AuthService } from './auth.service'
+import { ApiHeader } from '@nestjs/swagger'
 
 @Controller('/auth')
 @UseInterceptors(TransformInterceptor)
@@ -19,6 +20,8 @@ export class AuthController {
     return await this.authService.login(loginDto)
   }
 
+  @ApiHeader({ name: 'authorization' })
+  @ApiHeader({ name: 'refresh-token' })
   @Post('/refreshTokenMethod') // 注意：此端點路徑與 auth.guard.ts:validateRefreshToken() 存在耦合關係
   @ResponseMessage('成功刷新Token')
   async refreshTokenMethod(@Req() request) {

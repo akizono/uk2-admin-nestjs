@@ -1,6 +1,7 @@
 import { ValidationPipe, PayloadTooLargeException } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import * as express from 'express'
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 
 import { AppModule } from './app.module'
 import { EnvHelper } from './utils/env-helper'
@@ -78,6 +79,15 @@ async function bootstrap() {
       next()
     })
   })
+
+  // Swagger 設定
+  const options = new DocumentBuilder()
+    .setTitle('Cats example')
+    .setDescription('The cats API description')
+    .setVersion('1.0')
+    .build()
+  const document = SwaggerModule.createDocument(app, options)
+  SwaggerModule.setup('api-docs', app, document)
 
   await app.listen(EnvHelper.getNumber('SERVER_PORT'))
 }
