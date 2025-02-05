@@ -16,22 +16,6 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  // 定義共用的 select 欄位
-  private readonly select = {
-    id: true,
-    username: true,
-    nickname: true,
-    remark: true,
-    email: true,
-    mobile: true,
-    sex: true,
-    avatar: true,
-    status: true,
-    isDeleted: true,
-    createTime: true,
-    updateTime: true,
-  } as const
-
   async create(createUserDto: CreateUserDto) {
     const { username, password, ...remain } = createUserDto
 
@@ -47,6 +31,10 @@ export class UserService {
       salt,
     })
     await this.userRepository.save(newUser)
+    return {
+      id: newUser.id,
+      password,
+    }
   }
 
   async find(findUserDto: FindUserDto, isShowPassword = false) {
@@ -59,9 +47,22 @@ export class UserService {
       select: {
         password: isShowPassword,
         salt: isShowPassword,
-        ...this.select,
+
+        id: true,
+        username: true,
+        nickname: true,
+        email: true,
+        mobile: true,
+        age: true,
+        sex: true,
+        avatar: true,
+        remark: true,
+        status: true,
       },
-      where: conditions,
+      where: {
+        isDeleted: 0,
+        ...conditions,
+      },
       relations: {
         userRoles: {
           role: true,

@@ -21,20 +21,20 @@ export class UserEntity {
   @Column({ type: 'tinyint', comment: '年齡', nullable: true })
   age: number
 
-  @Column({ length: 255, comment: '備註', nullable: true })
-  remark: string
+  @Column({ type: 'tinyint', comment: '性別 1:男 2:女', nullable: true })
+  sex: number
 
   @Column({ length: 55, comment: '電子郵件', nullable: true })
   email: string
 
-  @Column({ length: 55, comment: '電話號碼', nullable: true })
+  @Column({ length: 55, comment: '手機號碼', nullable: true })
   mobile: string
-
-  @Column({ type: 'tinyint', comment: '性別 1:男 2:女', nullable: true })
-  sex: number
 
   @Column({ length: 255, comment: '頭像', nullable: true })
   avatar: string
+
+  @Column({ length: 255, comment: '備註', nullable: true })
+  remark: string
 
   @Column({ type: 'tinyint', comment: '狀態 0:禁用 1:啟用', default: 1 })
   status: number

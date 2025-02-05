@@ -1,15 +1,15 @@
 import { PartialType, OmitType } from '@nestjs/swagger'
 import { IsNotEmpty } from 'class-validator'
 import { Transform } from 'class-transformer'
-import { ParseBigIntPipe } from 'src/common/pipes/parse-bigInt-pipe'
-
-import { CreateUserDto } from './create-user.dto'
 import { ApiProperty } from '@nestjs/swagger'
 
-/** 排除 username 和 password 欄位 */
-const UserDtoWithoutCredentials = OmitType(CreateUserDto, ['username', 'password'] as const)
+import { ParseBigIntPipe } from 'src/common/pipes/parse-bigInt-pipe'
+import { BaseUserDto } from './base-user.dto'
 
-export class UpdateUserDto extends PartialType(UserDtoWithoutCredentials) {
+export class UpdateUserDto extends PartialType(
+  // 排除 username 欄位
+  OmitType(BaseUserDto, ['username'] as const),
+) {
   @ApiProperty({ description: '需要更新的使用者 ID' })
   @IsNotEmpty({ message: 'id不能為空' })
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))

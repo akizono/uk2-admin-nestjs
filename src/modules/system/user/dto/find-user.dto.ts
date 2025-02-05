@@ -4,12 +4,12 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
 import { ParseBigIntPipe } from 'src/common/pipes/parse-bigInt-pipe'
 
-import { CreateUserDto } from './create-user.dto'
+import { BaseUserDto } from './base-user.dto'
 
 const MAX_PAGE_SIZE = 999999
 const MAX_PAGE_NUMBER = 999999
 
-export class FindUserDto extends PartialType(CreateUserDto) {
+export class FindUserDto extends PartialType(BaseUserDto) {
   @ApiProperty({
     description: '分頁大小',
     example: 10,
