@@ -18,6 +18,6 @@ export class UserRoleService {
     const userRole = await this.userRoleRepository.findOne({ where: { userId, roleId } })
     if (userRole) throw new ConflictException('使用者已經綁定了該角色')
 
-    return this.userRoleRepository.save(createUserRoleDto)
+    this.userRoleRepository.save(createUserRoleDto)
   }
 }

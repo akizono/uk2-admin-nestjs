@@ -14,7 +14,7 @@ export class ParseBigIntPipe implements PipeTransform {
       if (bigIntValue > this.MAX_ALLOWED) {
         throw new BadRequestException('ID 太大了！最大值為 2^64-1')
       }
-      return bigIntValue
+      return bigIntValue.toString()
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error

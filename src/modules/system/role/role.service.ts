@@ -20,7 +20,17 @@ export class RoleService {
     const conditions = Object.keys(remain).length > 0 ? remain : undefined
 
     const [role, total] = await this.roleRepository.findAndCount({
-      where: conditions,
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        description: true,
+        status: true,
+      },
+      where: {
+        isDeleted: 0,
+        ...conditions,
+      },
       skip,
       take: pageSize,
     })

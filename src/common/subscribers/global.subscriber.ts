@@ -1,5 +1,6 @@
 import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent, BaseEntity } from 'typeorm'
 import { requestContext } from '@/utils/request-context'
+import { ConfigService } from '@nestjs/config'
 
 /** 定義基礎實體介面 */
 interface BaseEntityWithUser {
@@ -10,7 +11,10 @@ interface BaseEntityWithUser {
 /** 全局實體事件訂閱器 */
 @EventSubscriber()
 export class GlobalSubscriber implements EntitySubscriberInterface<BaseEntity & BaseEntityWithUser> {
-  constructor(dataSource: DataSource) {
+  constructor(
+    dataSource: DataSource,
+    private readonly configService: ConfigService,
+  ) {
     dataSource.subscribers.push(this)
   }
 
@@ -23,6 +27,13 @@ export class GlobalSubscriber implements EntitySubscriberInterface<BaseEntity & 
     return request['user']?.sub
   }
 
+  private isSwagger() {
+    const { request } = requestContext.getStore()
+    const currentEnv = this.configService.get<string>('NODE_ENV')
+    const isSwagger = request.headers['referer']?.indexOf('/api-docs') > -1
+    return currentEnv === 'dev' && isSwagger
+  }
+
   /**
    * 設置使用者相關列的值
    * @param event 實體事件對象
@@ -32,7 +43,7 @@ export class GlobalSubscriber implements EntitySubscriberInterface<BaseEntity & 
     event: InsertEvent<T> | UpdateEvent<T>,
     columnName: keyof BaseEntityWithUser,
   ) {
-    const currentUserId = this.getCurrentUserId()
+    const currentUserId = this.isSwagger ? '-1' : this.getCurrentUserId()
     const metadata = event.metadata
     const hasColumn = metadata.columns.some(column => column.propertyName === columnName)
     if (hasColumn && currentUserId) {

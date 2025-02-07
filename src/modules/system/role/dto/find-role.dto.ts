@@ -2,6 +2,8 @@ import { PartialType } from '@nestjs/swagger'
 import { IsNotEmpty, IsOptional, Max, Min } from 'class-validator'
 import { ApiProperty } from '@nestjs/swagger'
 
+import { PaginatedResponseDto } from 'src/utils/response-dto'
+
 import { CreateRoleDto } from './create-role.dto'
 
 const MAX_PAGE_SIZE = 999999
@@ -32,3 +34,11 @@ export class FindRoleDto extends PartialType(CreateRoleDto) {
   @IsOptional()
   id?: string
 }
+
+export class FindRoleResponseDto extends PaginatedResponseDto({
+  id: '1',
+  code: 'super_admin',
+  name: '超級管理員',
+  description: null,
+  status: 1,
+}) {}
