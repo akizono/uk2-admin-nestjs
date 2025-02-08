@@ -11,6 +11,8 @@ import { TokenBlacklistModule } from './modules/system/token-blacklist/token-bla
 import { RoleModule } from './modules/system/role/role.module'
 import { GlobalSubscriber } from './common/subscribers/global.subscriber'
 import { UserRoleModule } from './modules/system/user-role/user-role.module'
+import { MenuModule } from './modules/system/menu/menu.module'
+import { RoleMenuModule } from './modules/system/role-menu/role-menu.module'
 
 @Module({
   imports: [
@@ -41,6 +43,8 @@ import { UserRoleModule } from './modules/system/user-role/user-role.module'
     TokenBlacklistModule,
     RoleModule,
     UserRoleModule,
+    MenuModule,
+    RoleMenuModule,
   ],
 
   controllers: [AppController],

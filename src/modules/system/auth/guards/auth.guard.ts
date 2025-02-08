@@ -1,9 +1,10 @@
+// # JWT 路由守衛
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 
-import { JwtRequest } from './types'
+import { JwtRequest } from '../types'
 import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator'
 import { TokenBlacklistService } from '@/modules/system/token-blacklist/token-blacklist.service'
 

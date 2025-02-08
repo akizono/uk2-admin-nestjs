@@ -6,9 +6,11 @@ import { EnvHelper } from '@/utils/env-helper'
 
 import { UserModule } from '@/modules/system/user/user.module'
 import { TokenBlacklistModule } from '@/modules/system/token-blacklist/token-blacklist.module'
-import { AuthGuard } from './auth.guard'
+import { AuthGuard } from './guards/auth.guard'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
+import { HasPermissionGuard } from '@/modules/system/auth/guards/has-permission.guard'
+import { RoleModule } from '@/modules/system/role/role.module'
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { AuthService } from './auth.service'
     }),
     UserModule,
     TokenBlacklistModule,
+    RoleModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -27,6 +30,10 @@ import { AuthService } from './auth.service'
     {
       provide: APP_GUARD, // 注入守衛
       useClass: AuthGuard, // 使用守衛
+    },
+    {
+      provide: APP_GUARD,
+      useClass: HasPermissionGuard,
     },
   ],
 })

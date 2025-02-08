@@ -48,4 +48,18 @@ export class RoleService {
     const newRole = this.roleRepository.create(createRoleDto)
     await this.roleRepository.save(newRole)
   }
+
+  // 查詢角色綁定的菜單權限標識
+  async findRoleHasPermissions(roleCode: string) {
+    const role = await this.roleRepository.findOne({
+      where: { code: roleCode },
+      relations: {
+        roleMenus: {
+          menu: true,
+        },
+      },
+    })
+    if (!role) return []
+    return role.roleMenus?.map(roleMenu => roleMenu.menu.permission).filter(Boolean) || []
+  }
 }

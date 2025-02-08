@@ -36,9 +36,10 @@ export class AuthService {
     }
   }
 
-  async generateToken(userId: string, type: 'access' | 'refresh') {
+  async generateToken(userId: string, role: string[], type: 'access' | 'refresh') {
     const payload = {
       sub: userId,
+      role,
       type,
       jti: uuidv4(),
     }
@@ -61,8 +62,8 @@ export class AuthService {
       userInfo,
       role,
       token: {
-        accessToken: await this.generateToken(userInfo.id, 'access'),
-        refreshToken: await this.generateToken(userInfo.id, 'refresh'),
+        accessToken: await this.generateToken(userInfo.id, role, 'access'),
+        refreshToken: await this.generateToken(userInfo.id, role, 'refresh'),
       },
     }
   }
@@ -79,7 +80,7 @@ export class AuthService {
       // 如果剩餘時間小於 1800秒
       if (timeUntilExpiry < 1800) {
         if (timeUntilExpiry > 0) await this.tokenBlacklistService.create(payload) // 將未過期的 Token 加入黑名單
-        return await this.generateToken(payload.sub, payload.type) // 返回新的 Token
+        return await this.generateToken(payload.sub, payload.role, payload.type) // 返回新的 Token
       }
       return token
     }

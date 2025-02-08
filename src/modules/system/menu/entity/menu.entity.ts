@@ -1,19 +1,24 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
-import { RoleMenuEntity } from '@/modules/system/role-menu/entity/role-menu.entity'
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity('system_role')
-export class RoleEntity {
+@Entity('system_menu')
+export class MenuEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: string
 
-  @Column({ length: 50, comment: '角色代碼', unique: true })
-  code: string
-
-  @Column({ length: 50, comment: '角色名稱' })
+  @Column({ length: 50, comment: '菜單名稱' })
   name: string
 
-  @Column({ length: 255, comment: '角色描述', nullable: true })
-  description: string
+  @Column({ length: 100, comment: '菜單權限', nullable: true })
+  permission: string
+
+  @Column({ type: 'tinyint', comment: '菜單類型 0:目錄 1:菜單 2:按鈕' })
+  type: number
+
+  @Column({ type: 'int', comment: '排序' })
+  sort: number
+
+  @Column({ type: 'bigint', comment: '父級ID', nullable: true })
+  parentId: string
 
   @Column({ type: 'tinyint', comment: '狀態 0:禁用 1:啟用', default: 1 })
   status: number
@@ -48,7 +53,4 @@ export class RoleEntity {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updateTime: Date
-
-  @OneToMany(() => RoleMenuEntity, roleMenu => roleMenu.role)
-  roleMenus: RoleMenuEntity[]
 }

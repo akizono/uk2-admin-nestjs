@@ -1,9 +1,10 @@
 import { Body, Controller, Delete, Param, Get, Post, Put, UseInterceptors, Query } from '@nestjs/common'
-import { ApiOperation, ApiResponse, PartialType } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
+import { HasPermission } from '@/common/decorators/has-permission.decorator'
 
 import { MsgResponseDto } from '@/utils/response-dto'
 
@@ -26,6 +27,7 @@ export class UserController {
   }
 
   @Get()
+  @HasPermission('system:user:find')
   @ApiOperation({ summary: '取得使用者列表' })
   @ApiResponse({ type: FindUserResponseDto })
   @ResponseMessage('獲取使用者列表成功')
