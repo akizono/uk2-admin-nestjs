@@ -92,6 +92,11 @@ export class AuthGuard implements CanActivate {
       const currentEnv = this.configService.get<string>('NODE_ENV')
       const isSwagger = request.headers['referer']?.indexOf('/api-docs') > -1
       if (currentEnv === 'dev' && isSwagger) {
+        request['user'] = {
+          sub: '1',
+          role: ['super_admin'],
+          type: 'access',
+        }
         return true
       }
 
