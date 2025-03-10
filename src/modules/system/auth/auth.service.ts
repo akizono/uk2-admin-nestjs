@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-
 import { v4 as uuidv4 } from 'uuid'
+
+import { JwtRequest, AuthenticatedUser, Payload } from './types'
+import { LoginReqDto } from './dto/auth.req.dto'
+
 import { encryptPassword } from '@/utils/crypto'
 import { EnvHelper } from '@/utils/env-helper'
-
-import { LoginDto } from './dto/login.dto'
-import { JwtRequest, AuthenticatedUser, Payload } from './types'
 import { UserService } from '@/modules/system/user/user.service'
 import { TokenBlacklistService } from '@/modules/system/token-blacklist/token-blacklist.service'
 
@@ -54,8 +54,8 @@ export class AuthService {
   }
 
   /** 登入 */
-  async login(loginDto: LoginDto) {
-    const { userInfo, role } = await this.validateUser(loginDto.username, loginDto.password)
+  async login(loginReqDto: LoginReqDto) {
+    const { userInfo, role } = await this.validateUser(loginReqDto.username, loginReqDto.password)
     if (!userInfo) throw new UnauthorizedException('密碼錯誤')
 
     return {

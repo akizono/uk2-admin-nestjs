@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-import { CreateRoleMenuDto } from './dto/create-role-menu'
 import { RoleMenuEntity } from './entity/role-menu.entity'
+import { CreateRoleMenuReqDto } from './dto/role-menu.req.dto'
 
 @Injectable()
 export class RoleMenuService {
@@ -12,7 +12,7 @@ export class RoleMenuService {
     private readonly roleMenuRepository: Repository<RoleMenuEntity>,
   ) {}
 
-  async create(createRoleMenuDto: CreateRoleMenuDto) {
-    await this.roleMenuRepository.save(createRoleMenuDto)
+  async create(createRoleMenuReqDto: CreateRoleMenuReqDto) {
+    await this.roleMenuRepository.save(createRoleMenuReqDto)
   }
 }

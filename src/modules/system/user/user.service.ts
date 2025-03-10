@@ -2,12 +2,10 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-import { encryptPassword } from '@/utils/crypto'
-
 import { UserEntity } from './entity/user.entity'
-import { CreateUserDto } from './dto/create-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
-import { FindUserDto } from './dto/find-user.dto'
+import { CreateUserReqDto, FindUserReqDto, UpdateUserReqDto } from './dto/user.req.dto'
+
+import { encryptPassword } from '@/utils/crypto'
 
 @Injectable()
 export class UserService {
@@ -16,8 +14,8 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const { username, password, ...remain } = createUserDto
+  async create(createUserReqDto: CreateUserReqDto) {
+    const { username, password, ...remain } = createUserReqDto
 
     const existUser = await this.userRepository.findOne({ where: { username } })
     if (existUser) throw new ConflictException('使用者已存在')
@@ -37,8 +35,8 @@ export class UserService {
     }
   }
 
-  async find(findUserDto: FindUserDto, isShowPassword = false) {
-    const { pageSize = 10, currentPage = 1, ...remain } = findUserDto
+  async find(findUserReqDto: FindUserReqDto, isShowPassword = false) {
+    const { pageSize = 10, currentPage = 1, ...remain } = findUserReqDto
 
     const skip = (currentPage - 1) * pageSize
     const conditions = Object.keys(remain).length > 0 ? remain : undefined
@@ -86,8 +84,8 @@ export class UserService {
     }
   }
 
-  async update(updateUserDto: UpdateUserDto) {
-    const { id, ...remain } = updateUserDto
+  async update(updateUserReqDto: UpdateUserReqDto) {
+    const { id, ...remain } = updateUserReqDto
 
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')

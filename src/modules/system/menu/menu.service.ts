@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { MenuEntity } from './entity/menu.entity'
-import { CreateMenuDto } from './dto/create-menu.dto'
+import { CreateMenuReqDto } from './dto/menu.req.dto'
 
 @Injectable()
 export class MenuService {
@@ -12,8 +12,8 @@ export class MenuService {
     private readonly menuRepository: Repository<MenuEntity>,
   ) {}
 
-  async create(createMenuDto: CreateMenuDto) {
-    const newMenu = this.menuRepository.create(createMenuDto)
+  async create(createMenuReqDto: CreateMenuReqDto) {
+    const newMenu = this.menuRepository.create(createMenuReqDto)
     await this.menuRepository.save(newMenu)
   }
 }

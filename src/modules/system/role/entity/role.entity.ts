@@ -1,8 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
-import { RoleMenuEntity } from '@/modules/system/role-menu/entity/role-menu.entity'
 
+import { RoleMenuEntity } from '@/modules/system/role-menu/entity/role-menu.entity'
+import { BaseEntity } from '@/common/entities/base.entity'
 @Entity('system_role')
-export class RoleEntity {
+export class RoleEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: string
 
@@ -14,40 +15,6 @@ export class RoleEntity {
 
   @Column({ length: 255, comment: '角色描述', nullable: true })
   description: string
-
-  @Column({ type: 'tinyint', comment: '狀態 0:禁用 1:啟用', default: 1 })
-  status: number
-
-  @Column({
-    name: 'is_deleted',
-    type: 'tinyint',
-    comment: '是否刪除 0:否 1:是',
-    default: 0,
-  })
-  isDeleted: number
-
-  @Column({ type: 'bigint', comment: '建立人' })
-  creator: string
-
-  @Column({
-    name: 'create_time',
-    type: 'datetime',
-    comment: '建立時間',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createTime: Date
-
-  @Column({ type: 'bigint', comment: '更新人', nullable: true })
-  updater: string
-
-  @Column({
-    name: 'update_time',
-    type: 'datetime',
-    comment: '更新時間',
-    nullable: true,
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  updateTime: Date
 
   @OneToMany(() => RoleMenuEntity, roleMenu => roleMenu.role)
   roleMenus: RoleMenuEntity[]

@@ -3,9 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { RoleEntity } from './entity/role.entity'
-import { FindRoleDto } from './dto/find-role.dto'
-import { CreateRoleDto } from './dto/create-role.dto'
-
+import { CreateRoleReqDto, FindRoleReqDto } from './dto/role.req.dto'
 @Injectable()
 export class RoleService {
   constructor(
@@ -13,8 +11,16 @@ export class RoleService {
     private readonly roleRepository: Repository<RoleEntity>,
   ) {}
 
-  async find(findRoleDto: FindRoleDto) {
-    const { pageSize = 10, currentPage = 1, ...remain } = findRoleDto
+  async create(createRoleReqDto: CreateRoleReqDto) {
+    const existRole = await this.roleRepository.findOne({ where: { code: createRoleReqDto.code } })
+    if (existRole) throw new ConflictException('角色已存在')
+
+    const newRole = this.roleRepository.create(createRoleReqDto)
+    await this.roleRepository.save(newRole)
+  }
+
+  async find(findRoleReqDto: FindRoleReqDto) {
+    const { pageSize = 10, currentPage = 1, ...remain } = findRoleReqDto
 
     const skip = (currentPage - 1) * pageSize
     const conditions = Object.keys(remain).length > 0 ? remain : undefined
@@ -39,14 +45,6 @@ export class RoleService {
       total,
       list: role,
     }
-  }
-
-  async create(createRoleDto: CreateRoleDto) {
-    const existRole = await this.roleRepository.findOne({ where: { code: createRoleDto.code } })
-    if (existRole) throw new ConflictException('角色已存在')
-
-    const newRole = this.roleRepository.create(createRoleDto)
-    await this.roleRepository.save(newRole)
   }
 
   // 查詢角色綁定的菜單權限標識

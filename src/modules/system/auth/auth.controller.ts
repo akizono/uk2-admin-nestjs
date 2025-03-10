@@ -1,13 +1,14 @@
 import { Body, Controller, Post, UseInterceptors, Req } from '@nestjs/common'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { ApiHeader } from '@nestjs/swagger'
+
+import { AuthService } from './auth.service'
+import { LoginReqDto } from './dto/auth.req.dto'
+import { LoginResDto } from './dto/auth.res.dto'
 
 import { Public } from '@/common/decorators/public.decorator'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
-
-import { LoginDto, LoginResponseDto } from './dto/login.dto'
-import { AuthService } from './auth.service'
-import { ApiHeader } from '@nestjs/swagger'
 
 @Controller('/auth')
 @UseInterceptors(TransformInterceptor)
@@ -17,10 +18,10 @@ export class AuthController {
   @Public()
   @Post('/login')
   @ApiOperation({ summary: '登入' })
-  @ApiResponse({ type: LoginResponseDto })
+  @ApiResponse({ type: LoginResDto })
   @ResponseMessage('登入成功')
-  async login(@Body() loginDto: LoginDto) {
-    return await this.authService.login(loginDto)
+  async login(@Body() loginReqDto: LoginReqDto) {
+    return await this.authService.login(loginReqDto)
   }
 
   @ApiHeader({ name: 'authorization' })

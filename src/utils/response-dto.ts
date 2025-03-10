@@ -15,7 +15,7 @@ export function PaginatedResponseDto<T>(example: T) {
     data: T[]
 
     @ApiProperty({
-      example: 'success message!',
+      example: 'success!',
     })
     message: string
   }
@@ -34,7 +34,7 @@ export function SingleResponseDto<T>(example: T) {
     data: T[]
 
     @ApiProperty({
-      example: 'success message!',
+      example: 'success!',
     })
     message: string
   }
@@ -48,7 +48,7 @@ export function SingleResponseDto<T>(example: T) {
 export function MsgResponseDto() {
   class ResponseDto {
     @ApiProperty({
-      example: 'success message!',
+      example: 'success!',
     })
     message: string
   }

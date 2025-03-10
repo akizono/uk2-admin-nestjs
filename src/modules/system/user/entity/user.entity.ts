@@ -1,8 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
+
 import { UserRoleEntity } from '@/modules/system/user-role/entity/user-role.entity'
+import { BaseEntity } from '@/common/entities/base.entity'
 
 @Entity('system_user')
-export class UserEntity {
+export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: string
 
@@ -32,43 +34,6 @@ export class UserEntity {
 
   @Column({ length: 255, comment: '頭像', nullable: true })
   avatar: string
-
-  @Column({ length: 255, comment: '備註', nullable: true })
-  remark: string
-
-  @Column({ type: 'tinyint', comment: '狀態 0:禁用 1:啟用', default: 1 })
-  status: number
-
-  @Column({
-    name: 'is_deleted',
-    type: 'tinyint',
-    comment: '是否刪除 0:否 1:是',
-    default: 0,
-  })
-  isDeleted: number
-
-  @Column({ type: 'bigint', comment: '建立人', nullable: true })
-  creator: string
-
-  @Column({
-    name: 'create_time',
-    type: 'datetime',
-    comment: '建立時間',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createTime: Date
-
-  @Column({ type: 'bigint', comment: '更新人', nullable: true })
-  updater: string
-
-  @Column({
-    name: 'update_time',
-    type: 'datetime',
-    comment: '更新時間',
-    nullable: true,
-    onUpdate: 'CURRENT_TIMESTAMP',
-  })
-  updateTime: Date
 
   @OneToMany(() => UserRoleEntity, userRole => userRole.user)
   userRoles: UserRoleEntity[]

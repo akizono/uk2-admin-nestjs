@@ -1,7 +1,9 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm'
 
+import { BaseEntity } from '@/common/entities/base.entity'
+
 @Entity('system_token_blacklist')
-export class TokenBlacklistEntity {
+export class TokenBlacklistEntity extends BaseEntity {
   @PrimaryColumn({
     name: 'jwt_id',
     type: 'varchar',
@@ -37,18 +39,4 @@ export class TokenBlacklistEntity {
     comment: '發行時間',
   })
   issuedAt: Date
-
-  @Column({
-    type: 'bigint',
-    comment: '建立人',
-  })
-  creator: string
-
-  @Column({
-    name: 'create_time',
-    type: 'datetime',
-    default: () => 'CURRENT_TIMESTAMP',
-    comment: '建立時間',
-  })
-  createTime: Date
 }

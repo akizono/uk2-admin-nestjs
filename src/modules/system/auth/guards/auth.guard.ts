@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 
 import { JwtRequest } from '../types'
+
 import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator'
 import { TokenBlacklistService } from '@/modules/system/token-blacklist/token-blacklist.service'
 
