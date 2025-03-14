@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
-import { EnvHelper } from './utils/env-helper'
 
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { EnvHelper } from './utils/env-helper'
 import { UserModule } from './modules/system/user/user.module'
 import { AuthModule } from './modules/system/auth/auth.module'
 import { TokenBlacklistModule } from './modules/system/token-blacklist/token-blacklist.module'

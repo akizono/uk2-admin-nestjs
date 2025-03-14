@@ -1,6 +1,7 @@
 import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, UpdateEvent, BaseEntity } from 'typeorm'
-import { requestContext } from '@/utils/request-context'
 import { ConfigService } from '@nestjs/config'
+
+import { requestContext } from '@/utils/request-context'
 
 /** 定義基礎實體介面 */
 interface BaseEntityWithUser {
