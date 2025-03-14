@@ -1,12 +1,14 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
+import { IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
-import { ParseBigIntPipe } from 'src/common/pipes/parse-bigInt-pipe'
+
+import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
+import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 
 const MAX_PAGE_SIZE = 200
 const MAX_PAGE_NUMBER = 200
 
-class RoleReqDto {
+class RoleReqDto extends BaseReqDto {
   @ApiProperty({ description: '主鍵ID' })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
@@ -26,24 +28,9 @@ class RoleReqDto {
   @IsOptional()
   @IsString()
   description: string
-
-  @ApiProperty({ description: '備註', example: '建立使用者' })
-  @IsOptional()
-  @IsString()
-  remark: string
-
-  @ApiProperty({ description: '狀態' })
-  @IsOptional()
-  @IsNumber()
-  status: number
-
-  @ApiProperty({ description: '是否刪除' })
-  @IsOptional()
-  @IsNumber()
-  isDeleted: number
 }
 
-export class CreateRoleReqDto extends PartialType(OmitType(RoleReqDto, ['id', 'isDeleted'])) {}
+export class CreateRoleReqDto extends PartialType(OmitType(RoleReqDto, ['id', ...disableEditFields])) {}
 
 export class FindRoleReqDto extends PartialType(RoleReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })

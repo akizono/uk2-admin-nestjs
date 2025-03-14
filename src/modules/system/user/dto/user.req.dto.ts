@@ -1,13 +1,14 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
 import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
-import { PasswordGenerator } from 'src/utils/password-generator'
 import { Transform } from 'class-transformer'
-import { ParseBigIntPipe } from 'src/common/pipes/parse-bigInt-pipe'
+
+import { PasswordGenerator } from '@/utils/password-generator'
+import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
+import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 
 const MAX_PAGE_SIZE = 200
 const MAX_PAGE_NUMBER = 200
-
-class UserReqDto {
+class UserReqDto extends BaseReqDto {
   @ApiProperty({ description: '主鍵ID', required: true })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
@@ -33,7 +34,7 @@ class UserReqDto {
   @IsNumber()
   sex: number
 
-  @ApiProperty({ description: '電子郵件', example: 'test@gmail.com' })
+  @ApiProperty({ description: '電子郵件', example: '' })
   @IsOptional()
   @IsString()
   email: string
@@ -43,28 +44,13 @@ class UserReqDto {
   @IsString()
   mobile: string
 
-  @ApiProperty({ description: '頭像', example: 'https://example.com/avatar.png' })
+  @ApiProperty({ description: '頭像', example: '' })
   @IsOptional()
   @IsString()
   avatar: string
-
-  @ApiProperty({ description: '備註' })
-  @IsOptional()
-  @IsString()
-  remark: string
-
-  @ApiProperty({ description: '狀態' })
-  @IsOptional()
-  @IsNumber()
-  status: number
-
-  @ApiProperty({ description: '是否刪除' })
-  @IsOptional()
-  @IsNumber()
-  isDeleted: number
 }
 
-export class CreateUserReqDto extends PartialType(OmitType(UserReqDto, ['id', 'isDeleted'])) {
+export class CreateUserReqDto extends PartialType(OmitType(UserReqDto, ['id', ...disableEditFields])) {
   @ApiProperty({ description: '密碼', required: false })
   @IsNotEmpty()
   @IsString()
@@ -85,4 +71,4 @@ export class FindUserReqDto extends PartialType(UserReqDto) {
   currentPage?: number = 1
 }
 
-export class UpdateUserReqDto extends PartialType(OmitType(UserReqDto, ['username', 'isDeleted'])) {}
+export class UpdateUserReqDto extends PartialType(OmitType(UserReqDto, ['username', ...disableEditFields])) {}

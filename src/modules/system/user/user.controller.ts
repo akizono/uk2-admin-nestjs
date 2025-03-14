@@ -15,6 +15,7 @@ import { MsgResponseDto } from '@/utils/response-dto'
 @UseInterceptors(TransformInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
   @Post('/create')
   @HasPermission('system:user:create')
   @ApiOperation({ summary: '建立使用者' })

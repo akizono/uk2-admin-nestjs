@@ -42,21 +42,6 @@ export class UserService {
     const conditions = Object.keys(remain).length > 0 ? remain : undefined
 
     const [users, total] = await this.userRepository.findAndCount({
-      select: {
-        password: isShowPassword,
-        salt: isShowPassword,
-
-        id: true,
-        username: true,
-        nickname: true,
-        email: true,
-        mobile: true,
-        age: true,
-        sex: true,
-        avatar: true,
-        remark: true,
-        status: true,
-      },
       where: {
         isDeleted: 0,
         ...conditions,
@@ -72,8 +57,14 @@ export class UserService {
 
     const list = users.map(user => {
       const { userRoles, ...remain } = user
+
+      if (!isShowPassword) {
+        delete remain['password']
+        delete remain['salt']
+      }
+
       return {
-        userInfo: remain,
+        ...remain,
         role: userRoles?.map(item => item.role.code),
       }
     })

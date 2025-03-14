@@ -7,6 +7,9 @@ export class MenuEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: string
 
+  @Column({ type: 'bigint', comment: '父級ID' })
+  parentId: string
+
   @Column({ length: 50, comment: '菜單名稱' })
   name: string
 
@@ -18,7 +21,4 @@ export class MenuEntity extends BaseEntity {
 
   @Column({ type: 'int', comment: '排序' })
   sort: number
-
-  @Column({ type: 'bigint', comment: '父級ID', nullable: true })
-  parentId: string
 }

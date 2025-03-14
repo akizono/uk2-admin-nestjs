@@ -10,7 +10,7 @@ import { Public } from '@/common/decorators/public.decorator'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 
-@Controller('/auth')
+@Controller('/system/auth')
 @UseInterceptors(TransformInterceptor)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

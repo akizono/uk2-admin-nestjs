@@ -22,14 +22,13 @@ export class AuthService {
     const { list } = await this.userService.find({ username }, true)
     if (list.length === 0) throw new NotFoundException('使用者名稱或密碼錯誤')
 
-    const { userInfo, role } = list[0]
-    const { hashedPassword } = encryptPassword(inputPassword, userInfo.salt)
-    if (userInfo.password === hashedPassword) {
+    const user = list[0]
+    const { hashedPassword } = encryptPassword(inputPassword, user.salt)
+    if (user.password === hashedPassword) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, salt, ...userInfoFilter } = userInfo
+      const { password, salt, ...userInfoFilter } = user
       return {
-        userInfo: userInfoFilter,
-        role,
+        ...userInfoFilter,
       }
     } else {
       return null
@@ -55,15 +54,14 @@ export class AuthService {
 
   /** 登入 */
   async login(loginReqDto: LoginReqDto) {
-    const { userInfo, role } = await this.validateUser(loginReqDto.username, loginReqDto.password)
-    if (!userInfo) throw new UnauthorizedException('密碼錯誤')
+    const user = await this.validateUser(loginReqDto.username, loginReqDto.password)
+    if (!user) throw new UnauthorizedException('密碼錯誤')
 
     return {
-      userInfo,
-      role,
+      ...user,
       token: {
-        accessToken: await this.generateToken(userInfo.id, role, 'access'),
-        refreshToken: await this.generateToken(userInfo.id, role, 'refresh'),
+        accessToken: await this.generateToken(user.id, user.role, 'access'),
+        refreshToken: await this.generateToken(user.id, user.role, 'refresh'),
       },
     }
   }

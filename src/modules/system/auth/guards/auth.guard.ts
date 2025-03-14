@@ -30,7 +30,7 @@ export class AuthGuard implements CanActivate {
   private async validateRefreshToken(request: JwtRequest): Promise<boolean> {
     try {
       // 注意：request.url 與 auth.controller.ts:refreshTokenMethod() 存在耦合關係
-      if (!(request.url === '/auth/refreshTokenMethod' && request.method === 'POST')) {
+      if (!(request.url === '/system/auth/refreshTokenMethod' && request.method === 'POST')) {
         return false
       }
 
