@@ -12,6 +12,7 @@ import { RoleModule } from './modules/system/role/role.module'
 import { GlobalSubscriber } from './common/subscribers/global.subscriber'
 import { UserRoleModule } from './modules/system/user-role/user-role.module'
 import { MenuModule } from './modules/system/menu/menu.module'
+import { DeptModule } from './modules/system/dept/dept.module'
 import { RoleMenuModule } from './modules/system/role-menu/role-menu.module'
 
 @Module({
@@ -45,6 +46,7 @@ import { RoleMenuModule } from './modules/system/role-menu/role-menu.module'
     UserRoleModule,
     MenuModule,
     RoleMenuModule,
+    DeptModule,
   ],
 
   controllers: [AppController],
