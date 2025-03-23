@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
@@ -14,10 +14,10 @@ class DeptReqDto extends BaseReqDto {
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   id: string
 
-  @ApiProperty({ description: '父級ID（頂級0）', example: 0 })
-  @IsNotEmpty()
-  @IsString()
-  parentId: string = '0'
+  @ApiProperty({ description: '父級ID（頂級0）', example: '1' })
+  @IsOptional()
+  @Transform(({ value }) => new ParseBigIntPipe().transform(value))
+  parentId: string
 
   @ApiProperty({ description: '部門名稱', required: true })
   @IsNotEmpty()
@@ -29,7 +29,7 @@ class DeptReqDto extends BaseReqDto {
   @IsNumber()
   sort: number
 
-  @ApiProperty({ description: '負責人' })
+  @ApiProperty({ description: '負責人', example: '1' })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   leaderUserId: string
@@ -40,13 +40,13 @@ export class CreateDeptReqDto extends PartialType(OmitType(DeptReqDto, ['id', ..
 export class FindDeptReqDto extends PartialType(DeptReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
   @IsNotEmpty()
-  @Min(1)
+  @Min(0)
   @Max(MAX_PAGE_SIZE)
   pageSize?: number = 10
 
   @ApiProperty({ description: '分頁頁碼', example: 1, required: false })
   @IsNotEmpty()
-  @Min(1)
+  @Min(0)
   @Max(MAX_PAGE_NUMBER)
   currentPage?: number = 1
 }

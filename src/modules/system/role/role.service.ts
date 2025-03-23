@@ -22,8 +22,9 @@ export class RoleService {
   async find(findRoleReqDto: FindRoleReqDto) {
     const { pageSize = 10, currentPage = 1, ...remain } = findRoleReqDto
 
-    const skip = (currentPage - 1) * pageSize
     const conditions = Object.keys(remain).length > 0 ? remain : undefined
+    const skip = pageSize === 0 ? undefined : (currentPage - 1) * pageSize
+    const take = pageSize === 0 ? undefined : pageSize
 
     const [role, total] = await this.roleRepository.findAndCount({
       select: {
@@ -38,7 +39,7 @@ export class RoleService {
         ...conditions,
       },
       skip,
-      take: pageSize,
+      take,
     })
 
     return {

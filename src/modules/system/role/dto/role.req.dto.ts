@@ -35,13 +35,13 @@ export class CreateRoleReqDto extends PartialType(OmitType(RoleReqDto, ['id', ..
 export class FindRoleReqDto extends PartialType(RoleReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
   @IsNotEmpty()
-  @Min(1)
+  @Min(0)
   @Max(MAX_PAGE_SIZE)
   pageSize?: number = 10
 
   @ApiProperty({ description: '分頁頁碼', example: 1, required: false })
   @IsNotEmpty()
-  @Min(1)
+  @Min(0)
   @Max(MAX_PAGE_NUMBER)
   currentPage?: number = 1
 }

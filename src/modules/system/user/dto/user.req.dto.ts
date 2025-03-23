@@ -60,13 +60,13 @@ export class CreateUserReqDto extends PartialType(OmitType(UserReqDto, ['id', ..
 export class FindUserReqDto extends PartialType(UserReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
   @IsNotEmpty()
-  @Min(1)
+  @Min(0)
   @Max(MAX_PAGE_SIZE)
   pageSize?: number = 10
 
   @ApiProperty({ description: '分頁頁碼', example: 1, required: false })
   @IsNotEmpty()
-  @Min(1)
+  @Min(0)
   @Max(MAX_PAGE_NUMBER)
   currentPage?: number = 1
 }

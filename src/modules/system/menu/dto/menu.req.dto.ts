@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
 import { Transform } from 'class-transformer'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
@@ -11,10 +11,10 @@ export class MenuReqDto extends BaseReqDto {
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   id: string
 
-  @ApiProperty({ description: '父級ID（頂級0）', example: 0 })
-  @IsNotEmpty()
-  @IsString()
-  parentId: string = '0'
+  @ApiProperty({ description: '父級ID（頂級0）', example: '1' })
+  @IsOptional()
+  @Transform(({ value }) => new ParseBigIntPipe().transform(value))
+  parentId: string
 
   @ApiProperty({ description: '菜單名稱', example: '建立使用者' })
   @IsNotEmpty()

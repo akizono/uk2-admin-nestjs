@@ -38,8 +38,9 @@ export class UserService {
   async find(findUserReqDto: FindUserReqDto, isShowPassword = false) {
     const { pageSize = 10, currentPage = 1, ...remain } = findUserReqDto
 
-    const skip = (currentPage - 1) * pageSize
     const conditions = Object.keys(remain).length > 0 ? remain : undefined
+    const skip = pageSize === 0 ? undefined : (currentPage - 1) * pageSize
+    const take = pageSize === 0 ? undefined : pageSize
 
     const [users, total] = await this.userRepository.findAndCount({
       where: {
@@ -52,7 +53,7 @@ export class UserService {
         },
       },
       skip,
-      take: pageSize,
+      take,
     })
 
     const list = users.map(user => {

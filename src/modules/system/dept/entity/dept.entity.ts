@@ -8,7 +8,7 @@ export class DeptEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: string
 
-  @Column({ type: 'bigint', comment: '父級ID' })
+  @Column({ type: 'bigint', comment: '父級ID', nullable: true })
   parentId: string
 
   @Column({ length: 50, comment: '部門名稱' })
