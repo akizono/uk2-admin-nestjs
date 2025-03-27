@@ -6,6 +6,7 @@ import { UserEntity } from './entity/user.entity'
 import { CreateUserReqDto, FindUserReqDto, UpdateUserReqDto } from './dto/user.req.dto'
 
 import { encryptPassword } from '@/utils/crypto'
+import { create } from '@/common/services/base.service'
 
 @Injectable()
 export class UserService {
@@ -15,23 +16,21 @@ export class UserService {
   ) {}
 
   async create(createUserReqDto: CreateUserReqDto) {
-    const { username, password, ...remain } = createUserReqDto
-
-    const existUser = await this.userRepository.findOne({ where: { username } })
-    if (existUser) throw new ConflictException('使用者已存在')
-
-    const { hashedPassword, salt } = encryptPassword(password)
-
-    const newUser = this.userRepository.create({
-      ...remain,
-      username,
-      password: hashedPassword,
-      salt,
+    const { hashedPassword, salt } = encryptPassword(createUserReqDto.password)
+    const result = await create({
+      dto: {
+        ...createUserReqDto,
+        password: hashedPassword,
+        salt,
+      },
+      repository: this.userRepository,
+      existenceCondition: ['username'],
+      modalName: '使用者',
     })
-    await this.userRepository.save(newUser)
+
     return {
-      id: newUser.id,
-      password,
+      id: result.id,
+      password: createUserReqDto.password,
     }
   }
 

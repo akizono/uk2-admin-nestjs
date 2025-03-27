@@ -5,7 +5,7 @@ import { Transform } from 'class-transformer'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 
-const MAX_PAGE_SIZE = 200
+const MAX_PAGE_SIZE = 2000000000
 const MAX_PAGE_NUMBER = 200
 
 class DeptReqDto extends BaseReqDto {

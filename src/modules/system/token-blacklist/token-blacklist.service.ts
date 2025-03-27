@@ -5,6 +5,7 @@ import { Repository } from 'typeorm'
 import { TokenBlacklistEntity } from './entity/token-blacklist.entity'
 
 import { Payload } from '@/modules/system/auth/types'
+import { create } from '@/common/services/base.service'
 
 @Injectable()
 export class TokenBlacklistService {
@@ -15,15 +16,17 @@ export class TokenBlacklistService {
 
   // 將 token 加入黑名單
   async create(payload: Payload) {
-    const { sub, jti, type, exp, iat } = payload
-    const newTokenBlacklist = this.tokenBlacklistRepository.create({
-      jwtId: jti,
-      userId: sub,
-      type: type,
-      expiredAt: new Date(exp * 1000),
-      issuedAt: new Date(iat * 1000),
+    await create({
+      dto: {
+        jwtId: payload.jti,
+        userId: payload.sub,
+        type: payload.type,
+        expiredAt: new Date(payload.exp * 1000),
+        issuedAt: new Date(payload.iat * 1000),
+      },
+      repository: this.tokenBlacklistRepository,
+      modalName: 'Token 黑名單',
     })
-    await this.tokenBlacklistRepository.save(newTokenBlacklist)
   }
 
   // 根據 jwtId 查詢 token 是否在黑名單中

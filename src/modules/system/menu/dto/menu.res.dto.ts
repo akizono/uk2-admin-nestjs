@@ -1,15 +1,16 @@
 import { PaginatedResponseDto, SingleResponseDto } from '@/utils/response-dto'
 
-export class CreateDeptResDto extends SingleResponseDto({
+export class CreateMenuResDto extends SingleResponseDto({
   id: '100',
 }) {}
 
-export class FindDeptResDto extends PaginatedResponseDto({
+export class FindMenuResDto extends PaginatedResponseDto({
   id: '1',
   parentId: '0',
-  name: 'string',
-  sort: 0,
-  leaderUserId: '1',
+  name: '建立使用者',
+  permission: 'system:menu:create',
+  type: 2,
+  sort: 1,
 
   remark: 'remark',
   status: 0,

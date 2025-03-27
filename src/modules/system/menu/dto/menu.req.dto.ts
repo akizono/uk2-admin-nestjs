@@ -1,9 +1,12 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
+
+const MAX_PAGE_SIZE = 2000000000
+const MAX_PAGE_NUMBER = 200
 
 export class MenuReqDto extends BaseReqDto {
   @ApiProperty({ description: '主鍵ID' })
@@ -38,3 +41,19 @@ export class MenuReqDto extends BaseReqDto {
 }
 
 export class CreateMenuReqDto extends PartialType(OmitType(MenuReqDto, ['id', ...disableEditFields])) {}
+
+export class FindMenuReqDto extends PartialType(MenuReqDto) {
+  @ApiProperty({ description: '分頁大小', example: 10, required: false })
+  @IsNotEmpty()
+  @Min(0)
+  @Max(MAX_PAGE_SIZE)
+  pageSize?: number = 10
+
+  @ApiProperty({ description: '分頁頁碼', example: 1, required: false })
+  @IsNotEmpty()
+  @Min(0)
+  @Max(MAX_PAGE_NUMBER)
+  currentPage?: number = 1
+}
+
+export class UpdateMenuReqDto extends PartialType(OmitType(MenuReqDto, [...disableEditFields])) {}

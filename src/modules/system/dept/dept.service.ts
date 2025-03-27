@@ -5,6 +5,8 @@ import { Repository } from 'typeorm'
 import { DeptEntity } from './entity/dept.entity'
 import { CreateDeptReqDto, FindDeptReqDto, UpdateDeptReqDto } from './dto/dept.req.dto'
 
+import { create, find } from '@/common/services/base.service'
+
 @Injectable()
 export class DeptService {
   constructor(
@@ -14,39 +16,34 @@ export class DeptService {
 
   // 新增部門
   async create(createDeptReqDto: CreateDeptReqDto) {
-    const newDept = this.deptRepository.create(createDeptReqDto)
-    await this.deptRepository.save(newDept)
-    return {
-      id: newDept.id,
-    }
+    const result = await create({
+      dto: createDeptReqDto,
+      repository: this.deptRepository,
+      modalName: '部門',
+    })
+
+    return { id: result.id }
   }
 
   // 查詢部門
   async find(findDeptReqDto: FindDeptReqDto) {
-    const { pageSize, currentPage, ...remain } = findDeptReqDto
-
-    const conditions = Object.keys(remain).length > 0 ? remain : undefined
-    const skip = pageSize === 0 ? undefined : (currentPage - 1) * pageSize
-    const take = pageSize === 0 ? undefined : pageSize
-
-    const [depts, total] = await this.deptRepository.findAndCount({
+    const { list, total } = await find({
+      dto: findDeptReqDto,
+      repository: this.deptRepository,
       relations: ['leaderUser'],
       where: {
         isDeleted: 0,
-        ...conditions,
       },
-      skip,
-      take,
     })
 
-    // 如果 leaderUser 存在則去除password
-    depts.forEach(dept => {
-      if (dept.leaderUser) delete dept.leaderUser['password']
+    // 如果存在leaderUser這個欄位，則去除password
+    list.forEach(item => {
+      if (item.leaderUser) delete item.leaderUser['password']
     })
 
     return {
       total,
-      list: depts,
+      list,
     }
   }
 

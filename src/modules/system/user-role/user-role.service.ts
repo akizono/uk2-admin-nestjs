@@ -1,9 +1,12 @@
-import { ConflictException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { UserRoleEntity } from './entity/user-role.entity'
 import { CreateUserRoleReqDto } from './dto/user-role.req.dto'
+
+import { create } from '@/common/services/base.service'
+
 @Injectable()
 export class UserRoleService {
   constructor(
@@ -12,11 +15,11 @@ export class UserRoleService {
   ) {}
 
   async create(createUserRoleReqDto: CreateUserRoleReqDto) {
-    const { userId, roleId } = createUserRoleReqDto
-
-    const userRole = await this.userRoleRepository.findOne({ where: { userId, roleId } })
-    if (userRole) throw new ConflictException('使用者已經綁定了該角色')
-
-    await this.userRoleRepository.save(createUserRoleReqDto)
+    return await create({
+      dto: createUserRoleReqDto,
+      repository: this.userRoleRepository,
+      modalName: '使用者角色',
+      existenceCondition: ['userId', 'roleId'],
+    })
   }
 }

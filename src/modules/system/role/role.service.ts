@@ -1,9 +1,12 @@
-import { ConflictException, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { RoleEntity } from './entity/role.entity'
 import { CreateRoleReqDto, FindRoleReqDto } from './dto/role.req.dto'
+
+import { create } from '@/common/services/base.service'
+
 @Injectable()
 export class RoleService {
   constructor(
@@ -12,11 +15,12 @@ export class RoleService {
   ) {}
 
   async create(createRoleReqDto: CreateRoleReqDto) {
-    const existRole = await this.roleRepository.findOne({ where: { code: createRoleReqDto.code } })
-    if (existRole) throw new ConflictException('角色已存在')
-
-    const newRole = this.roleRepository.create(createRoleReqDto)
-    await this.roleRepository.save(newRole)
+    await create({
+      dto: createRoleReqDto,
+      repository: this.roleRepository,
+      existenceCondition: ['code'],
+      modalName: '角色',
+    })
   }
 
   async find(findRoleReqDto: FindRoleReqDto) {
