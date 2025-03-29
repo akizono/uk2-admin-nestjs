@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { DeptEntity } from './entity/dept.entity'
 import { CreateDeptReqDto, FindDeptReqDto, UpdateDeptReqDto } from './dto/dept.req.dto'
 
-import { create, find } from '@/common/services/base.service'
+import { create, find, update, _delete } from '@/common/services/base.service'
 
 @Injectable()
 export class DeptService {
@@ -49,47 +49,40 @@ export class DeptService {
 
   // 更新部門
   async update(updateDeptReqDto: UpdateDeptReqDto) {
-    const { id, ...remain } = updateDeptReqDto
-
-    const existDept = await this.deptRepository.findOne({ where: { id } })
-    if (!existDept) throw new NotFoundException('部門不存在')
-
-    await this.deptRepository.update({ id }, remain)
+    await update({
+      dto: updateDeptReqDto,
+      repository: this.deptRepository,
+      existenceCondition: ['id'],
+      modalName: '部門',
+    })
   }
 
   // 刪除部門
   async delete(id: string) {
-    const existDept = await this.deptRepository.findOne({ where: { id } })
-    if (!existDept) throw new NotFoundException('部門不存在')
-
-    // 檢查是否存在子部門
-    const childDept = await this.deptRepository.findOne({
-      where: {
-        parentId: id,
-        isDeleted: 0,
-      },
+    await _delete({
+      id,
+      repository: this.deptRepository,
+      modalName: '部門',
     })
-
-    if (childDept) {
-      throw new BadRequestException('該部門下存在子部門，無法刪除')
-    }
-
-    await this.deptRepository.update({ id }, { isDeleted: 1 })
   }
 
   // 封鎖部門
   async block(id: string) {
-    const existDept = await this.deptRepository.findOne({ where: { id } })
-    if (!existDept) throw new NotFoundException('部門不存在')
-
-    await this.deptRepository.update({ id }, { status: 0 })
+    await update({
+      dto: { id, status: 0 },
+      repository: this.deptRepository,
+      existenceCondition: ['id'],
+      modalName: '部門',
+    })
   }
 
   // 解封鎖部門
   async unblock(id: string) {
-    const existDept = await this.deptRepository.findOne({ where: { id } })
-    if (!existDept) throw new NotFoundException('部門不存在')
-
-    await this.deptRepository.update({ id }, { status: 1 })
+    await update({
+      dto: { id, status: 1 },
+      repository: this.deptRepository,
+      existenceCondition: ['id'],
+      modalName: '部門',
+    })
   }
 }

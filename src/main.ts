@@ -45,10 +45,26 @@ async function bootstrap() {
       throw new PayloadTooLargeException(`URL 路徑段數超過最大限制`)
     }
 
-    // 檢查 URL 片段長度
-    for (const segment of url) {
-      if (segment && segment.length > maxFieldLength) {
-        throw new PayloadTooLargeException(`URL 片段 "${segment}" 超過最大長度限制 ${maxFieldLength} 字元`)
+    // 檢查 URL 每个片段的長度
+    for (let i = 0; i < url.length; i++) {
+      // 檢查是否為最後一個 URL 片段
+      if (i === url.length - 1) {
+        const urlParts = url[i].split('?') // 使用 '?' 作為分隔符將 URL 片段分割為基本路徑和查詢參數
+        if (urlParts.length > 0) {
+          // 如果存在查詢參數部分
+          if (urlParts[1]) {
+            const queryParams = urlParts[1].split('&') // 使用 '&' 作為分隔符分割查詢參數
+
+            // 檢查每一個查詢參數的長度
+            for (const param of queryParams) {
+              if (param.length > maxFieldLength) {
+                throw new PayloadTooLargeException(`查詢參數 "${param}" 超過最大長度限制 ${maxFieldLength} 字元`) // 拋出錯誤
+              }
+            }
+          }
+        }
+      } else if (url[i] && url[i].length > maxFieldLength) {
+        throw new PayloadTooLargeException(`URL 片段 "${url[i]}" 超過最大長度限制 ${maxFieldLength} 字元`) // 拋出錯誤
       }
     }
 

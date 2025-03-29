@@ -24,6 +24,16 @@ export class MenuReqDto extends BaseReqDto {
   @IsString()
   name: string
 
+  @ApiProperty({ description: '路由路徑', example: '/system/user/create' })
+  @IsOptional()
+  @IsString()
+  path: string
+
+  @ApiProperty({ description: '元件路徑', example: 'system/user/create' })
+  @IsOptional()
+  @IsString()
+  component: string
+
   @ApiProperty({ description: '菜單權限', example: 'system:user:create' })
   @IsNotEmpty()
   @IsString()
@@ -33,6 +43,36 @@ export class MenuReqDto extends BaseReqDto {
   @IsNotEmpty()
   @IsNumber()
   type: number
+
+  @ApiProperty({ description: '菜單圖標', example: 'el-icon-user' })
+  @IsOptional()
+  @IsString()
+  icon: string
+
+  @ApiProperty({ description: '外連地址', example: 'https://www.google.com' })
+  @IsOptional()
+  @IsString()
+  link: string
+
+  @ApiProperty({ description: '是否緩存', example: 0 })
+  @IsNotEmpty()
+  @IsNumber()
+  isCache: number
+
+  @ApiProperty({ description: '是否顯示在標籤', example: 0 })
+  @IsNotEmpty()
+  @IsNumber()
+  isShowTag: number
+
+  @ApiProperty({ description: '是否常駐標籤欄', example: 0 })
+  @IsNotEmpty()
+  @IsNumber()
+  isKeepAlive: number
+
+  @ApiProperty({ description: '是否顯示在側邊欄', example: 0 })
+  @IsNotEmpty()
+  @IsNumber()
+  isShowSide: number
 
   @ApiProperty({ description: '排序', example: 1 })
   @IsNotEmpty()
