@@ -124,18 +124,26 @@ export async function _delete(params: DeleteParams) {
   try {
     const { id, repository, modalName } = params
 
+    // 檢查是否存在
     const exist = await repository.findOne({ where: { id } })
     if (!exist) throw new NotFoundException(`${modalName}不存在`)
 
-    // 檢查是否存在子部門
-    const childs = await repository.findOne({
-      where: {
-        parentId: id,
-        isDeleted: 0,
-      },
-    })
-    if (childs && childs.length > 0) {
-      throw new BadRequestException(`${modalName}下存在子項，無法刪除`)
+    // 檢查表是否有 parentId 欄位
+    const hasParentIdColumn = repository.manager.connection
+      .getMetadata(repository.target)
+      .hasColumnWithPropertyPath('parentId')
+
+    // 只有在表有 parentId 欄位時才檢查子項
+    if (hasParentIdColumn) {
+      const childs = await repository.findOne({
+        where: {
+          parentId: id,
+          isDeleted: 0,
+        },
+      })
+      if (childs && childs.length > 0) {
+        throw new BadRequestException(`${modalName}下存在子項，無法刪除`)
+      }
     }
 
     await repository.update({ id }, { isDeleted: 1 })
