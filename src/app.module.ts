@@ -14,6 +14,7 @@ import { UserRoleModule } from './modules/system/user-role/user-role.module'
 import { MenuModule } from './modules/system/menu/menu.module'
 import { DeptModule } from './modules/system/dept/dept.module'
 import { RoleMenuModule } from './modules/system/role-menu/role-menu.module'
+import { DictTypeModule } from './modules/system/dict-type/dict-type.module'
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { RoleMenuModule } from './modules/system/role-menu/role-menu.module'
     MenuModule,
     RoleMenuModule,
     DeptModule,
+    DictTypeModule,
   ],
 
   controllers: [AppController],
