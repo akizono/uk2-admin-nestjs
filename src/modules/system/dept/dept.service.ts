@@ -38,7 +38,10 @@ export class DeptService {
 
     // 如果存在leaderUser這個欄位，則去除password
     list.forEach(item => {
-      if (item.leaderUser) delete item.leaderUser['password']
+      if (item.leaderUser) {
+        delete item.leaderUser['password']
+        delete item.leaderUser['salt']
+      }
     })
 
     return {

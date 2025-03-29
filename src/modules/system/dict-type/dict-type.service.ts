@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { DictTypeEntity } from './entity/dict-type.entity'
-import { CreateDictTypeReqDto, FindDictTypeReqDto } from './dto/dict-type.req.dto'
+import { CreateDictTypeReqDto, FindDictTypeReqDto, UpdateDictTypeReqDto } from './dto/dict-type.req.dto'
 
 import { create, find, update, _delete } from '@/common/services/base.service'
 
@@ -43,7 +43,7 @@ export class DictTypeService {
   }
 
   // 更新字典類型
-  async update(updateDictTypeReqDto: CreateDictTypeReqDto) {
+  async update(updateDictTypeReqDto: UpdateDictTypeReqDto) {
     await update({
       dto: updateDictTypeReqDto,
       repository: this.dictTypeRepository,

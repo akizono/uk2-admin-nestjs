@@ -15,6 +15,7 @@ import { MenuModule } from './modules/system/menu/menu.module'
 import { DeptModule } from './modules/system/dept/dept.module'
 import { RoleMenuModule } from './modules/system/role-menu/role-menu.module'
 import { DictTypeModule } from './modules/system/dict-type/dict-type.module'
+import { DictDataModule } from './modules/system/dict-data/dict-data.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { DictTypeModule } from './modules/system/dict-type/dict-type.module'
     RoleMenuModule,
     DeptModule,
     DictTypeModule,
+    DictDataModule,
   ],
 
   controllers: [AppController],
