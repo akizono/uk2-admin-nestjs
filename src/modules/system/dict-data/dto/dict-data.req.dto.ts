@@ -14,10 +14,10 @@ class DictDataReqDto extends BaseReqDto {
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   id: string
 
-  @ApiProperty({ description: '字典類型ID', required: true })
+  @ApiProperty({ description: '字典類型', required: true })
   @IsNotEmpty()
-  @Transform(({ value }) => new ParseBigIntPipe().transform(value))
-  dictTypeId: string
+  @IsString()
+  dictType: string
 
   @ApiProperty({ description: '字典標籤', required: true })
   @IsNotEmpty()
@@ -26,8 +26,8 @@ class DictDataReqDto extends BaseReqDto {
 
   @ApiProperty({ description: '字典鍵值', required: true })
   @IsNotEmpty()
-  @IsString()
-  value: string
+  @IsNumber()
+  value: number
 
   @ApiProperty({ description: '排序', required: true })
   @IsNotEmpty()

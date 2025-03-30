@@ -19,7 +19,7 @@ export class DictDataService {
     const result = await create({
       dto: createDictDataReqDto,
       repository: this.dictDataRepository,
-      existenceCondition: ['dictTypeId', 'label', 'value'],
+      existenceCondition: ['dictType', 'label', 'value'],
       modalName: '字典數據',
     })
 

@@ -6,9 +6,9 @@ export class CreateDictDataResDto extends SingleResponseDto({
 
 export class FindDictDataResDto extends PaginatedResponseDto({
   id: '1',
-  dictTypeId: '1',
-  label: 'string',
-  value: 'string',
+  dictType: 'system_user_sex',
+  label: '女',
+  value: 1,
   sort: 0,
 
   remark: 'remark',
