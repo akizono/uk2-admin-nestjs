@@ -105,6 +105,10 @@ export async function update(params: UpdateParams) {
 
     const { id, ...remain } = dto
 
+    if (id && remain.parentId && id === remain.parentId) {
+      throw new BadRequestException('不能將自己設為父級')
+    }
+
     if (existenceCondition.length > 0) {
       const whereFields = existenceCondition.reduce((acc, field) => {
         acc[field] = dto[field]
