@@ -8,7 +8,8 @@ export class FindDictDataResDto extends PaginatedResponseDto({
   id: '1',
   dictType: 'system_user_sex',
   label: '女',
-  value: 1,
+  value: '1',
+  dataType: 'number',
   sort: 0,
 
   remark: 'remark',

@@ -46,4 +46,4 @@ export class FindDictTypeReqDto extends PartialType(DictTypeReqDto) {
   currentPage?: number = 1
 }
 
-export class UpdateDictTypeReqDto extends PartialType(OmitType(DictTypeReqDto, [...disableEditFields])) {}
+export class UpdateDictTypeReqDto extends PartialType(OmitType(DictTypeReqDto, ['type', ...disableEditFields])) {}

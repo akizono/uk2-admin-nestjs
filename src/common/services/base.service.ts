@@ -62,8 +62,19 @@ export async function create(params: CreateParams) {
       if (exist) throw new ConflictException(`${modalName}已存在`)
     }
 
-    const newData = repository.create(dto)
-    await repository.save(newData)
+    let newData
+    try {
+      newData = repository.create(dto)
+    } catch (error) {
+      throw new BadRequestException(`建立${modalName}失敗：${error.message}`)
+    }
+
+    try {
+      await repository.save(newData)
+    } catch (error) {
+      throw new BadRequestException(`儲存${modalName}失敗：${error.message}`)
+    }
+
     return newData
   } catch (error) {
     throw error

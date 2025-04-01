@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator'
+import { IsEnum, IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
@@ -26,8 +26,13 @@ class DictDataReqDto extends BaseReqDto {
 
   @ApiProperty({ description: '字典鍵值', required: true })
   @IsNotEmpty()
-  @IsNumber()
-  value: number
+  @IsString()
+  value: string
+
+  @ApiProperty({ description: '數據類型', required: true })
+  @IsNotEmpty()
+  @IsEnum(['undefined', 'null', 'number', 'string', 'boolean', 'object', 'array'])
+  dataType: string
 
   @ApiProperty({ description: '排序', required: true })
   @IsNotEmpty()
