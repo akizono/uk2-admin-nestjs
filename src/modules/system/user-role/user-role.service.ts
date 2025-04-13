@@ -19,7 +19,7 @@ export class UserRoleService {
       dto: createUserRoleReqDto,
       repository: this.userRoleRepository,
       modalName: '使用者角色',
-      existenceCondition: ['userId', 'roleId'],
+      repeatCondition: ['userId', 'roleId'],
     })
   }
 }

@@ -24,7 +24,7 @@ export class UserService {
         salt,
       },
       repository: this.userRepository,
-      existenceCondition: ['username'],
+      repeatCondition: ['username'],
       modalName: '使用者',
     })
 

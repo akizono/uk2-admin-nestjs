@@ -19,10 +19,10 @@ export class MenuEntity extends BaseEntity {
   @Column({ length: 255, comment: '元件路徑', nullable: true })
   component: string
 
-  @Column({ length: 100, comment: '菜單權限' })
+  @Column({ length: 100, comment: '菜單權限', nullable: true })
   permission: string
 
-  @Column({ type: 'tinyint', comment: '菜單類型 0:目錄 1:菜單 2:按鈕' })
+  @Column({ type: 'tinyint', comment: '菜單類型 0:目錄 1:頁面 2:按鈕' })
   type: number
 
   @Column({ length: 50, comment: '菜單圖標', nullable: true })

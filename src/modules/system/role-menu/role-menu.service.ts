@@ -24,7 +24,7 @@ export class RoleMenuService {
     await create({
       dto: createRoleMenuReqDto,
       repository: this.roleMenuRepository,
-      existenceCondition: ['roleId', 'menuId'],
+      repeatCondition: ['roleId', 'menuId'],
       modalName: '角色關聯菜單',
       foreignKeyChecks: [
         {

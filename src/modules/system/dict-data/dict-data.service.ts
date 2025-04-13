@@ -19,7 +19,7 @@ export class DictDataService {
     const result = await create({
       dto: createDictDataReqDto,
       repository: this.dictDataRepository,
-      existenceCondition: ['dictType', 'label', 'value'],
+      repeatCondition: ['label', 'dictType', 'value'],
       modalName: '字典數據',
     })
 
@@ -45,6 +45,7 @@ export class DictDataService {
       dto: updateDictDataReqDto,
       repository: this.dictDataRepository,
       existenceCondition: ['id'],
+      repeatCondition: ['label', 'dictType', 'value'],
       modalName: '字典數據',
     })
   }

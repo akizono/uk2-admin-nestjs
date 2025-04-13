@@ -19,7 +19,7 @@ export class DictTypeService {
     const result = await create({
       dto: createDictTypeReqDto,
       repository: this.dictTypeRepository,
-      existenceCondition: ['type'],
+      repeatCondition: ['type'],
       modalName: '字典類型',
     })
 
@@ -48,6 +48,7 @@ export class DictTypeService {
       dto: updateDictTypeReqDto,
       repository: this.dictTypeRepository,
       existenceCondition: ['id'],
+      repeatCondition: ['type'],
       modalName: '字典類型',
     })
   }

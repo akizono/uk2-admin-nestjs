@@ -31,7 +31,7 @@ class DictDataReqDto extends BaseReqDto {
 
   @ApiProperty({ description: '數據類型', required: true })
   @IsNotEmpty()
-  @IsEnum(['undefined', 'null', 'number', 'string', 'boolean', 'object', 'array'])
+  @IsEnum(['undefined', 'null', 'number', 'string', 'boolean'])
   dataType: string
 
   @ApiProperty({ description: '排序', required: true })

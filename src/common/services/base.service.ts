@@ -4,7 +4,7 @@ import { Repository } from 'typeorm'
 interface CreateParams {
   dto: Record<string, any> // 後端接收的參數
   repository: Repository<any> // 資料庫操作的 Repository
-  existenceCondition?: string[] // 需要進行存在性判斷的條件
+  repeatCondition?: string[] // 查詢是否有重複的數據
   modalName: string // 模組名稱
 
   /**
@@ -30,6 +30,7 @@ interface UpdateParams {
   dto: Record<string, any>
   repository: Repository<any>
   existenceCondition?: string[]
+  repeatCondition?: string[]
   modalName: string
 }
 
@@ -41,7 +42,7 @@ interface DeleteParams {
 
 export async function create(params: CreateParams) {
   try {
-    const { dto, repository, existenceCondition = [], modalName, foreignKeyChecks = [] } = params
+    const { dto, repository, repeatCondition = [], modalName, foreignKeyChecks = [] } = params
 
     // 檢查外鍵是否存在
     for (const check of foreignKeyChecks) {
@@ -53,8 +54,8 @@ export async function create(params: CreateParams) {
       }
     }
 
-    if (existenceCondition.length > 0) {
-      const whereFields = existenceCondition.reduce((acc, field) => {
+    if (repeatCondition.length > 0) {
+      const whereFields = repeatCondition.reduce((acc, field) => {
         acc[field] = dto[field]
         return acc
       }, {})
@@ -112,7 +113,7 @@ export async function find(params: FindParams) {
 
 export async function update(params: UpdateParams) {
   try {
-    const { dto, repository, existenceCondition, modalName } = params
+    const { dto, repository, existenceCondition, repeatCondition, modalName } = params
 
     const { id, ...remain } = dto
 
@@ -120,13 +121,22 @@ export async function update(params: UpdateParams) {
       throw new BadRequestException('不能將自己設為父級')
     }
 
-    if (existenceCondition.length > 0) {
+    if (existenceCondition && existenceCondition.length > 0) {
       const whereFields = existenceCondition.reduce((acc, field) => {
         acc[field] = dto[field]
         return acc
       }, {})
       const exist = await repository.findOne({ where: whereFields })
       if (!exist) throw new NotFoundException(`${modalName}不存在`)
+    }
+
+    if (repeatCondition && repeatCondition.length > 0) {
+      const whereFields = repeatCondition.reduce((acc, field) => {
+        acc[field] = dto[field]
+        return acc
+      }, {})
+      const exist = await repository.findOne({ where: whereFields })
+      if (exist) throw new ConflictException(`[${repeatCondition.join('、')}]已存在`)
     }
 
     await repository.update({ id }, remain)

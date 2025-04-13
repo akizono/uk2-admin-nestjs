@@ -18,7 +18,7 @@ export class RoleService {
     await create({
       dto: createRoleReqDto,
       repository: this.roleRepository,
-      existenceCondition: ['code'],
+      repeatCondition: ['code'],
       modalName: '角色',
     })
   }

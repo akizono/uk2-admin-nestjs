@@ -35,7 +35,7 @@ export class MenuReqDto extends BaseReqDto {
   component: string
 
   @ApiProperty({ description: '菜單權限', example: 'system:user:create' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   permission: string
 
