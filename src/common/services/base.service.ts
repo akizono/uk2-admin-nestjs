@@ -29,8 +29,8 @@ interface FindParams {
 interface UpdateParams {
   dto: Record<string, any>
   repository: Repository<any>
-  existenceCondition?: string[]
-  repeatCondition?: string[]
+  existenceCondition?: string[] // 需要進行存在性判斷的條件
+  repeatCondition?: string[] // 需要進行重複性判斷的條件
   modalName: string
 }
 
@@ -136,7 +136,9 @@ export async function update(params: UpdateParams) {
         return acc
       }, {})
       const exist = await repository.findOne({ where: whereFields })
-      if (exist) throw new ConflictException(`[${repeatCondition.join('、')}]已存在`)
+      if (exist && exist.id !== id) {
+        throw new ConflictException(`[${repeatCondition.join('、')}]已存在`)
+      }
     }
 
     await repository.update({ id }, remain)
