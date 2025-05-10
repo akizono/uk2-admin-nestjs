@@ -48,7 +48,7 @@ export class DictTypeService {
       dto: updateDictTypeReqDto,
       repository: this.dictTypeRepository,
       existenceCondition: ['id'],
-      repeatCondition: ['type'],
+      // repeatCondition: ['type'],
       modalName: '字典類型',
     })
   }

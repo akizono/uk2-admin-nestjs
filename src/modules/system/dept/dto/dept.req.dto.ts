@@ -4,9 +4,7 @@ import { Transform } from 'class-transformer'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
-
-const MAX_PAGE_SIZE = 2000000000
-const MAX_PAGE_NUMBER = 200
+import { MAX_PAGE_SIZE, MAX_PAGE_NUMBER } from '@/utils/pagination-config'
 
 class DeptReqDto extends BaseReqDto {
   @ApiProperty({ description: '主鍵ID', required: true })

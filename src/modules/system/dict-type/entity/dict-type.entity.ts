@@ -13,6 +13,6 @@ export class DictTypeEntity extends BaseEntity {
   @Column({ length: 50, comment: '字典類型' })
   type: string
 
-  @Column({ type: 'int', comment: '排序' })
+  @Column({ type: 'float', comment: '排序' })
   sort: number
 }

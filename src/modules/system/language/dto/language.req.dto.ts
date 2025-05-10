@@ -5,31 +5,31 @@ import { Transform } from 'class-transformer'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { MAX_PAGE_SIZE, MAX_PAGE_NUMBER } from '@/utils/pagination-config'
-class DictTypeReqDto extends BaseReqDto {
-  @ApiProperty({ description: '主鍵ID', required: true })
+export class LanguageReqDto extends BaseReqDto {
+  @ApiProperty({ description: '主鍵ID' })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   id: string
 
-  @ApiProperty({ description: '字典名稱', required: true })
+  @ApiProperty({ description: '語言名稱', example: '繁體中文' })
   @IsNotEmpty()
   @IsString()
   name: string
 
-  @ApiProperty({ description: '字典類型', required: true })
+  @ApiProperty({ description: '語言代碼', example: 'zh-TW' })
   @IsNotEmpty()
   @IsString()
-  type: string
+  code: string
 
-  @ApiProperty({ description: '排序', required: true })
+  @ApiProperty({ description: '排序', example: 1 })
   @IsNotEmpty()
   @IsNumber()
   sort: number
 }
 
-export class CreateDictTypeReqDto extends PartialType(OmitType(DictTypeReqDto, ['id', ...disableEditFields])) {}
+export class CreateLanguageReqDto extends PartialType(OmitType(LanguageReqDto, ['id', ...disableEditFields])) {}
 
-export class FindDictTypeReqDto extends PartialType(DictTypeReqDto) {
+export class FindLanguageReqDto extends PartialType(LanguageReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
   @IsNotEmpty()
   @Min(0)
@@ -43,4 +43,4 @@ export class FindDictTypeReqDto extends PartialType(DictTypeReqDto) {
   currentPage?: number = 1
 }
 
-export class UpdateDictTypeReqDto extends PartialType(OmitType(DictTypeReqDto, ['type', ...disableEditFields])) {}
+export class UpdateLanguageReqDto extends PartialType(OmitType(LanguageReqDto, [...disableEditFields])) {}
