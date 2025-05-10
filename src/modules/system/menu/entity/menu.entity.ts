@@ -37,8 +37,8 @@ export class MenuEntity extends BaseEntity {
   @Column({ type: 'tinyint', comment: '是否顯示在標籤', default: 0 })
   isShowTag: number
 
-  @Column({ type: 'tinyint', comment: '是否常駐標籤欄', default: 0 })
-  isKeepAlive: number
+  @Column({ type: 'tinyint', comment: '是否常駐標籤欄位', default: 0 })
+  isPersistentTag: number
 
   @Column({ type: 'tinyint', comment: '是否顯示在側邊欄', default: 0 })
   isShowSide: number
