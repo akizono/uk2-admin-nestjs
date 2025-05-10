@@ -8,6 +8,7 @@ export class FindDeptResDto extends PaginatedResponseDto({
   id: '1',
   parentId: '0',
   name: 'string',
+  code: 'string',
   sort: 0,
   leaderUserId: '1',
   leaderUser: {

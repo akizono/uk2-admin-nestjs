@@ -8,11 +8,14 @@ export class DeptEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: string
 
-  @Column({ type: 'bigint', comment: '父級ID', nullable: true })
+  @Column({ name: 'parent_id', type: 'bigint', comment: '父級ID', nullable: true })
   parentId: string
 
   @Column({ length: 50, comment: '部門名稱' })
   name: string
+
+  @Column({ length: 50, comment: '部門代碼' })
+  code: string
 
   @Column({ type: 'int', comment: '排序' })
   sort: number

@@ -7,7 +7,7 @@ export class DictDataEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: string
 
-  @Column({ length: 50, comment: '字典類型' })
+  @Column({ name: 'dict_type', length: 50, comment: '字典類型' })
   dictType: string
 
   @Column({ length: 50, comment: '字典標籤' })
@@ -16,7 +16,7 @@ export class DictDataEntity extends BaseEntity {
   @Column({ length: 50, comment: '字典鍵值' })
   value: string
 
-  @Column({ length: 10, comment: '數據類型' })
+  @Column({ name: 'data_type', length: 10, comment: '數據類型' })
   dataType: string
 
   @Column({ type: 'int', comment: '排序' })

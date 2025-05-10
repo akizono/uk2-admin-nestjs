@@ -22,6 +22,11 @@ class DeptReqDto extends BaseReqDto {
   @IsString()
   name: string
 
+  @ApiProperty({ description: '部門代碼', required: true })
+  @IsNotEmpty()
+  @IsString()
+  code: string
+
   @ApiProperty({ description: '排序', required: true })
   @IsNotEmpty()
   @IsNumber()

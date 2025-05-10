@@ -10,6 +10,7 @@ import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { MsgResponseDto } from '@/utils/response-dto'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
+import { Public } from '@/common/decorators/public.decorator'
 
 @Controller('/system/language')
 @UseInterceptors(TransformInterceptor)
@@ -25,8 +26,9 @@ export class LanguageController {
     return this.languageService.create(createLanguageReqDto)
   }
 
+  @Public()
   @Get('/page')
-  @HasPermission('system:language:page')
+  // @HasPermission('system:language:page')
   @ApiOperation({ summary: '取得語言分頁列表' })
   @ApiResponse({ type: FindLanguageResDto })
   @ResponseMessage('取得語言分頁列表成功')

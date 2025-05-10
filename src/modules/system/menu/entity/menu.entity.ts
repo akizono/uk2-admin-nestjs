@@ -7,7 +7,7 @@ export class MenuEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: string
 
-  @Column({ type: 'bigint', comment: '父級ID', nullable: true })
+  @Column({ name: 'parent_id', type: 'bigint', comment: '父級ID', nullable: true })
   parentId: string
 
   @Column({ length: 50, comment: '菜單名稱' })
@@ -31,16 +31,16 @@ export class MenuEntity extends BaseEntity {
   @Column({ length: 255, comment: '外連地址', nullable: true })
   link: string
 
-  @Column({ type: 'tinyint', comment: '是否緩存', default: 0 })
+  @Column({ name: 'is_cache', type: 'tinyint', comment: '是否緩存', default: 0 })
   isCache: number
 
-  @Column({ type: 'tinyint', comment: '是否顯示在標籤', default: 0 })
+  @Column({ name: 'is_show_tag', type: 'tinyint', comment: '是否顯示在標籤', default: 0 })
   isShowTag: number
 
-  @Column({ type: 'tinyint', comment: '是否常駐標籤欄位', default: 0 })
+  @Column({ name: 'is_persistent_tag', type: 'tinyint', comment: '是否常駐標籤欄位', default: 0 })
   isPersistentTag: number
 
-  @Column({ type: 'tinyint', comment: '是否顯示在側邊欄', default: 0 })
+  @Column({ name: 'is_show_side', type: 'tinyint', comment: '是否顯示在側邊欄', default: 0 })
   isShowSide: number
 
   @Column({ type: 'int', comment: '排序', default: 0 })
