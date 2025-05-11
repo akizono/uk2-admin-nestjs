@@ -1,6 +1,9 @@
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common'
 import { Repository } from 'typeorm'
 
+import { requestContext } from '@/utils/request-context'
+import { MultilingualFieldsEntity } from '@/modules/system/multilingual-fields/entity/multilingual-fields.entity'
+
 interface CreateParams {
   dto: Record<string, any> // 後端接收的參數
   repository: Repository<any> // 資料庫操作的 Repository
@@ -84,14 +87,12 @@ export async function create(params: CreateParams) {
 
 export async function find(params: FindParams) {
   try {
+    /** 查詢數據 */
     const { dto, repository, relations = [], where } = params
-
     const { pageSize, currentPage, ...remain } = dto
-
     const conditions = Object.keys(remain).length > 0 ? remain : undefined
     const skip = pageSize === 0 ? undefined : (currentPage - 1) * pageSize
     const take = pageSize === 0 ? undefined : pageSize
-
     const [list, total] = await repository.findAndCount({
       relations,
       where: {
@@ -101,6 +102,48 @@ export async function find(params: FindParams) {
       skip,
       take,
     })
+
+    /** 根據請求頭中的語言設定，將多語言欄位轉為對應語言  */
+    // 檢查是否存在「多語言欄位」
+    const multilingualFields = []
+    outerLoop: for (let i = 0; i < list.length; i++) {
+      const item = list[i]
+      for (const key in item) {
+        if (
+          item[key] !== null &&
+          item[key] !== undefined &&
+          typeof item[key] === 'string' &&
+          item[key].startsWith('multilingual-')
+        ) {
+          multilingualFields.push(key)
+          break outerLoop
+        }
+      }
+    }
+    // 根據multilingualFields，查詢list中每條資料的多語言欄位
+    if (multilingualFields.length > 0) {
+      // 獲取請求頭中的語言設定
+      const { request } = requestContext.getStore()
+      const languageCurrent = request.headers['language-current']
+      // 注入 MultilingualFieldsEntity
+      const multilingualFieldsRepository = repository.manager.getRepository(MultilingualFieldsEntity)
+      // 使用 Promise.all 等待所有操作完成
+      await Promise.all(
+        list.map(async item => {
+          await Promise.all(
+            multilingualFields.map(async field => {
+              const data = await multilingualFieldsRepository.find({
+                where: {
+                  fieldId: item[field],
+                  isDeleted: 0,
+                },
+              })
+              item[field] = data.find(item => item.language === languageCurrent)?.value
+            }),
+          )
+        }),
+      )
+    }
 
     return {
       list,
