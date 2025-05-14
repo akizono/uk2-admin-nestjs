@@ -66,6 +66,18 @@ export class MultilingualFieldsService {
     })
   }
 
+  // 批次更新
+  async updateBatch(updateMultilingualFieldsReqDtoArr: UpdateMultilingualFieldsReqDto[]) {
+    for (const updateMultilingualFieldsReqDto of updateMultilingualFieldsReqDtoArr) {
+      await update({
+        dto: updateMultilingualFieldsReqDto,
+        repository: this.multilingualFieldsRepository,
+        existenceCondition: ['id'],
+        modalName: '多語言欄位',
+      })
+    }
+  }
+
   // 刪除多語言欄位
   async delete(id: string) {
     await _delete({

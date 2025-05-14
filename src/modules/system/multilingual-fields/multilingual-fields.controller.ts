@@ -56,6 +56,15 @@ export class MultilingualFieldsController {
     return this.multilingualFieldsService.update(updateMultilingualFieldsReqDto)
   }
 
+  @Put('/update-batch')
+  @HasPermission('system:multilingual-fields:update')
+  @ApiOperation({ summary: '批次更新多語言欄位' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('批次更新多語言欄位成功')
+  updateBatch(@Body() updateMultilingualFieldsReqDtoArr: UpdateMultilingualFieldsReqDto[]) {
+    return this.multilingualFieldsService.updateBatch(updateMultilingualFieldsReqDtoArr)
+  }
+
   @Delete('/delete/:id')
   @HasPermission('system:multilingual-fields:delete')
   @ApiOperation({ summary: '刪除多語言欄位' })

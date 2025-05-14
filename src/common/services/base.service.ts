@@ -1,7 +1,6 @@
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common'
 import { Repository } from 'typeorm'
 
-import { requestContext } from '@/utils/request-context'
 import { MultilingualFieldsEntity } from '@/modules/system/multilingual-fields/entity/multilingual-fields.entity'
 
 interface CreateParams {
@@ -103,7 +102,7 @@ export async function find(params: FindParams) {
       take,
     })
 
-    /** 根據請求頭中的語言設定，將多語言欄位轉為對應語言  */
+    /** 在 list 的返回值中攜帶「多語言欄位」的具體數據  */
     // 檢查是否存在「多語言欄位」
     const multilingualFields = []
     outerLoop: for (let i = 0; i < list.length; i++) {
@@ -123,8 +122,9 @@ export async function find(params: FindParams) {
     // 根據multilingualFields，查詢list中每條資料的多語言欄位
     if (multilingualFields.length > 0) {
       // 獲取請求頭中的語言設定
-      const { request } = requestContext.getStore()
-      const languageCurrent = request.headers['language-current']
+      // const { request } = requestContext.getStore()
+      // const languageCurrent = request.headers['language-current']
+
       // 注入 MultilingualFieldsEntity
       const multilingualFieldsRepository = repository.manager.getRepository(MultilingualFieldsEntity)
       // 使用 Promise.all 等待所有操作完成
@@ -138,7 +138,11 @@ export async function find(params: FindParams) {
                   isDeleted: 0,
                 },
               })
-              item[field] = data.find(item => item.language === languageCurrent)?.value
+              // 將多語言欄位轉為對應語言
+              // item[field] = data.find(item => item.language === languageCurrent)?.value
+              // 將多語言資訊一併返回
+              if (!item['multilingualFields']) item['multilingualFields'] = {}
+              item['multilingualFields'][field] = data
             }),
           )
         }),
