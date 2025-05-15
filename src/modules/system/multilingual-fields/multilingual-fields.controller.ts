@@ -6,6 +6,7 @@ import {
   CreateMultilingualFieldsReqDto,
   FindMultilingualFieldsReqDto,
   UpdateMultilingualFieldsReqDto,
+  ConvertLanguageReqDto,
 } from './dto/multilingual-fields.req.dto'
 import { CreateMultilingualFieldsResDto, FindMultilingualFieldsResDto } from './dto/multilingual-fields.res.dto'
 
@@ -90,5 +91,14 @@ export class MultilingualFieldsController {
   @ResponseMessage('解封鎖多語言欄位成功')
   unblock(@Param('id', ParseBigIntPipe) id: string) {
     return this.multilingualFieldsService.unblock(id)
+  }
+
+  @Post('/ai/convert-language')
+  @HasPermission('system:multilingual-fields:ai-convert-language')
+  @ApiOperation({ summary: '將「字串」轉換為其他語言' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('將「字串」轉換為其他語言成功')
+  convertLanguage(@Body() convertLanguageReqDto: ConvertLanguageReqDto) {
+    return this.multilingualFieldsService.convertLanguage(convertLanguageReqDto)
   }
 }

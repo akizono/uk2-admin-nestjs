@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsNotEmpty, IsString, Max, Min } from 'class-validator'
+import { IsArray, IsNotEmpty, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
@@ -49,3 +49,14 @@ export class FindMultilingualFieldsReqDto extends PartialType(MultilingualFields
 export class UpdateMultilingualFieldsReqDto extends PartialType(
   OmitType(MultilingualFieldsReqDto, [...disableEditFields]),
 ) {}
+
+export class ConvertLanguageReqDto {
+  @ApiProperty({ description: '要轉換的原始文字' })
+  @IsString()
+  text: string
+
+  @ApiProperty({ description: '目標語言代碼列表，例如：["zh-TW", "en", "ja"]' })
+  @IsArray()
+  @IsString({ each: true })
+  targetLanguages: string[]
+}
