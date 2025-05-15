@@ -4,7 +4,8 @@ import { Transform } from 'class-transformer'
 
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
-import { MAX_PAGE_SIZE, MAX_PAGE_NUMBER } from '@/utils/pagination-config'
+import { EnvHelper } from '@/utils/env-helper'
+
 class RoleReqDto extends BaseReqDto {
   @ApiProperty({ description: '主鍵ID' })
   @IsNotEmpty()
@@ -33,12 +34,12 @@ export class FindRoleReqDto extends PartialType(RoleReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
   @IsNotEmpty()
   @Min(0)
-  @Max(MAX_PAGE_SIZE)
+  @Max(EnvHelper.getNumber('MAX_PAGE_SIZE'))
   pageSize?: number = 10
 
   @ApiProperty({ description: '分頁頁碼', example: 1, required: false })
   @IsNotEmpty()
   @Min(0)
-  @Max(MAX_PAGE_NUMBER)
+  @Max(EnvHelper.getNumber('MAX_PAGE_NUMBER'))
   currentPage?: number = 1
 }

@@ -4,7 +4,7 @@ import { Transform } from 'class-transformer'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
-import { MAX_PAGE_SIZE, MAX_PAGE_NUMBER } from '@/utils/pagination-config'
+import { EnvHelper } from '@/utils/env-helper'
 
 export class MenuReqDto extends BaseReqDto {
   @ApiProperty({ description: '主鍵ID' })
@@ -42,7 +42,7 @@ export class MenuReqDto extends BaseReqDto {
   @IsNumber()
   type: number
 
-  @ApiProperty({ description: '菜單圖標', example: 'el-icon-user' })
+  @ApiProperty({ description: '菜單圖示', example: 'el-icon-user' })
   @IsOptional()
   @IsString()
   icon: string
@@ -52,7 +52,7 @@ export class MenuReqDto extends BaseReqDto {
   @IsString()
   link: string
 
-  @ApiProperty({ description: '是否緩存', example: 0 })
+  @ApiProperty({ description: '是否快取', example: 0 })
   @IsNotEmpty()
   @IsNumber()
   isCache: number
@@ -84,13 +84,13 @@ export class FindMenuReqDto extends PartialType(MenuReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
   @IsNotEmpty()
   @Min(0)
-  @Max(MAX_PAGE_SIZE)
+  @Max(EnvHelper.getNumber('MAX_PAGE_SIZE'))
   pageSize?: number = 10
 
   @ApiProperty({ description: '分頁頁碼', example: 1, required: false })
   @IsNotEmpty()
   @Min(0)
-  @Max(MAX_PAGE_NUMBER)
+  @Max(EnvHelper.getNumber('MAX_PAGE_NUMBER'))
   currentPage?: number = 1
 }
 

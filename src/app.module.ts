@@ -23,7 +23,6 @@ import { MultilingualFieldsModule } from './modules/system/multilingual-fields/m
   imports: [
     /* 全局環境變數 */
     ConfigModule.forRoot({
-      envFilePath: EnvHelper.getEnvFilePath(),
       isGlobal: true,
     }),
 
