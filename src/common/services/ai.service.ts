@@ -2,7 +2,6 @@ import OpenAI from 'openai'
 
 import { EnvHelper } from '@/utils/env-helper'
 
-console.log(`EnvHelper.getString('OPENAI_API_KEY')`, EnvHelper.getString('OPENAI_API_KEY'))
 const openAIClient = new OpenAI({
   apiKey: EnvHelper.getString('OPENAI_API_KEY'),
 })

@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, NotFoundException } from '@nest
 import { Repository } from 'typeorm'
 
 import { MultilingualFieldsEntity } from '@/modules/system/multilingual-fields/entity/multilingual-fields.entity'
+import { getEntityColumnMetadata } from '@/utils/entity-utils'
 
 interface CreateParams {
   dto: Record<string, any> // 後端接收的參數
@@ -161,6 +162,25 @@ export async function find(params: FindParams) {
 export async function update(params: UpdateParams) {
   try {
     const { dto, repository, existenceCondition, repeatCondition, modalName } = params
+
+    // 收集所有屬性的元數據
+    const columnMetadataMap = new Map()
+    for (const key in dto) {
+      try {
+        const metadata = getEntityColumnMetadata(repository.target, key)
+        if (metadata) {
+          columnMetadataMap.set(key, metadata)
+        }
+      } catch (error) {
+        console.error(`獲取 ${key} 欄位定義失敗:`, error)
+      }
+    }
+
+    columnMetadataMap.forEach((metadata, key) => {
+      if (!metadata.nullable && metadata.default !== undefined) {
+        dto[key] = metadata.default
+      }
+    })
 
     const { id, ...remain } = dto
 
