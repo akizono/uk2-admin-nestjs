@@ -13,18 +13,18 @@ export class MenuService {
     private readonly menuRepository: Repository<MenuEntity>,
   ) {}
 
-  // 新增菜單
+  // 新增選單
   async create(createMenuReqDto: CreateMenuReqDto) {
     const result = await create({
       dto: createMenuReqDto,
       repository: this.menuRepository,
-      modalName: '菜單',
+      modalName: '選單',
     })
 
     return { id: result.id }
   }
 
-  // 查詢菜單
+  // 查詢選單
   async find(findMenuReqDto: FindMenuReqDto) {
     const { list, total } = await find({
       dto: findMenuReqDto,
@@ -40,42 +40,42 @@ export class MenuService {
     }
   }
 
-  // 更新菜單
+  // 更新選單
   async update(updateMenuReqDto: UpdateMenuReqDto) {
     await update({
       dto: updateMenuReqDto,
       repository: this.menuRepository,
       existenceCondition: ['id'],
-      modalName: '菜單',
+      modalName: '選單',
     })
   }
 
-  // 刪除菜單
+  // 刪除選單
   async delete(id: string) {
     await _delete({
       id,
       repository: this.menuRepository,
-      modalName: '菜單',
+      modalName: '選單',
     })
   }
 
-  // 封鎖菜單
+  // 封鎖選單
   async block(id: string) {
     await update({
       dto: { id, status: 0 },
       repository: this.menuRepository,
       existenceCondition: ['id'],
-      modalName: '菜單',
+      modalName: '選單',
     })
   }
 
-  // 解封鎖菜單
+  // 解封鎖選單
   async unblock(id: string) {
     await update({
       dto: { id, status: 1 },
       repository: this.menuRepository,
       existenceCondition: ['id'],
-      modalName: '菜單',
+      modalName: '選單',
     })
   }
 }

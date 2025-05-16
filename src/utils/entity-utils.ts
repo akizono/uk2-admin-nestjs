@@ -1,4 +1,5 @@
 import { EntityTarget, getMetadataArgsStorage } from 'typeorm'
+import { Repository } from 'typeorm'
 
 /**
  * 獲取實體類中屬性的列定義資訊
@@ -137,4 +138,30 @@ export function getEntityPropertyDecorator(entity: EntityTarget<any>, propertyNa
     console.error('獲取屬性裝飾器設定失敗:', error)
     return null
   }
+}
+
+/**
+ * 將 dto 中「非空」的欄位設為預設值
+ * @param dto 需要填充預設值的 DTO
+ * @param repository 實體類的 Repository
+ * @returns 填充預設值後的 DTO
+ */
+export function fillNonEmptyWithDefaults(dto: Record<string, any>, repository: Repository<any>) {
+  const columnMetadataMap = new Map()
+  for (const key in dto) {
+    try {
+      const metadata = getEntityColumnMetadata(repository.target, key)
+      if (metadata) {
+        columnMetadataMap.set(key, metadata)
+      }
+    } catch (error) {
+      console.error(`獲取 ${key} 欄位定義失敗:`, error)
+    }
+  }
+  columnMetadataMap.forEach((metadata, key) => {
+    if (!dto[key] && !metadata.nullable && metadata.default !== undefined) {
+      dto[key] = metadata.default
+    }
+  })
+  return dto
 }

@@ -2,7 +2,7 @@ import { BadRequestException, ConflictException, NotFoundException } from '@nest
 import { Repository } from 'typeorm'
 
 import { MultilingualFieldsEntity } from '@/modules/system/multilingual-fields/entity/multilingual-fields.entity'
-import { getEntityColumnMetadata } from '@/utils/entity-utils'
+import { fillNonEmptyWithDefaults } from '@/utils/entity-utils'
 
 interface CreateParams {
   dto: Record<string, any> // 後端接收的參數
@@ -45,7 +45,8 @@ interface DeleteParams {
 
 export async function create(params: CreateParams) {
   try {
-    const { dto, repository, repeatCondition = [], modalName, foreignKeyChecks = [] } = params
+    const { repository, repeatCondition = [], modalName, foreignKeyChecks = [] } = params
+    const dto = fillNonEmptyWithDefaults(params.dto, repository)
 
     // 檢查外鍵是否存在
     for (const check of foreignKeyChecks) {
@@ -89,7 +90,7 @@ export async function find(params: FindParams) {
   try {
     /** 查詢數據 */
     const { dto, repository, relations = [], where } = params
-    const { pageSize, currentPage, ...remain } = dto
+    const { pageSize, currentPage, ...remain } = fillNonEmptyWithDefaults(dto, repository)
     const conditions = Object.keys(remain).length > 0 ? remain : undefined
     const skip = pageSize === 0 ? undefined : (currentPage - 1) * pageSize
     const take = pageSize === 0 ? undefined : pageSize
@@ -122,10 +123,6 @@ export async function find(params: FindParams) {
     }
     // 根據multilingualFields，查詢list中每條資料的多語言欄位
     if (multilingualFields.length > 0) {
-      // 獲取請求頭中的語言設定
-      // const { request } = requestContext.getStore()
-      // const languageCurrent = request.headers['language-current']
-
       // 注入 MultilingualFieldsEntity
       const multilingualFieldsRepository = repository.manager.getRepository(MultilingualFieldsEntity)
       // 使用 Promise.all 等待所有操作完成
@@ -139,8 +136,6 @@ export async function find(params: FindParams) {
                   isDeleted: 0,
                 },
               })
-              // 將多語言欄位轉為對應語言
-              // item[field] = data.find(item => item.language === languageCurrent)?.value
               // 將多語言資訊一併返回
               if (!item['multilingualFields']) item['multilingualFields'] = {}
               item['multilingualFields'][field] = data
@@ -162,27 +157,7 @@ export async function find(params: FindParams) {
 export async function update(params: UpdateParams) {
   try {
     const { dto, repository, existenceCondition, repeatCondition, modalName } = params
-
-    // 收集所有屬性的元數據
-    const columnMetadataMap = new Map()
-    for (const key in dto) {
-      try {
-        const metadata = getEntityColumnMetadata(repository.target, key)
-        if (metadata) {
-          columnMetadataMap.set(key, metadata)
-        }
-      } catch (error) {
-        console.error(`獲取 ${key} 欄位定義失敗:`, error)
-      }
-    }
-
-    columnMetadataMap.forEach((metadata, key) => {
-      if (!metadata.nullable && metadata.default !== undefined) {
-        dto[key] = metadata.default
-      }
-    })
-
-    const { id, ...remain } = dto
+    const { id, ...remain } = fillNonEmptyWithDefaults(dto, repository)
 
     if (id && remain.parentId && id === remain.parentId) {
       throw new BadRequestException('不能將自己設為父級')

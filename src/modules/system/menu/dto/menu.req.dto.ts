@@ -17,7 +17,7 @@ export class MenuReqDto extends BaseReqDto {
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   parentId: string
 
-  @ApiProperty({ description: '菜單名稱', example: '建立使用者' })
+  @ApiProperty({ description: '選單名稱', example: '建立使用者' })
   @IsNotEmpty()
   @IsString()
   name: string
@@ -32,17 +32,17 @@ export class MenuReqDto extends BaseReqDto {
   @IsString()
   component: string
 
-  @ApiProperty({ description: '菜單權限', example: 'system:user:create' })
+  @ApiProperty({ description: '選單權限', example: 'system:user:create' })
   @IsOptional()
   @IsString()
   permission: string
 
-  @ApiProperty({ description: '菜單類型（值查字典）', example: 2 })
+  @ApiProperty({ description: '選單類型（值查字典）', example: 2 })
   @IsNotEmpty()
   @IsNumber()
   type: number
 
-  @ApiProperty({ description: '菜單圖示', example: 'el-icon-user' })
+  @ApiProperty({ description: '選單圖示', example: 'el-icon-user' })
   @IsOptional()
   @IsString()
   icon: string

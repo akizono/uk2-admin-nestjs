@@ -18,54 +18,54 @@ export class MenuController {
 
   @Post('/create')
   @HasPermission('system:menu:create')
-  @ApiOperation({ summary: '建立菜單' })
+  @ApiOperation({ summary: '建立選單' })
   @ApiResponse({ type: CreateMenuResDto })
-  @ResponseMessage('建立菜單成功')
+  @ResponseMessage('建立選單成功')
   create(@Body() createMenuReqDto: CreateMenuReqDto) {
     return this.menuService.create(createMenuReqDto)
   }
 
   @Get('/page')
   @HasPermission('system:menu:page')
-  @ApiOperation({ summary: '取得菜單分頁列表' })
+  @ApiOperation({ summary: '取得選單分頁列表' })
   @ApiResponse({ type: FindMenuResDto })
-  @ResponseMessage('取得菜單分頁列表成功')
+  @ResponseMessage('取得選單分頁列表成功')
   find(@Query() findMenuReqDto: FindMenuReqDto) {
     return this.menuService.find(findMenuReqDto)
   }
 
   @Put('/update')
   @HasPermission('system:menu:update')
-  @ApiOperation({ summary: '更新菜單' })
+  @ApiOperation({ summary: '更新選單' })
   @ApiResponse({ type: MsgResponseDto() })
-  @ResponseMessage('更新菜單成功')
+  @ResponseMessage('更新選單成功')
   update(@Body() updateMenuReqDto: UpdateMenuReqDto) {
     return this.menuService.update(updateMenuReqDto)
   }
 
   @Delete('/delete/:id')
   @HasPermission('system:menu:delete')
-  @ApiOperation({ summary: '刪除菜單' })
+  @ApiOperation({ summary: '刪除選單' })
   @ApiResponse({ type: MsgResponseDto() })
-  @ResponseMessage('刪除菜單成功')
+  @ResponseMessage('刪除選單成功')
   delete(@Param('id', ParseBigIntPipe) id: string) {
     return this.menuService.delete(id)
   }
 
   @Put('/block/:id')
   @HasPermission('system:menu:block')
-  @ApiOperation({ summary: '封鎖菜單' })
+  @ApiOperation({ summary: '封鎖選單' })
   @ApiResponse({ type: MsgResponseDto() })
-  @ResponseMessage('封鎖菜單成功')
+  @ResponseMessage('封鎖選單成功')
   block(@Param('id', ParseBigIntPipe) id: string) {
     return this.menuService.block(id)
   }
 
   @Put('/unblock/:id')
   @HasPermission('system:menu:unblock')
-  @ApiOperation({ summary: '解封鎖菜單' })
+  @ApiOperation({ summary: '解封鎖選單' })
   @ApiResponse({ type: MsgResponseDto() })
-  @ResponseMessage('解封鎖菜單成功')
+  @ResponseMessage('解封鎖選單成功')
   unblock(@Param('id', ParseBigIntPipe) id: string) {
     return this.menuService.unblock(id)
   }
