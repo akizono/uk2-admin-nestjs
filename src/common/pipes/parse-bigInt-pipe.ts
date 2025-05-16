@@ -6,6 +6,10 @@ export class ParseBigIntPipe implements PipeTransform {
   private readonly MAX_ALLOWED = BigInt('18446744073709551615')
 
   transform(value: string) {
+    if (value === null) {
+      return null
+    }
+
     try {
       const bigIntValue = BigInt(value)
       if (bigIntValue < 0) {
