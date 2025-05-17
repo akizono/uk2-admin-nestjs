@@ -7,7 +7,8 @@ export class CreateMenuResDto extends SingleResponseDto({
 export class FindMenuResDto extends PaginatedResponseDto({
   id: '1',
   parentId: '0',
-  name: '建立使用者',
+  title: '建立使用者',
+  name: 'CreateUser',
   permission: 'system:menu:create',
   type: 2,
   sort: 1,

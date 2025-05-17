@@ -10,8 +10,11 @@ export class MenuEntity extends BaseEntity {
   @Column({ name: 'parent_id', type: 'bigint', comment: '父級ID', nullable: true })
   parentId: string
 
-  @Column({ length: 50, comment: '選單名稱' })
+  @Column({ length: 50, comment: '選單名稱', nullable: true })
   name: string
+
+  @Column({ length: 50, comment: '選單標題', nullable: true })
+  title: string
 
   @Column({ length: 255, comment: '路由路徑', nullable: true })
   path: string

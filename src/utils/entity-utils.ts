@@ -159,7 +159,7 @@ export function fillNonEmptyWithDefaults(dto: Record<string, any>, repository: R
     }
   }
   columnMetadataMap.forEach((metadata, key) => {
-    if (!dto[key] && !metadata.nullable && metadata.default !== undefined) {
+    if (dto[key] === null && !metadata.nullable && metadata.default !== undefined) {
       dto[key] = metadata.default
     }
   })

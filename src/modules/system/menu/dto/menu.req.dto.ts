@@ -17,7 +17,12 @@ export class MenuReqDto extends BaseReqDto {
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   parentId: string
 
-  @ApiProperty({ description: '選單名稱', example: '建立使用者' })
+  @ApiProperty({ description: '選單標題', example: '建立使用者' })
+  @IsNotEmpty()
+  @IsString()
+  title: string
+
+  @ApiProperty({ description: '選單名稱', example: 'CreateUser' })
   @IsNotEmpty()
   @IsString()
   name: string
