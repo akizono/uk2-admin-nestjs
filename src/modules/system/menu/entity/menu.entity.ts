@@ -38,10 +38,10 @@ export class MenuEntity extends BaseEntity {
   isCache: number
 
   @Column({ name: 'is_show_tag', type: 'tinyint', comment: '是否顯示在標籤', default: 0 })
-  isShowTag: number
+  isShowTab: number
 
   @Column({ name: 'is_persistent_tag', type: 'tinyint', comment: '是否常駐標籤欄位', default: 0 })
-  isPersistentTag: number
+  isPersistentTab: number
 
   @Column({ name: 'is_show_side', type: 'tinyint', comment: '是否顯示在側邊欄', default: 0 })
   isShowSide: number

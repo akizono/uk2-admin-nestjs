@@ -65,12 +65,12 @@ export class MenuReqDto extends BaseReqDto {
   @ApiProperty({ description: '是否顯示在標籤', example: 0 })
   @IsNotEmpty()
   @IsNumber()
-  isShowTag: number
+  isShowTab: number
 
   @ApiProperty({ description: '是否常駐標籤欄', example: 0 })
   @IsNotEmpty()
   @IsNumber()
-  isPersistentTag: number
+  isPersistentTab: number
 
   @ApiProperty({ description: '是否顯示在側邊欄', example: 0 })
   @IsNotEmpty()
