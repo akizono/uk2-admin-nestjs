@@ -88,21 +88,117 @@ export async function create(params: CreateParams) {
 
 export async function find(params: FindParams) {
   try {
-    /** 查詢數據 */
+    // 解構參數
     const { dto, repository, relations = [], where } = params
+    // 解構DTO
     const { pageSize, currentPage, ...remain } = fillNonEmptyWithDefaults(dto, repository)
+    // 組裝查詢條件
     const conditions = Object.keys(remain).length > 0 ? remain : undefined
     const skip = pageSize === 0 ? undefined : (currentPage - 1) * pageSize
     const take = pageSize === 0 ? undefined : pageSize
-    const [list, total] = await repository.findAndCount({
-      relations,
-      where: {
-        ...conditions,
-        ...where,
-      },
-      skip,
-      take,
-    })
+
+    // 注入 MultilingualFieldsEntity
+    const multilingualFieldsRepository = repository.manager.getRepository(MultilingualFieldsEntity)
+
+    // 如果有多語言欄位，則需要獲取語言在multilingual-fields資料庫中的id
+    const fieldIds = {}
+    if (dto.multilingualFields && Array.isArray(dto.multilingualFields) && dto.multilingualFields.length > 0) {
+      const mfKeys = dto.multilingualFields
+      for (let index = 0; index < mfKeys.length; index++) {
+        const key = mfKeys[index]
+        if (conditions && conditions[key]) {
+          // 在 multilingual-fields 資料庫中進行尋找
+          const value = conditions[key]
+          fieldIds[key] = (
+            await multilingualFieldsRepository.find({
+              where: {
+                value,
+              },
+            })
+          ).map(item => item.fieldId)
+        }
+      }
+    }
+
+    // 查詢資料
+    let list = []
+    let total = 0
+    // 「需要適配多語言的查詢參數」的尋找
+    if (Object.keys(fieldIds).length > 0) {
+      const fieldKeys = Object.keys(fieldIds)
+
+      // 計算所有可能的組合（笛卡兒積）
+      const generateCombinations = arrays => {
+        if (arrays.length === 0) return [[]]
+        if (arrays.length === 1) return arrays[0].map(item => [item])
+
+        const result = []
+        const restCombinations = generateCombinations(arrays.slice(1))
+
+        for (const item of arrays[0]) {
+          for (const combination of restCombinations) {
+            result.push([item, ...combination])
+          }
+        }
+
+        return result
+      }
+
+      const fieldValueArrays = fieldKeys.map(key => fieldIds[key])
+      const combinations = generateCombinations(fieldValueArrays)
+
+      // 將組合轉換為查詢條件對象
+      const queryCombinations = combinations.map(combination => {
+        const queryObj = {}
+        fieldKeys.forEach((key, index) => {
+          queryObj[key] = combination[index]
+        })
+        return queryObj
+      })
+
+      // 使用每個組合進行查詢（不應用分頁，先查出所有結果）
+      const allResults = []
+      for (const combination of queryCombinations) {
+        const result = await repository.find({
+          relations,
+          where: {
+            ...where,
+            ...conditions,
+            ...combination,
+          },
+        })
+        allResults.push(...result)
+      }
+
+      // 去重（根據id）
+      const uniqueItems = allResults.filter((item, index, self) => index === self.findIndex(t => t.id === item.id))
+
+      // 設定總數
+      total = uniqueItems.length
+
+      // 應用分頁
+      if (pageSize > 0) {
+        const startIndex = (currentPage - 1) * pageSize
+        list = uniqueItems.slice(startIndex, startIndex + pageSize)
+      } else {
+        list = uniqueItems
+      }
+    }
+
+    // 「不需要適配多語言的查詢參數」的尋找
+    else {
+      const result = await repository.findAndCount({
+        relations,
+        where: {
+          ...conditions,
+          ...where,
+        },
+        skip,
+        take,
+      })
+      list = result[0]
+      total = result[1]
+    }
 
     /** 在 list 的返回值中攜帶「多語言欄位」的具體數據  */
     // 檢查是否存在「多語言欄位」
@@ -123,8 +219,6 @@ export async function find(params: FindParams) {
     }
     // 根據multilingualFields，查詢list中每條資料的多語言欄位
     if (multilingualFields.length > 0) {
-      // 注入 MultilingualFieldsEntity
-      const multilingualFieldsRepository = repository.manager.getRepository(MultilingualFieldsEntity)
       // 使用 Promise.all 等待所有操作完成
       await Promise.all(
         list.map(async item => {

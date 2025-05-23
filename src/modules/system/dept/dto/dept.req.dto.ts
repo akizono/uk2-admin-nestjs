@@ -38,7 +38,9 @@ class DeptReqDto extends BaseReqDto {
   leaderUserId: string
 }
 
-export class CreateDeptReqDto extends PartialType(OmitType(DeptReqDto, ['id', ...disableEditFields])) {}
+export class CreateDeptReqDto extends PartialType(
+  OmitType(DeptReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+) {}
 
 export class FindDeptReqDto extends PartialType(DeptReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
@@ -54,4 +56,4 @@ export class FindDeptReqDto extends PartialType(DeptReqDto) {
   currentPage?: number = 1
 }
 
-export class UpdateDeptReqDto extends PartialType(OmitType(DeptReqDto, [...disableEditFields])) {}
+export class UpdateDeptReqDto extends PartialType(OmitType(DeptReqDto, ['multilingualFields', ...disableEditFields])) {}

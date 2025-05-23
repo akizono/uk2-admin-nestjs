@@ -28,7 +28,9 @@ class DictTypeReqDto extends BaseReqDto {
   sort: number
 }
 
-export class CreateDictTypeReqDto extends PartialType(OmitType(DictTypeReqDto, ['id', ...disableEditFields])) {}
+export class CreateDictTypeReqDto extends PartialType(
+  OmitType(DictTypeReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+) {}
 
 export class FindDictTypeReqDto extends PartialType(DictTypeReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
@@ -44,4 +46,6 @@ export class FindDictTypeReqDto extends PartialType(DictTypeReqDto) {
   currentPage?: number = 1
 }
 
-export class UpdateDictTypeReqDto extends PartialType(OmitType(DictTypeReqDto, ['type', ...disableEditFields])) {}
+export class UpdateDictTypeReqDto extends PartialType(
+  OmitType(DictTypeReqDto, ['type', 'multilingualFields', ...disableEditFields]),
+) {}

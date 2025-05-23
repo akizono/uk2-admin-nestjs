@@ -49,7 +49,9 @@ class UserReqDto extends BaseReqDto {
   avatar: string
 }
 
-export class CreateUserReqDto extends PartialType(OmitType(UserReqDto, ['id', ...disableEditFields])) {
+export class CreateUserReqDto extends PartialType(
+  OmitType(UserReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+) {
   @ApiProperty({ description: '密碼', required: false })
   @IsNotEmpty()
   @IsString()
@@ -70,4 +72,6 @@ export class FindUserReqDto extends PartialType(UserReqDto) {
   currentPage?: number = 1
 }
 
-export class UpdateUserReqDto extends PartialType(OmitType(UserReqDto, ['username', ...disableEditFields])) {}
+export class UpdateUserReqDto extends PartialType(
+  OmitType(UserReqDto, ['username', 'multilingualFields', ...disableEditFields]),
+) {}

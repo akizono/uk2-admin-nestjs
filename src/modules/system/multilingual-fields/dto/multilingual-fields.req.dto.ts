@@ -29,7 +29,7 @@ export class MultilingualFieldsReqDto extends BaseReqDto {
 }
 
 export class CreateMultilingualFieldsReqDto extends PartialType(
-  OmitType(MultilingualFieldsReqDto, ['id', ...disableEditFields]),
+  OmitType(MultilingualFieldsReqDto, ['id', 'multilingualFields', ...disableEditFields]),
 ) {}
 
 export class FindMultilingualFieldsReqDto extends PartialType(MultilingualFieldsReqDto) {
@@ -47,7 +47,7 @@ export class FindMultilingualFieldsReqDto extends PartialType(MultilingualFields
 }
 
 export class UpdateMultilingualFieldsReqDto extends PartialType(
-  OmitType(MultilingualFieldsReqDto, [...disableEditFields]),
+  OmitType(MultilingualFieldsReqDto, ['multilingualFields', ...disableEditFields]),
 ) {}
 
 export class ConvertLanguageReqDto {

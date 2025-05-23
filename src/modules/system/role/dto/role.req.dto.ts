@@ -28,7 +28,9 @@ class RoleReqDto extends BaseReqDto {
   description: string
 }
 
-export class CreateRoleReqDto extends PartialType(OmitType(RoleReqDto, ['id', ...disableEditFields])) {}
+export class CreateRoleReqDto extends PartialType(
+  OmitType(RoleReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+) {}
 
 export class FindRoleReqDto extends PartialType(RoleReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })

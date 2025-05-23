@@ -28,7 +28,9 @@ export class LanguageReqDto extends BaseReqDto {
   sort: number
 }
 
-export class CreateLanguageReqDto extends PartialType(OmitType(LanguageReqDto, ['id', ...disableEditFields])) {}
+export class CreateLanguageReqDto extends PartialType(
+  OmitType(LanguageReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+) {}
 
 export class FindLanguageReqDto extends PartialType(LanguageReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
@@ -44,4 +46,6 @@ export class FindLanguageReqDto extends PartialType(LanguageReqDto) {
   currentPage?: number = 1
 }
 
-export class UpdateLanguageReqDto extends PartialType(OmitType(LanguageReqDto, [...disableEditFields])) {}
+export class UpdateLanguageReqDto extends PartialType(
+  OmitType(LanguageReqDto, ['multilingualFields', ...disableEditFields]),
+) {}

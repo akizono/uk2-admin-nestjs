@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Transform } from 'class-transformer'
-import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsArray, IsDateString, IsNumber, IsOptional, IsString } from 'class-validator'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 
@@ -42,4 +42,10 @@ export class BaseReqDto {
   @IsOptional()
   @IsDateString()
   updateTime: Date
+
+  // 該屬性只有在前端的「尋找（query）」開啟了「多語言（multilingual: true）」的時候會被前端帶上
+  @ApiProperty({ description: '開啟了多語言欄位的欄位', example: ['title', 'description'] })
+  @IsOptional()
+  @IsArray()
+  multilingualFields?: string[]
 }

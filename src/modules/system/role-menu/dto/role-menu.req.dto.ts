@@ -22,4 +22,6 @@ class RoleMenuReqDto extends BaseReqDto {
   menuId: string
 }
 
-export class CreateRoleMenuReqDto extends PartialType(OmitType(RoleMenuReqDto, ['id', ...disableEditFields])) {}
+export class CreateRoleMenuReqDto extends PartialType(
+  OmitType(RoleMenuReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+) {}

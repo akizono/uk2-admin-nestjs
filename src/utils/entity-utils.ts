@@ -148,7 +148,11 @@ export function getEntityPropertyDecorator(entity: EntityTarget<any>, propertyNa
  */
 export function fillNonEmptyWithDefaults(dto: Record<string, any>, repository: Repository<any>) {
   const columnMetadataMap = new Map()
-  for (const key in dto) {
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { multilingualFields, ...remain } = dto
+
+  for (const key in remain) {
     try {
       const metadata = getEntityColumnMetadata(repository.target, key)
       if (metadata) {
@@ -159,9 +163,10 @@ export function fillNonEmptyWithDefaults(dto: Record<string, any>, repository: R
     }
   }
   columnMetadataMap.forEach((metadata, key) => {
-    if (dto[key] === null && !metadata.nullable && metadata.default !== undefined) {
-      dto[key] = metadata.default
+    if (remain[key] === null && !metadata.nullable && metadata.default !== undefined) {
+      remain[key] = metadata.default
     }
   })
-  return dto
+
+  return remain
 }

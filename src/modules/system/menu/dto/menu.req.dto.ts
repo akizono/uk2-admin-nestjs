@@ -83,7 +83,9 @@ export class MenuReqDto extends BaseReqDto {
   sort: number
 }
 
-export class CreateMenuReqDto extends PartialType(OmitType(MenuReqDto, ['id', ...disableEditFields])) {}
+export class CreateMenuReqDto extends PartialType(
+  OmitType(MenuReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+) {}
 
 export class FindMenuReqDto extends PartialType(MenuReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
@@ -99,4 +101,4 @@ export class FindMenuReqDto extends PartialType(MenuReqDto) {
   currentPage?: number = 1
 }
 
-export class UpdateMenuReqDto extends PartialType(OmitType(MenuReqDto, [...disableEditFields])) {}
+export class UpdateMenuReqDto extends PartialType(OmitType(MenuReqDto, ['multilingualFields', ...disableEditFields])) {}

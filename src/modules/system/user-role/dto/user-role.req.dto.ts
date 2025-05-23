@@ -22,4 +22,6 @@ class UserRoleReqDto extends BaseReqDto {
   roleId: string
 }
 
-export class CreateUserRoleReqDto extends PartialType(OmitType(UserRoleReqDto, ['id', ...disableEditFields])) {}
+export class CreateUserRoleReqDto extends PartialType(
+  OmitType(UserRoleReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+) {}
