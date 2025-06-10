@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { RoleMenuEntity } from './entity/role-menu.entity'
-import { CreateRoleMenuReqDto } from './dto/role-menu.req.dto'
+import { CreateRoleMenuReqDto, FindRoleMenuReqDto } from './dto/role-menu.req.dto'
 
 import { MenuEntity } from '@/modules/system/menu/entity/menu.entity'
 import { RoleEntity } from '@/modules/system/role/entity/role.entity'
-import { create } from '@/common/services/base.service'
+import { create, find } from '@/common/services/base.service'
 
 @Injectable()
 export class RoleMenuService {
@@ -39,5 +39,21 @@ export class RoleMenuService {
         },
       ],
     })
+  }
+
+  async find(findRoleMenuReqDto: FindRoleMenuReqDto) {
+    const { list, total } = await find({
+      dto: findRoleMenuReqDto,
+      repository: this.roleMenuRepository,
+      relations: ['menu'],
+      where: {
+        isDeleted: 0,
+      },
+    })
+
+    return {
+      total,
+      list,
+    }
   }
 }

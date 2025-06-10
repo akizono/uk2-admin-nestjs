@@ -1,8 +1,9 @@
-import { Body, Controller, Post, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Get, Post, Query, UseInterceptors } from '@nestjs/common'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 import { RoleMenuService } from './role-menu.service'
-import { CreateRoleMenuReqDto } from './dto/role-menu.req.dto'
+import { CreateRoleMenuReqDto, FindRoleMenuReqDto } from './dto/role-menu.req.dto'
+import { FindRoleMenuResDto } from './dto/role-menu.res.dto'
 
 import { MsgResponseDto } from '@/utils/response-dto'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
@@ -21,5 +22,14 @@ export class RoleMenuController {
   @ResponseMessage('角色綁定菜單成功')
   async create(@Body() createRoleMenuReqDto: CreateRoleMenuReqDto) {
     await this.roleMenuService.create(createRoleMenuReqDto)
+  }
+
+  @Get('/page')
+  @HasPermission('system:role-menu:page')
+  @ApiOperation({ summary: '分頁查詢角色綁定菜單' })
+  @ApiResponse({ type: FindRoleMenuResDto })
+  @ResponseMessage('分頁查詢角色綁定菜單成功')
+  find(@Query() findRoleMenuReqDto: FindRoleMenuReqDto) {
+    return this.roleMenuService.find(findRoleMenuReqDto)
   }
 }

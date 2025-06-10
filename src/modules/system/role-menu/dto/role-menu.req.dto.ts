@@ -1,9 +1,10 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsNotEmpty } from 'class-validator'
+import { IsNotEmpty, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
-import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
+import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
+import { EnvHelper } from '@/utils/env-helper'
 
 class RoleMenuReqDto extends BaseReqDto {
   @ApiProperty({ description: '主鍵ID' })
@@ -24,4 +25,22 @@ class RoleMenuReqDto extends BaseReqDto {
 
 export class CreateRoleMenuReqDto extends PartialType(
   OmitType(RoleMenuReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+) {}
+
+export class FindRoleMenuReqDto extends PartialType(RoleMenuReqDto) {
+  @ApiProperty({ description: '分頁大小', example: 10, required: false })
+  @IsNotEmpty()
+  @Min(0)
+  @Max(EnvHelper.getNumber('MAX_PAGE_SIZE'))
+  pageSize?: number = 10
+
+  @ApiProperty({ description: '分頁頁碼', example: 1, required: false })
+  @IsNotEmpty()
+  @Min(0)
+  @Max(EnvHelper.getNumber('MAX_PAGE_NUMBER'))
+  currentPage?: number = 1
+}
+
+export class UpdateRoleMenuReqDto extends PartialType(
+  OmitType(RoleMenuReqDto, ['multilingualFields', ...disableEditFields]),
 ) {}
