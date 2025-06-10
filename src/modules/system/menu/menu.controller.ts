@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseInterceptors, Req } from '@nestjs/common'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { Request } from 'express'
 
 import { MenuService } from './menu.service'
 import { CreateMenuReqDto, FindMenuReqDto, UpdateMenuReqDto } from './dto/menu.req.dto'
@@ -32,6 +33,15 @@ export class MenuController {
   @ResponseMessage('取得選單分頁列表成功')
   find(@Query() findMenuReqDto: FindMenuReqDto) {
     return this.menuService.find(findMenuReqDto)
+  }
+
+  @Get('/user-menus')
+  @ApiOperation({ summary: '取得當前使用者的選單' })
+  @ApiResponse({ type: FindMenuResDto })
+  @ResponseMessage('取得當前使用者選單成功')
+  getUserMenus(@Req() request: Request) {
+    const userId = request['user'].sub
+    return this.menuService.getUserMenus(userId)
   }
 
   @Put('/update')

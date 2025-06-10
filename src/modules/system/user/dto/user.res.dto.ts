@@ -19,4 +19,5 @@ export class FindUserResDto extends PaginatedResponseDto({
     status: 1,
   },
   role: ['super_admin', 'common'],
+  roleIds: ['1', '2'],
 }) {}

@@ -66,7 +66,7 @@ export class AuthGuard implements CanActivate {
 
       // 驗證兩個令牌的sub'是否相同
       if (accessPayload.sub !== refreshPayload.sub) {
-        console.log('認證失敗：access token 與 refresh token 的用戶不匹配')
+        console.log('認證失敗：access token 與 refresh token 的使用者不匹配')
         throw new UnauthorizedException()
       }
 

@@ -12,5 +12,6 @@ import { RoleEntity } from '@/modules/system/role/entity/role.entity'
   imports: [TypeOrmModule.forFeature([RoleMenuEntity, MenuEntity, RoleEntity])],
   controllers: [RoleMenuController],
   providers: [RoleMenuService],
+  exports: [RoleMenuService],
 })
 export class RoleMenuModule {}

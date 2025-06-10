@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
@@ -66,6 +66,7 @@ export class UserService {
       return {
         ...remain,
         role: userRoles?.map(item => item.role.code),
+        roleIds: userRoles?.map(item => item.role.id),
       }
     })
 
