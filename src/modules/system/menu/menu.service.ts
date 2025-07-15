@@ -47,7 +47,7 @@ export class MenuService {
     }
   }
 
-  // 獲取使用者有權限的菜單
+  /** 獲取使用者有權限的菜單 */
   async getUserMenus(userId: string) {
     // 1. 先獲取使用者資訊及其角色
     const userInfo = await this.userService.find({ id: userId }, false)
@@ -80,11 +80,31 @@ export class MenuService {
     }
 
     // 4. 過濾使用者有權限的菜單
-    const filteredMenus = allMenus.list.filter(menu => userMenuIds.has(menu.id))
+    // 如果菜單的 permission 為 null 或空字符串，則不進行權限校驗，直接加入
+    const filteredMenus = allMenus.list.filter(menu => {
+      // 如果 類型為0 或 沒有權限標識(permission為null或空字符串)，則不需要校驗
+      if (menu.type === 0 || !menu.permission) {
+        return true
+      }
+      // 否則，檢查用戶是否有此菜單的權限
+      return userMenuIds.has(menu.id)
+    })
+
+    // 5. 進一步處理目錄（type=0）：如果目錄下沒有子項，則移除該目錄
+    // 使用Map提高查詢效率
+    const menuMap = new Map(filteredMenus.map(menu => [menu.id, menu]))
+
+    // 找出所有作為父級的ID
+    const parentIds = new Set(
+      filteredMenus.filter(menu => menu.parentId && menuMap.has(menu.parentId)).map(menu => menu.parentId),
+    )
+
+    // 最終結果：保留非目錄項或有子項的目錄
+    const finalMenus = filteredMenus.filter(menu => menu.type !== 0 || parentIds.has(menu.id))
 
     return {
-      total: filteredMenus.length,
-      list: filteredMenus,
+      total: finalMenus.length,
+      list: finalMenus,
     }
   }
 
