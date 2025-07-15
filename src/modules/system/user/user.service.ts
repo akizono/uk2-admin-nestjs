@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
+import { MultilingualFieldsEntity } from '../multilingual-fields/entity/multilingual-fields.entity'
+
 import { UserEntity } from './entity/user.entity'
 import { CreateUserReqDto, FindUserReqDto, UpdateUserReqDto } from './dto/user.req.dto'
 
@@ -13,6 +15,8 @@ export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(MultilingualFieldsEntity)
+    private readonly multilingualFieldsRepository: Repository<MultilingualFieldsEntity>,
   ) {}
 
   async create(createUserReqDto: CreateUserReqDto) {
@@ -50,25 +54,44 @@ export class UserService {
         userRoles: {
           role: true,
         },
+        dept: true,
       },
       skip,
       take,
     })
 
-    const list = users.map(user => {
-      const { userRoles, ...remain } = user
+    const list = await Promise.all(
+      users.map(async user => {
+        const { userRoles, ...remain } = user
 
-      if (!isShowPassword) {
-        delete remain['password']
-        delete remain['salt']
-      }
+        // 不顯示密碼
+        if (!isShowPassword) {
+          delete remain['password']
+          delete remain['salt']
+        }
 
-      return {
-        ...remain,
-        role: userRoles?.map(item => item.role.code),
-        roleIds: userRoles?.map(item => item.role.id),
-      }
-    })
+        /* 如果「部門」存在，則需要將「部門名稱」和「部門名稱的多語言欄位」一併返回 */
+        if (remain.dept) {
+          // 如果「multilingualFields」不存在，則需要初始化
+          if (!remain['multilingualFields']) {
+            remain['multilingualFields'] = {}
+          }
+          remain['deptName'] = remain.dept.name
+          remain['multilingualFields']['deptName'] = await this.multilingualFieldsRepository.find({
+            where: {
+              fieldId: remain.dept.name,
+              isDeleted: 0,
+            },
+          })
+        }
+
+        return {
+          ...remain,
+          role: userRoles?.map(item => item.role.code),
+          roleIds: userRoles?.map(item => item.role.id),
+        }
+      }),
+    )
 
     return {
       total,

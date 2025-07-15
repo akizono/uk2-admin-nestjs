@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm'
 
 import { UserRoleEntity } from '@/modules/system/user-role/entity/user-role.entity'
+import { DeptEntity } from '@/modules/system/dept/entity/dept.entity'
 import { BaseEntity } from '@/common/entities/base.entity'
 
 @Entity('system_user')
@@ -35,6 +36,13 @@ export class UserEntity extends BaseEntity {
   @Column({ length: 255, comment: '頭像', nullable: true })
   avatar: string
 
+  @Column({ name: 'dept_id', type: 'bigint', comment: '部門ID', nullable: true })
+  deptId: string
+
   @OneToMany(() => UserRoleEntity, userRole => userRole.user)
   userRoles: UserRoleEntity[]
+
+  @ManyToOne(() => DeptEntity, dept => dept.users)
+  @JoinColumn({ name: 'dept_id' })
+  dept: DeptEntity
 }

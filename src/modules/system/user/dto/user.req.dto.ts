@@ -47,6 +47,11 @@ class UserReqDto extends BaseReqDto {
   @IsOptional()
   @IsString()
   avatar: string
+
+  @ApiProperty({ description: '部門ID' })
+  @IsOptional()
+  @Transform(({ value }) => new ParseBigIntPipe().transform(value))
+  deptId: string
 }
 
 export class CreateUserReqDto extends PartialType(

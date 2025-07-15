@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm'
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm'
 
 import { BaseEntity } from '@/common/entities/base.entity'
 import { UserEntity } from '@/modules/system/user/entity/user.entity'
@@ -26,4 +26,7 @@ export class DeptEntity extends BaseEntity {
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'leader_user_id' })
   leaderUser: UserEntity
+
+  @OneToMany(() => UserEntity, user => user.dept)
+  users: UserEntity[]
 }
