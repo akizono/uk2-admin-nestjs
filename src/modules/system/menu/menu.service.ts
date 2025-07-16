@@ -70,6 +70,7 @@ export class MenuService {
         roleId,
         pageSize: 0,
         currentPage: 1,
+        status: 1,
       })
 
       if (roleMenus.list && roleMenus.list.length) {
