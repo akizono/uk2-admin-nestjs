@@ -18,6 +18,7 @@ import { DictTypeModule } from './modules/system/dict-type/dict-type.module'
 import { DictDataModule } from './modules/system/dict-data/dict-data.module'
 import { LanguageModule } from './modules/system/language/language.module'
 import { MultilingualFieldsModule } from './modules/system/multilingual-fields/multilingual-fields.module'
+import { CodeGenerationModule } from './modules/operations/code-generation/code-generation.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { MultilingualFieldsModule } from './modules/system/multilingual-fields/m
     DictDataModule,
     LanguageModule,
     MultilingualFieldsModule,
+    CodeGenerationModule,
   ],
 
   controllers: [AppController],
