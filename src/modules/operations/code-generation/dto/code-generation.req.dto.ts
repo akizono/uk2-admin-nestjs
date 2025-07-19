@@ -25,17 +25,17 @@ export class CodeGenerationReqDto extends BaseReqDto {
   @ApiProperty({ description: '是否創建資料表', example: 0 })
   @IsNotEmpty()
   @IsNumber()
-  isCreateTable: number
+  isGenerateTable: number
 
   @ApiProperty({ description: '是否生成後端代碼', example: 0 })
   @IsNotEmpty()
   @IsNumber()
-  isCreateBackendCode: number
+  isGenerateBackendCode: number
 
   @ApiProperty({ description: '是否生成前端代碼', example: 0 })
   @IsNotEmpty()
   @IsNumber()
-  isCreateFrontendCode: number
+  isGenerateWebCode: number
 
   @ApiProperty({ description: '是否導入菜單和權限', example: 0 })
   @IsNotEmpty()
@@ -49,7 +49,7 @@ export class CodeGenerationReqDto extends BaseReqDto {
 }
 
 export class CreateCodeGenerationReqDto extends PartialType(
-  OmitType(CodeGenerationReqDto, ['id', ...disableEditFields]),
+  OmitType(CodeGenerationReqDto, ['id', 'multilingualFields', ...disableEditFields]),
 ) {}
 
 export class FindCodeGenerationReqDto extends PartialType(CodeGenerationReqDto) {

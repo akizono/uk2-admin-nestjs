@@ -14,13 +14,13 @@ export class CodeGenerationEntity extends BaseEntity {
   code: string
 
   @Column({ type: 'tinyint', comment: '是否創建資料表', default: 0 })
-  isCreateTable: number
+  isGenerateTable: number
 
   @Column({ type: 'tinyint', comment: '是否生成後端代碼', default: 0 })
-  isCreateBackendCode: number
+  isGenerateBackendCode: number
 
   @Column({ type: 'tinyint', comment: '是否生成前端代碼', default: 0 })
-  isCreateFrontendCode: number
+  isGenerateWebCode: number
 
   @Column({ type: 'tinyint', comment: '是否導入菜單和權限', default: 0 })
   isImportMenuAndPermission: number
