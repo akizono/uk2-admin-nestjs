@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { spawn } from 'child_process'
+import * as fs from 'fs'
+import * as path from 'path'
 
 import { CodeGenerationEntity } from './entity/code-generation.entity'
 import {
   CreateCodeGenerationReqDto,
   FindCodeGenerationReqDto,
+  PreviewTableCodeReqDto,
   UpdateCodeGenerationReqDto,
 } from './dto/code-generation.req.dto'
 
@@ -84,5 +88,77 @@ export class CodeGenerationService {
       existenceCondition: ['id'],
       modalName: '選單',
     })
+  }
+
+  // 生成數據表的代碼返回前端進行預覽
+  // previewTableCodeReqDto 的案例：{"className":"DemoStudentEntity", "fileName":"1721433600000", "tableName":"demo_student","tableColumns":[{"columnName":"姓名","dataType":"VARCHAR","length":55,"isNotNull":1,"isAutoIncrement":0,"isPrimaryKey":0,"isUnique":0,"defaultValue":null,"comment":"姓名"},{"columnName":"age","dataType":"int","length":null,"isNotNull":1,"isAutoIncrement":0,"isPrimaryKey":0,"isUnique":0,"defaultValue":"12","comment":"年齡"},{"columnName":"idCard","dataType":"VARCHAR","length":null,"isNotNull":0,"isAutoIncrement":0,"isPrimaryKey":0,"isUnique":1,"defaultValue":null,"comment":"證件號"}]}
+  async previewTableCode(previewTableCodeReqDto: PreviewTableCodeReqDto) {
+    await new Promise((resolve, reject) => {
+      const jsonInput = JSON.stringify(previewTableCodeReqDto)
+      const plop = spawn('npx', ['plop', 'entity'], { stdio: 'pipe' })
+
+      // 設置超時（例如10秒）
+      const timeout = setTimeout(() => {
+        plop.kill() // 終止進程
+        reject(new Error('操作超時：未收到預期的JSON配置提示'))
+      }, 10000)
+
+      // 監聽 plop 的輸出
+      let receivedPrompt = false
+      plop.stdout.on('data', data => {
+        const output = data.toString()
+
+        // 更靈活的提示檢測（不區分大小寫，包含關鍵字即可）
+        if (!receivedPrompt && output.includes('hint::請輸入JSON配置::')) {
+          receivedPrompt = true
+          clearTimeout(timeout) // 取消超時
+
+          // 等待1000毫秒後再輸入
+          setTimeout(() => {
+            plop.stdin.write(jsonInput + '\n')
+          }, 1000)
+        }
+      })
+
+      // 監聽 plop 的錯誤輸出
+      // plop.stderr.on('data', data => {
+      //   console.error(`stderr: ${data}`)
+      // })
+
+      plop.on('close', code => {
+        clearTimeout(timeout) // 確保清除定時器
+        if (code === 0) {
+          resolve('執行成功')
+        } else {
+          console.error('❌ Plop 執行失敗')
+          reject(new Error('Plop 執行失敗'))
+        }
+      })
+
+      plop.on('error', err => {
+        clearTimeout(timeout) // 確保清除定時器
+        console.error('❌ 執行出錯:', err)
+        reject(err)
+      })
+    })
+
+    const filePath = path.join(__dirname, `../../../../plop-templates/.cache/${previewTableCodeReqDto.fileName}`)
+    // 讀取文件
+    const entityCode = await new Promise<string>((resolve, reject) => {
+      fs.readFile(filePath, 'utf-8', (err, data) => {
+        if (err) {
+          console.error('讀取文件失敗:', err)
+          reject(err)
+        } else {
+          resolve(data)
+        }
+      })
+    })
+    // 刪除文件
+    // await fs.promises.unlink(filePath)
+
+    return {
+      entity: entityCode,
+    }
   }
 }

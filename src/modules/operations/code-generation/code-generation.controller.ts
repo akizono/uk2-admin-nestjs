@@ -5,6 +5,7 @@ import { CodeGenerationService } from './code-generation.service'
 import {
   CreateCodeGenerationReqDto,
   FindCodeGenerationReqDto,
+  PreviewTableCodeReqDto,
   UpdateCodeGenerationReqDto,
 } from './dto/code-generation.req.dto'
 import { CreateCodeGenerationResDto, FindCodeGenerationResDto } from './dto/code-generation.res.dto'
@@ -72,5 +73,10 @@ export class CodeGenerationController {
   @ResponseMessage('解封鎖模組成功')
   unblock(@Param('id', ParseBigIntPipe) id: string) {
     return this.codeGenerationService.unblock(id)
+  }
+
+  @Post('/preview-table-code')
+  previewTableCode(@Body() previewTableCodeReqDto: PreviewTableCodeReqDto) {
+    return this.codeGenerationService.previewTableCode(previewTableCodeReqDto)
   }
 }
