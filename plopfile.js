@@ -47,7 +47,7 @@ module.exports = function (plop) {
       return [
         {
           type: 'add',
-          path: `plop-templates/.cache/${config.fileName}`,
+          path: `plop-templates/.cache/${config.fileName}-${config.timestamp}`,
           templateFile: 'plop-templates/entity.hbs',
           data: {
             ...config,

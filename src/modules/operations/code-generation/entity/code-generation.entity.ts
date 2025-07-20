@@ -13,8 +13,8 @@ export class CodeGenerationEntity extends BaseEntity {
   @Column({ length: 50, comment: '標識', nullable: true })
   code: string
 
-  @Column({ type: 'tinyint', comment: '是否創建資料表', default: 0 })
-  isGenerateTable: number
+  @Column({ type: 'tinyint', comment: '是否創建實體', default: 0 })
+  isGenerateEntity: number
 
   @Column({ type: 'tinyint', comment: '是否生成後端代碼', default: 0 })
   isGenerateBackendCode: number

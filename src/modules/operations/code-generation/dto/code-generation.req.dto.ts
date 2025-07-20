@@ -22,10 +22,10 @@ export class CodeGenerationReqDto extends BaseReqDto {
   @IsString()
   code: string
 
-  @ApiProperty({ description: '是否創建資料表', example: 0 })
+  @ApiProperty({ description: '是否創建實體', example: 0 })
   @IsNotEmpty()
   @IsNumber()
-  isGenerateTable: number
+  isGenerateEntity: number
 
   @ApiProperty({ description: '是否生成後端代碼', example: 0 })
   @IsNotEmpty()
@@ -113,13 +113,18 @@ export class TableColumnDto {
   comment: string
 }
 
-export class PreviewTableCodeReqDto {
-  @ApiProperty({ description: '類名稱', example: 'StudentEntity' })
+export class PreviewEntityCodeReqDto {
+  @ApiProperty({ description: '類名稱', example: 'SystemUserEntity' })
   @IsNotEmpty()
   @IsString()
   className: string
 
-  @ApiProperty({ description: '檔案名稱', example: '1721433600000' })
+  @ApiProperty({ description: '時間戳', example: '1721433600000' })
+  @IsNotEmpty()
+  @IsString()
+  timestamp: string
+
+  @ApiProperty({ description: '檔案名稱', example: 'system-user' })
   @IsNotEmpty()
   @IsString()
   fileName: string

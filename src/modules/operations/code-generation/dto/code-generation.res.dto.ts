@@ -8,7 +8,7 @@ export class FindCodeGenerationResDto extends PaginatedResponseDto({
   id: '1',
   name: '學生管理',
   code: 'student',
-  isGenerateTable: 0,
+  isGenerateEntity: 0,
   isGenerateBackendCode: 0,
   isGenerateWebCode: 0,
   isImportMenuAndPermission: 0,

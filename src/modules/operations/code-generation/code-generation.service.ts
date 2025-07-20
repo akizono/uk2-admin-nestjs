@@ -9,7 +9,7 @@ import { CodeGenerationEntity } from './entity/code-generation.entity'
 import {
   CreateCodeGenerationReqDto,
   FindCodeGenerationReqDto,
-  PreviewTableCodeReqDto,
+  PreviewEntityCodeReqDto,
   UpdateCodeGenerationReqDto,
 } from './dto/code-generation.req.dto'
 
@@ -91,10 +91,9 @@ export class CodeGenerationService {
   }
 
   // 生成數據表的代碼返回前端進行預覽
-  // previewTableCodeReqDto 的案例：{"className":"DemoStudentEntity", "fileName":"1721433600000", "tableName":"demo_student","tableColumns":[{"columnName":"姓名","dataType":"VARCHAR","length":55,"isNotNull":1,"isAutoIncrement":0,"isPrimaryKey":0,"isUnique":0,"defaultValue":null,"comment":"姓名"},{"columnName":"age","dataType":"int","length":null,"isNotNull":1,"isAutoIncrement":0,"isPrimaryKey":0,"isUnique":0,"defaultValue":"12","comment":"年齡"},{"columnName":"idCard","dataType":"VARCHAR","length":null,"isNotNull":0,"isAutoIncrement":0,"isPrimaryKey":0,"isUnique":1,"defaultValue":null,"comment":"證件號"}]}
-  async previewTableCode(previewTableCodeReqDto: PreviewTableCodeReqDto) {
+  async previewEntityCode(previewEntityCodeReqDto: PreviewEntityCodeReqDto) {
     await new Promise((resolve, reject) => {
-      const jsonInput = JSON.stringify(previewTableCodeReqDto)
+      const jsonInput = JSON.stringify(previewEntityCodeReqDto)
       const plop = spawn('npx', ['plop', 'entity'], { stdio: 'pipe' })
 
       // 設置超時（例如10秒）
@@ -142,23 +141,33 @@ export class CodeGenerationService {
       })
     })
 
-    const filePath = path.join(__dirname, `../../../../plop-templates/.cache/${previewTableCodeReqDto.fileName}`)
+    const filePath = path.join(
+      __dirname,
+      `../../../../plop-templates/.cache/${previewEntityCodeReqDto.fileName}-${previewEntityCodeReqDto.timestamp}`,
+    )
     // 讀取文件
-    const entityCode = await new Promise<string>((resolve, reject) => {
-      fs.readFile(filePath, 'utf-8', (err, data) => {
-        if (err) {
-          console.error('讀取文件失敗:', err)
-          reject(err)
-        } else {
-          resolve(data)
-        }
+    const entityCode = (
+      await new Promise<string>((resolve, reject) => {
+        fs.readFile(filePath, 'utf-8', (err, data) => {
+          if (err) {
+            console.error('讀取文件失敗:', err)
+            reject(err)
+          } else {
+            resolve(data)
+          }
+        })
       })
-    })
+    )
+      .match(/<entity>([\s\S]*?)<\/entity>/)[1]
+      .trim()
+
     // 刪除文件
     // await fs.promises.unlink(filePath)
 
     return {
-      entity: entityCode,
+      code: {
+        entity: entityCode,
+      },
     }
   }
 }

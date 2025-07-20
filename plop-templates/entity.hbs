@@ -1,3 +1,4 @@
+<entity>
 import { Entity{{#if hasColumn}}, Column{{/if}}{{#if hasPrimaryGeneratedColumn}}, PrimaryGeneratedColumn{{/if}}{{#if hasPrimaryColumn}}, PrimaryColumn{{/if}} } from 'typeorm'
 
 import { BaseEntity } from '@/common/entities/base.entity'
@@ -36,4 +37,4 @@ export class {{ className }} extends BaseEntity {
 
 {{/each}}
 }
-
+</entity>

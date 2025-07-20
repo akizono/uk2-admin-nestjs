@@ -5,7 +5,7 @@ import { CodeGenerationService } from './code-generation.service'
 import {
   CreateCodeGenerationReqDto,
   FindCodeGenerationReqDto,
-  PreviewTableCodeReqDto,
+  PreviewEntityCodeReqDto,
   UpdateCodeGenerationReqDto,
 } from './dto/code-generation.req.dto'
 import { CreateCodeGenerationResDto, FindCodeGenerationResDto } from './dto/code-generation.res.dto'
@@ -75,8 +75,8 @@ export class CodeGenerationController {
     return this.codeGenerationService.unblock(id)
   }
 
-  @Post('/preview-table-code')
-  previewTableCode(@Body() previewTableCodeReqDto: PreviewTableCodeReqDto) {
-    return this.codeGenerationService.previewTableCode(previewTableCodeReqDto)
+  @Post('/preview-entity-code')
+  previewEntityCode(@Body() previewEntityCodeReqDto: PreviewEntityCodeReqDto) {
+    return this.codeGenerationService.previewEntityCode(previewEntityCodeReqDto)
   }
 }
