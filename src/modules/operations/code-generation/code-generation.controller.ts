@@ -7,8 +7,13 @@ import {
   FindCodeGenerationReqDto,
   PreviewEntityCodeReqDto,
   UpdateCodeGenerationReqDto,
+  InsertEntityCodeReqDto,
 } from './dto/code-generation.req.dto'
-import { CreateCodeGenerationResDto, FindCodeGenerationResDto } from './dto/code-generation.res.dto'
+import {
+  CreateCodeGenerationResDto,
+  FindCodeGenerationResDto,
+  PreviewEntityCodeResDto,
+} from './dto/code-generation.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
@@ -76,7 +81,16 @@ export class CodeGenerationController {
   }
 
   @Post('/preview-entity-code')
+  @HasPermission('operations:code-generation:update')
+  @ApiOperation({ summary: '預覽實體的程式碼' })
+  @ApiResponse({ type: PreviewEntityCodeResDto })
+  @ResponseMessage('成功獲取實體程式碼')
   previewEntityCode(@Body() previewEntityCodeReqDto: PreviewEntityCodeReqDto) {
     return this.codeGenerationService.previewEntityCode(previewEntityCodeReqDto)
+  }
+
+  @Post('/insert-entity-code')
+  insertEntityCode(@Body() insertEntityCodeReqDto: InsertEntityCodeReqDto) {
+    return this.codeGenerationService.insertEntityCode(insertEntityCodeReqDto)
   }
 }

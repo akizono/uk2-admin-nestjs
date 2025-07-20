@@ -10,7 +10,7 @@ export class CodeGenerationEntity extends BaseEntity {
   @Column({ length: 50, comment: '名稱', nullable: true })
   name: string
 
-  @Column({ length: 50, comment: '標識', nullable: true })
+  @Column({ length: 50, comment: '標識', nullable: true, unique: true })
   code: string
 
   @Column({ type: 'tinyint', comment: '是否創建實體', default: 0 })

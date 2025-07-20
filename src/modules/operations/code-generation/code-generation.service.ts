@@ -4,12 +4,14 @@ import { Repository } from 'typeorm'
 import { spawn } from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
+import { HttpException, HttpStatus } from '@nestjs/common'
 
 import { CodeGenerationEntity } from './entity/code-generation.entity'
 import {
   CreateCodeGenerationReqDto,
   FindCodeGenerationReqDto,
   PreviewEntityCodeReqDto,
+  InsertEntityCodeReqDto,
   UpdateCodeGenerationReqDto,
 } from './dto/code-generation.req.dto'
 
@@ -91,8 +93,7 @@ export class CodeGenerationService {
     })
   }
 
-  // 生成數據表的代碼返回前端進行預覽
-  async previewEntityCode(previewEntityCodeReqDto: PreviewEntityCodeReqDto) {
+  async generateEntityCode(previewEntityCodeReqDto: PreviewEntityCodeReqDto) {
     await new Promise((resolve, reject) => {
       const jsonInput = JSON.stringify(previewEntityCodeReqDto)
       const plop = spawn('npx', ['plop', 'entity'], { stdio: 'pipe' })
@@ -163,7 +164,14 @@ export class CodeGenerationService {
       .trim()
 
     // 刪除文件
-    // await fs.promises.unlink(filePath)
+    await fs.promises.unlink(filePath)
+
+    return entityCode
+  }
+
+  // 返回 EntityCode 預覽
+  async previewEntityCode(previewEntityCodeReqDto: PreviewEntityCodeReqDto) {
+    const entityCode = await this.generateEntityCode(previewEntityCodeReqDto)
 
     /** 生成代碼預覽頁面的文件數 */
     const treeData = [
@@ -212,6 +220,45 @@ export class CodeGenerationService {
 
     return {
       treeData,
+    }
+  }
+
+  // 插入 EntityCode
+  async insertEntityCode(insertEntityCodeReqDto: InsertEntityCodeReqDto) {
+    const { splitName, fileName } = insertEntityCodeReqDto
+
+    const entityCode = await this.generateEntityCode(insertEntityCodeReqDto)
+
+    // 根目錄
+    const rootDir = process.cwd()
+    // 文件指定路徑
+    const filePath = path.join(rootDir, 'src/modules', splitName[0], splitName[1], 'entity', `${fileName}.entity.ts`)
+
+    try {
+      // 檢查文件是否存在
+      await fs.promises.access(filePath)
+      throw new HttpException('文件已存在', HttpStatus.BAD_REQUEST)
+    } catch (error) {
+      // 如果錯誤是 HttpException，則繼續拋出
+      if (error instanceof HttpException) {
+        throw error
+      }
+
+      // 文件不存在，繼續執行創建操作
+      try {
+        // 修改本模組的isGenerateEntity為1
+        await this.codeGenerationRepository.update({ code: fileName }, { isGenerateEntity: 1 })
+
+        // 確保目錄存在
+        const dirPath = path.dirname(filePath)
+        await fs.promises.mkdir(dirPath, { recursive: true })
+
+        // 使用非同步寫入
+        await fs.promises.writeFile(filePath, entityCode)
+      } catch (error) {
+        console.error('創建文件時發生錯誤：', error)
+        throw new Error(`文件創建失敗: ${error.message}`)
+      }
     }
   }
 }

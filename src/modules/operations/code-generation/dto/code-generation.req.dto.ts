@@ -112,7 +112,6 @@ export class TableColumnDto {
   @IsString()
   comment: string
 }
-
 export class PreviewEntityCodeReqDto {
   @ApiProperty({ description: '時間戳', example: '1721433600000' })
   @IsNotEmpty()
@@ -145,3 +144,5 @@ export class PreviewEntityCodeReqDto {
   @Type(() => TableColumnDto)
   tableColumns: TableColumnDto[]
 }
+
+export class InsertEntityCodeReqDto extends PreviewEntityCodeReqDto {}
