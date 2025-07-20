@@ -2,7 +2,7 @@ import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
 import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
-import { PasswordGenerator } from '@/utils/password-generator'
+import { StrGenerator } from '@/utils/str-generator'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { EnvHelper } from '@/utils/env-helper'
@@ -60,7 +60,7 @@ export class CreateUserReqDto extends PartialType(
   @ApiProperty({ description: '密碼', required: false })
   @IsNotEmpty()
   @IsString()
-  password: string = PasswordGenerator.generate(14)
+  password: string = StrGenerator.generate(14)
 }
 
 export class FindUserReqDto extends PartialType(UserReqDto) {

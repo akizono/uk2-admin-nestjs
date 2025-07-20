@@ -114,20 +114,25 @@ export class TableColumnDto {
 }
 
 export class PreviewEntityCodeReqDto {
-  @ApiProperty({ description: '類名稱', example: 'SystemUserEntity' })
-  @IsNotEmpty()
-  @IsString()
-  className: string
-
   @ApiProperty({ description: '時間戳', example: '1721433600000' })
   @IsNotEmpty()
   @IsString()
   timestamp: string
 
+  @ApiProperty({ description: '類名稱', example: 'SystemUserEntity' })
+  @IsNotEmpty()
+  @IsString()
+  className: string
+
   @ApiProperty({ description: '檔案名稱', example: 'system-user' })
   @IsNotEmpty()
   @IsString()
   fileName: string
+
+  @ApiProperty({ description: '分割後的名稱', example: ['system', 'user'] })
+  @IsNotEmpty()
+  @IsArray()
+  splitName: string[]
 
   @ApiProperty({ description: '數據表名稱', example: 'system_user' })
   @IsNotEmpty()

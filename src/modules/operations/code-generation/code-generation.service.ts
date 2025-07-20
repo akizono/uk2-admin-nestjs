@@ -13,6 +13,7 @@ import {
   UpdateCodeGenerationReqDto,
 } from './dto/code-generation.req.dto'
 
+import { StrGenerator } from '@/utils/str-generator'
 import { create, find, update, _delete } from '@/common/services/base.service'
 
 @Injectable()
@@ -164,10 +165,53 @@ export class CodeGenerationService {
     // 刪除文件
     // await fs.promises.unlink(filePath)
 
-    return {
-      code: {
-        entity: entityCode,
+    /** 生成代碼預覽頁面的文件數 */
+    const treeData = [
+      {
+        label: 'src',
+        key: StrGenerator.generateAlphanumeric(8),
+        type: 'folder',
+        children: [
+          {
+            label: 'modules',
+            key: StrGenerator.generateAlphanumeric(8),
+            type: 'folder',
+            children: [
+              {
+                label: previewEntityCodeReqDto.splitName[0],
+                key: StrGenerator.generateAlphanumeric(8),
+                type: 'folder',
+                children: [
+                  {
+                    label: previewEntityCodeReqDto.splitName[1],
+                    key: StrGenerator.generateAlphanumeric(8),
+                    type: 'folder',
+                    children: [
+                      {
+                        label: 'entity',
+                        key: StrGenerator.generateAlphanumeric(8),
+                        type: 'folder',
+                        children: [
+                          {
+                            label: `${previewEntityCodeReqDto.fileName}.entity.ts`,
+                            key: StrGenerator.generateAlphanumeric(8),
+                            type: 'file',
+                            code: entityCode,
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
+    ]
+
+    return {
+      treeData,
     }
   }
 }
