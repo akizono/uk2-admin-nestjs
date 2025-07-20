@@ -12,17 +12,19 @@ export class {{ className }} extends BaseEntity {
     name: '{{ this.columnNameUnderline }}',
     type: '{{ this.dataType }}'{{#if this.length}},
     length: {{ this.length }}{{/if}}{{#if this.comment}},
-    comment: '{{ this.comment }}'{{/if}}
+    comment: '{{ this.comment }}'{{/if}},
   })
     {{else}}
   @PrimaryColumn({
     name: '{{ this.columnNameUnderline }}',
     type: '{{ this.dataType }}'{{#if this.length}},
     length: {{ this.length }}{{/if}}{{#if this.comment}},
-    comment: '{{ this.comment }}'{{/if}}
+    comment: '{{ this.comment }}'{{/if}},
   })
     {{/if}}
-  {{ this.columnName }}: {{ this.jsDataType }}
+  {{ this.columnName }}: {{ this.jsDataType }}{{#unless @last}}
+
+{{/unless}}
   {{else}}
   @Column({
     name: '{{ this.columnNameUnderline }}',
@@ -30,11 +32,13 @@ export class {{ className }} extends BaseEntity {
     length: {{ this.length }}{{/if}}{{#if this.isNotNull}},
     nullable: {{#if (eq this.isNotNull 1)}}false{{else}}true{{/if}}{{/if}}{{#if (eq this.isAutoIncrement 1)}},
     generated: 'increment'{{/if}}{{#if this.comment}},
-    comment: '{{ this.comment }}'{{/if}}
+    comment: '{{ this.comment }}'{{/if}},
   })
-  {{ this.columnName }}: {{ this.jsDataType }}
-  {{/if}}
+  {{ this.columnName }}: {{ this.jsDataType }}{{#unless @last}}
 
+{{/unless}}
+  {{/if}}
 {{/each}}
+
 }
 </entity>

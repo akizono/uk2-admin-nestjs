@@ -148,20 +148,21 @@ export class CodeGenerationService {
       `../../../../plop-templates/.cache/${previewEntityCodeReqDto.fileName}-${previewEntityCodeReqDto.timestamp}`,
     )
     // 讀取文件
-    const entityCode = (
-      await new Promise<string>((resolve, reject) => {
-        fs.readFile(filePath, 'utf-8', (err, data) => {
-          if (err) {
-            console.error('讀取文件失敗:', err)
-            reject(err)
-          } else {
-            resolve(data)
-          }
+    const entityCode =
+      (
+        await new Promise<string>((resolve, reject) => {
+          fs.readFile(filePath, 'utf-8', (err, data) => {
+            if (err) {
+              console.error('讀取文件失敗:', err)
+              reject(err)
+            } else {
+              resolve(data)
+            }
+          })
         })
-      })
-    )
-      .match(/<entity>([\s\S]*?)<\/entity>/)[1]
-      .trim()
+      )
+        .match(/<entity>([\s\S]*?)<\/entity>/)[1]
+        .trim() + '\n'
 
     // 刪除文件
     await fs.promises.unlink(filePath)
