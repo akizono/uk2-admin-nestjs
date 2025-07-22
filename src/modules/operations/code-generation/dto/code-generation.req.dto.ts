@@ -146,3 +146,10 @@ export class PreviewEntityCodeReqDto {
 }
 
 export class InsertEntityCodeReqDto extends PreviewEntityCodeReqDto {}
+
+export class GetEntityCustomFieldsReqDto {
+  @ApiProperty({ description: '分割的模組標識', example: 'student' })
+  @IsNotEmpty()
+  @IsString()
+  moduleNameSplit: string
+}

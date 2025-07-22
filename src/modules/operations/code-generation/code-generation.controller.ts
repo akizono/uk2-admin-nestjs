@@ -8,10 +8,12 @@ import {
   PreviewEntityCodeReqDto,
   UpdateCodeGenerationReqDto,
   InsertEntityCodeReqDto,
+  GetEntityCustomFieldsReqDto,
 } from './dto/code-generation.req.dto'
 import {
   CreateCodeGenerationResDto,
   FindCodeGenerationResDto,
+  GetEntityCustomFieldsResDto,
   PreviewEntityCodeResDto,
 } from './dto/code-generation.res.dto'
 
@@ -90,7 +92,20 @@ export class CodeGenerationController {
   }
 
   @Post('/insert-entity-code')
+  @HasPermission('operations:code-generation:update')
+  @ApiOperation({ summary: '插入實體的程式碼' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('插入實體程式碼成功')
   insertEntityCode(@Body() insertEntityCodeReqDto: InsertEntityCodeReqDto) {
     return this.codeGenerationService.insertEntityCode(insertEntityCodeReqDto)
+  }
+
+  @Get('/get-entity-custom-fields')
+  @HasPermission('operations:code-generation:update')
+  @ApiOperation({ summary: '獲取實體的自訂欄位' })
+  @ApiResponse({ type: GetEntityCustomFieldsResDto })
+  @ResponseMessage('獲取實體的自訂欄位成功')
+  getEntityCustomFields(@Query() getEntityCustomFieldsReqDto: GetEntityCustomFieldsReqDto) {
+    return this.codeGenerationService.getEntityCustomFields(getEntityCustomFieldsReqDto)
   }
 }

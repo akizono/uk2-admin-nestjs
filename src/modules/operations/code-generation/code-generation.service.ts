@@ -13,6 +13,7 @@ import {
   PreviewEntityCodeReqDto,
   InsertEntityCodeReqDto,
   UpdateCodeGenerationReqDto,
+  GetEntityCustomFieldsReqDto,
 } from './dto/code-generation.req.dto'
 
 import { StrGenerator } from '@/utils/str-generator'
@@ -261,5 +262,83 @@ export class CodeGenerationService {
         throw new Error(`文件創建失敗: ${error.message}`)
       }
     }
+  }
+
+  // 獲取 Entity 中的所有自訂欄位
+  async getEntityCustomFields(getEntityCustomFieldsReqDto: GetEntityCustomFieldsReqDto) {
+    const moduleNameSplit = JSON.parse(getEntityCustomFieldsReqDto.moduleNameSplit)
+
+    // 根目錄
+    const rootDir = process.cwd()
+    // 文件指定路徑
+    const filePath = path.join(
+      rootDir,
+      'src/modules',
+      moduleNameSplit[0],
+      moduleNameSplit[1],
+      'entity',
+      `${moduleNameSplit[0]}-${moduleNameSplit[1]}.entity.ts`,
+    )
+    // 讀取文件
+    const entityCode = await fs.promises.readFile(filePath, 'utf-8')
+
+    // 提取實體中的所有自訂欄位
+    function extractProperties(entityCode: string): Record<string, { label: string; type: string }> {
+      const result: Record<string, { label: string; type: string }> = {}
+
+      // 匹配 @Column 和 @PrimaryGeneratedColumn 裝飾器
+      const columnRegex = /@(?:Column|PrimaryGeneratedColumn)\({([\s\S]*?)}\)[\s\S]*?\n\s*(\w+):/g
+
+      let match
+      while ((match = columnRegex.exec(entityCode)) !== null) {
+        const [_, params, propertyName] = match
+
+        // 提取參數
+        const paramObj: Record<string, any> = {}
+        const paramPairs = params.split(',').flatMap(p => p.split('\n'))
+
+        for (const pair of paramPairs) {
+          const trimmed = pair.trim()
+          if (!trimmed) continue
+
+          const colonIndex = trimmed.indexOf(':')
+          if (colonIndex === -1) continue
+
+          const key = trimmed.substring(0, colonIndex).trim()
+          let value = trimmed.substring(colonIndex + 1).trim()
+
+          // 處理值中的引號和註釋
+          if (value.startsWith("'") || value.startsWith('"')) {
+            value = value.substring(1, value.lastIndexOf("'") !== -1 ? value.lastIndexOf("'") : value.lastIndexOf('"'))
+          } else if (value.endsWith(',')) {
+            value = value.substring(0, value.length - 1).trim()
+          }
+
+          paramObj[key] = value
+        }
+
+        // 確定類型
+        let type = 'string' // 默認類型
+        if (paramObj.type) {
+          if (paramObj.type === 'int' || paramObj.type === 'integer' || paramObj.type === 'number') {
+            type = 'number'
+          } else if (paramObj.type === 'boolean') {
+            type = 'boolean'
+          } else if (paramObj.type === 'date' || paramObj.type === 'datetime') {
+            type = 'date'
+          }
+          // 其他情況保持默認的 string 類型
+        }
+
+        result[propertyName] = {
+          label: paramObj.comment || propertyName,
+          type: type,
+        }
+      }
+
+      return result
+    }
+
+    return extractProperties(entityCode)
   }
 }

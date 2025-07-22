@@ -70,3 +70,22 @@ export class PreviewEntityCodeResDto extends SingleResponseDto({
     },
   ],
 }) {}
+
+export class GetEntityCustomFieldsResDto extends SingleResponseDto({
+  'id': {
+    'label': 'id主鍵',
+    'type': 'string',
+  },
+  'name': {
+    'label': '姓名',
+    'type': 'string',
+  },
+  'age': {
+    'label': '年齡',
+    'type': 'number',
+  },
+  'idCard': {
+    'label': '證件號碼',
+    'type': 'string',
+  },
+}) {}
