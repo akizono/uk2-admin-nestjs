@@ -9,6 +9,7 @@ import {
   UpdateCodeGenerationReqDto,
   InsertEntityCodeReqDto,
   GetEntityCustomFieldsReqDto,
+  PreviewBackendCodeReqDto,
 } from './dto/code-generation.req.dto'
 import {
   CreateCodeGenerationResDto,
@@ -107,5 +108,14 @@ export class CodeGenerationController {
   @ResponseMessage('獲取實體的自訂欄位成功')
   getEntityCustomFields(@Query() getEntityCustomFieldsReqDto: GetEntityCustomFieldsReqDto) {
     return this.codeGenerationService.getEntityCustomFields(getEntityCustomFieldsReqDto)
+  }
+
+  @Post('/preview-backend-code')
+  @HasPermission('operations:code-generation:update')
+  @ApiOperation({ summary: '預覽後端代碼' })
+  // @ApiResponse({ type: PreviewBackendCodeResDto })
+  @ResponseMessage('預覽後端代碼成功')
+  previewBackendCode(@Body() previewBackendCodeReqDto: PreviewBackendCodeReqDto) {
+    return this.codeGenerationService.previewBackendCode(previewBackendCodeReqDto)
   }
 }

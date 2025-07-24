@@ -14,6 +14,7 @@ import {
   InsertEntityCodeReqDto,
   UpdateCodeGenerationReqDto,
   GetEntityCustomFieldsReqDto,
+  PreviewBackendCodeReqDto,
 } from './dto/code-generation.req.dto'
 
 import { StrGenerator } from '@/utils/str-generator'
@@ -175,7 +176,7 @@ export class CodeGenerationService {
   async previewEntityCode(previewEntityCodeReqDto: PreviewEntityCodeReqDto) {
     const entityCode = await this.generateEntityCode(previewEntityCodeReqDto)
 
-    /** 生成代碼預覽頁面的文件數 */
+    /** 生成代碼預覽頁面的文件樹 */
     const treeData = [
       {
         label: 'src',
@@ -266,7 +267,7 @@ export class CodeGenerationService {
 
   // 獲取 Entity 中的所有自訂欄位
   async getEntityCustomFields(getEntityCustomFieldsReqDto: GetEntityCustomFieldsReqDto) {
-    const moduleNameSplit = JSON.parse(getEntityCustomFieldsReqDto.moduleNameSplit)
+    const moduleSplitName = JSON.parse(getEntityCustomFieldsReqDto.moduleSplitName)
 
     // 根目錄
     const rootDir = process.cwd()
@@ -274,23 +275,24 @@ export class CodeGenerationService {
     const filePath = path.join(
       rootDir,
       'src/modules',
-      moduleNameSplit[0],
-      moduleNameSplit[1],
+      moduleSplitName[0],
+      moduleSplitName[1],
       'entity',
-      `${moduleNameSplit[0]}-${moduleNameSplit[1]}.entity.ts`,
+      `${moduleSplitName[0]}-${moduleSplitName[1]}.entity.ts`,
     )
     // 讀取文件
     const entityCode = await fs.promises.readFile(filePath, 'utf-8')
 
     // 提取實體中的所有自訂欄位
-    function extractProperties(entityCode: string): Record<string, { label: string; type: string }> {
-      const result: Record<string, { label: string; type: string }> = {}
+    function extractProperties(entityCode: string): Record<string, { label: string; type: string; nullable: boolean }> {
+      const result: Record<string, { label: string; type: string; nullable: boolean }> = {}
 
       // 匹配 @Column 和 @PrimaryGeneratedColumn 裝飾器
-      const columnRegex = /@(?:Column|PrimaryGeneratedColumn)\({([\s\S]*?)}\)[\s\S]*?\n\s*(\w+):/g
+      const columnRegex = /@(?:Column|PrimaryGeneratedColumn|PrimaryColumn)\({([\s\S]*?)}\)[\s\S]*?\n\s*(\w+):/g
 
       let match
       while ((match = columnRegex.exec(entityCode)) !== null) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [_, params, propertyName] = match
 
         // 提取參數
@@ -314,6 +316,13 @@ export class CodeGenerationService {
             value = value.substring(0, value.length - 1).trim()
           }
 
+          // 處理布林值
+          if (value === 'true') {
+            value = true
+          } else if (value === 'false') {
+            value = false
+          }
+
           paramObj[key] = value
         }
 
@@ -330,9 +339,18 @@ export class CodeGenerationService {
           // 其他情況保持默認的 string 類型
         }
 
+        // 處理 nullable 屬性
+        let nullable = false // 預設為 false
+        // 檢查是否為 @Column 且有 nullable 屬性
+        if (match[0].startsWith('@Column') && paramObj.hasOwnProperty('nullable')) {
+          nullable = paramObj.nullable === true
+        }
+        // 對於 @PrimaryGeneratedColumn 和 @PrimaryColumn，nullable 預設為 false
+
         result[propertyName] = {
           label: paramObj.comment || propertyName,
           type: type,
+          nullable: nullable,
         }
       }
 
@@ -340,5 +358,163 @@ export class CodeGenerationService {
     }
 
     return extractProperties(entityCode)
+  }
+
+  async generateBackendCode(previewBackendCodeReqDto: PreviewBackendCodeReqDto) {
+    await new Promise((resolve, reject) => {
+      const jsonInput = JSON.stringify(previewBackendCodeReqDto)
+      const plop = spawn('npx', ['plop', 'backend-code'], { stdio: 'pipe' })
+
+      // 設置超時（例如10秒）
+      const timeout = setTimeout(() => {
+        plop.kill() // 終止進程
+        reject(new Error('操作超時：未收到預期的JSON配置提示'))
+      }, 10000)
+
+      // 監聽 plop 的輸出
+      let receivedPrompt = false
+      plop.stdout.on('data', data => {
+        const output = data.toString()
+
+        // 更靈活的提示檢測（不區分大小寫，包含關鍵字即可）
+        if (!receivedPrompt && output.includes('hint::請輸入JSON配置::')) {
+          receivedPrompt = true
+          clearTimeout(timeout) // 取消超時
+
+          // 等待1000毫秒後再輸入
+          setTimeout(() => {
+            plop.stdin.write(jsonInput + '\n')
+          }, 1000)
+        }
+      })
+
+      // 監聽 plop 的錯誤輸出
+      // plop.stderr.on('data', data => {
+      //   console.error(`stderr: ${data}`)
+      // })
+
+      plop.on('close', code => {
+        clearTimeout(timeout) // 確保清除定時器
+        if (code === 0) {
+          resolve('執行成功')
+        } else {
+          console.error('❌ Plop 執行失敗')
+          reject(new Error('Plop 執行失敗'))
+        }
+      })
+
+      plop.on('error', err => {
+        clearTimeout(timeout) // 確保清除定時器
+        console.error('❌ 執行出錯:', err)
+        reject(err)
+      })
+    })
+
+    const filePath = path.join(
+      __dirname,
+      `../../../../plop-templates/.cache/${previewBackendCodeReqDto.fileName}-${previewBackendCodeReqDto.timestamp}`,
+    )
+
+    // 讀取文件
+    const backendCode = await new Promise<string>((resolve, reject) => {
+      fs.readFile(filePath, 'utf-8', (err, data) => {
+        if (err) {
+          console.error('讀取文件失敗:', err)
+          reject(err)
+        } else {
+          resolve(data)
+        }
+      })
+    })
+
+    // 刪除文件
+    await fs.promises.unlink(filePath)
+
+    return {
+      reqDtoCode: backendCode.match(/<req\.dto>([\s\S]*?)<\/req\.dto>/)[1].trim() + '\n',
+      resDtoCode: backendCode.match(/<res\.dto>([\s\S]*?)<\/res\.dto>/)[1].trim() + '\n',
+      controllerCode: backendCode.match(/<controller>([\s\S]*?)<\/controller>/)[1].trim() + '\n',
+      moduleCode: backendCode.match(/<module>([\s\S]*?)<\/module>/)[1].trim() + '\n',
+      serviceCode: backendCode.match(/<service>([\s\S]*?)<\/service>/)[1].trim() + '\n',
+    }
+  }
+
+  // 返回 後端代碼 預覽
+  async previewBackendCode(previewBackendCodeReqDto: PreviewBackendCodeReqDto) {
+    const { reqDtoCode, resDtoCode, controllerCode, moduleCode, serviceCode } =
+      await this.generateBackendCode(previewBackendCodeReqDto)
+
+    /** 生成代碼預覽頁面的文件樹 */
+    const treeData = [
+      {
+        label: 'src',
+        key: StrGenerator.generateAlphanumeric(8),
+        type: 'folder',
+        children: [
+          {
+            label: 'modules',
+            key: StrGenerator.generateAlphanumeric(8),
+            type: 'folder',
+            children: [
+              {
+                label: previewBackendCodeReqDto.moduleSplitName[0],
+                key: StrGenerator.generateAlphanumeric(8),
+                type: 'folder',
+                children: [
+                  {
+                    label: previewBackendCodeReqDto.moduleSplitName[1],
+                    key: StrGenerator.generateAlphanumeric(8),
+                    type: 'folder',
+                    children: [
+                      {
+                        label: 'dot',
+                        key: StrGenerator.generateAlphanumeric(8),
+                        type: 'folder',
+                        children: [
+                          {
+                            label: `${previewBackendCodeReqDto.fileName}.req.dto.ts`,
+                            key: StrGenerator.generateAlphanumeric(8),
+                            type: 'file',
+                            code: reqDtoCode,
+                          },
+                          {
+                            label: `${previewBackendCodeReqDto.fileName}.res.dto.ts`,
+                            key: StrGenerator.generateAlphanumeric(8),
+                            type: 'file',
+                            code: resDtoCode,
+                          },
+                        ],
+                      },
+                      {
+                        label: `${previewBackendCodeReqDto.fileName}.controller.ts`,
+                        key: StrGenerator.generateAlphanumeric(8),
+                        type: 'file',
+                        code: controllerCode,
+                      },
+                      {
+                        label: `${previewBackendCodeReqDto.fileName}.module.ts`,
+                        key: StrGenerator.generateAlphanumeric(8),
+                        type: 'file',
+                        code: moduleCode,
+                      },
+                      {
+                        label: `${previewBackendCodeReqDto.fileName}.service.ts`,
+                        key: StrGenerator.generateAlphanumeric(8),
+                        type: 'file',
+                        code: serviceCode,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ]
+
+    return {
+      treeData,
+    }
   }
 }

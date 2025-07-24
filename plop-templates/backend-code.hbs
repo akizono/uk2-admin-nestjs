@@ -1,0 +1,246 @@
+<req.dto>
+import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
+import { Transform } from 'class-transformer'
+
+import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
+import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
+import { EnvHelper } from '@/utils/env-helper'
+
+export class {{ classNamePrefix }}ReqDto extends BaseReqDto {
+{{#each columns}}
+  @ApiProperty({ description: '{{this.label}}' }){{#if this.nullable}}
+  @IsOptional(){{else}}
+  @IsNotEmpty(){{/if}}{{#if (eq this.type 'number')}}
+  @IsNumber(){{else if (eq this.type 'array')}}
+  @IsArray(){{else if (eq this.type 'boolean')}}
+  @IsBoolean(){{else if (eq this.type 'object')}}
+  @IsObject(){{else if (eq this.type 'string')}}
+  @IsString(){{/if}}
+  {{@key}}: {{this.type}}{{#unless @last}}
+
+{{/unless}}
+{{/each}}
+
+}
+
+export class Create{{ classNamePrefix }}ReqDto extends PartialType(
+  OmitType({{ classNamePrefix }}ReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+) {}
+
+export class Find{{ classNamePrefix }}ReqDto extends PartialType({{ classNamePrefix }}ReqDto) {
+  @ApiProperty({ description: '分頁大小', example: 10, required: false })
+  @IsNotEmpty()
+  @Min(0)
+  @Max(EnvHelper.getNumber('MAX_PAGE_SIZE'))
+  pageSize?: number = 10
+
+  @ApiProperty({ description: '分頁頁碼', example: 1, required: false })
+  @IsNotEmpty()
+  @Min(0)
+  @Max(EnvHelper.getNumber('MAX_PAGE_NUMBER'))
+  currentPage?: number = 1
+}
+
+export class Update{{ classNamePrefix }}ReqDto extends PartialType(OmitType({{ classNamePrefix }}ReqDto, ['multilingualFields', ...disableEditFields])) {}
+</req.dto>
+
+<res.dto>
+import { PaginatedResponseDto, SingleResponseDto } from '@/utils/response-dto'
+
+export class Create{{ classNamePrefix }}ResDto extends SingleResponseDto({
+  id: '100',
+}) {}
+
+export class Find{{ classNamePrefix }}ResDto extends PaginatedResponseDto({
+{{#each exampleData}}
+  {{@key}}: '{{this}}',
+{{/each}}
+
+  remark: 'remark',
+  status: 0,
+  isDeleted: 0,
+  creator: '-1',
+  createTime: '2025-03-14T04:50:19.000Z',
+  updater: null,
+  updateTime: null,
+}) {}
+</res.dto>
+
+<controller>
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseInterceptors, Req } from '@nestjs/common'
+import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { Request } from 'express'
+
+import { {{ classNamePrefix }}Service } from './{{ fileName }}.service'
+import { Create{{ classNamePrefix }}ReqDto, Find{{ classNamePrefix }}ReqDto, Update{{ classNamePrefix }}ReqDto } from './dto/{{ fileName }}.req.dto'
+import { Create{{ classNamePrefix }}ResDto, Find{{ classNamePrefix }}ResDto } from './dto/{{ fileName }}.res.dto'
+
+import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
+import { ResponseMessage } from '@/common/decorators/response-message.decorator'
+import { MsgResponseDto } from '@/utils/response-dto'
+import { HasPermission } from '@/common/decorators/has-permission.decorator'
+import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
+
+@Controller('/{{ moduleSplitName.[0] }}/{{ moduleSplitName.[1] }}')
+@UseInterceptors(TransformInterceptor)
+export class {{ classNamePrefix }}Controller {
+  constructor(private readonly {{ camelName }}Service: {{ classNamePrefix }}Service) {}
+
+  @Post('/create')
+  @HasPermission('{{ moduleSplitName.[0] }}:{{ moduleSplitName.[2] }}:create')
+  @ApiOperation({ summary: '建立{{ unitName }}' })
+  @ApiResponse({ type: Create{{ classNamePrefix }}ResDto })
+  @ResponseMessage('建立{{ unitName }}成功')
+  create(@Body() create{{ classNamePrefix }}ReqDto: Create{{ classNamePrefix }}ReqDto) {
+    return this.{{ camelName }}Service.create(create{{ classNamePrefix }}ReqDto)
+  }
+
+  @Get('/page')
+  @HasPermission('{{ moduleSplitName.[1] }}:{{ moduleSplitName.[2] }}:page')
+  @ApiOperation({ summary: '取得{{ unitName }}分頁列表' })
+  @ApiResponse({ type: Find{{ classNamePrefix }}ResDto })
+  @ResponseMessage('取得{{ unitName }}分頁列表成功')
+  find(@Query() find{{ classNamePrefix }}ReqDto: Find{{ classNamePrefix }}ReqDto) {
+    return this.{{ camelName }}Service.find(find{{ classNamePrefix }}ReqDto)
+  }
+
+  @Put('/update')
+  @HasPermission('{{ moduleSplitName.[1] }}:{{ moduleSplitName.[2] }}:update')
+  @ApiOperation({ summary: '更新{{ unitName }}' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('更新{{ unitName }}成功')
+  update(@Body() update{{ classNamePrefix }}ReqDto: Update{{ classNamePrefix }}ReqDto) {
+    return this.{{ camelName }}Service.update(update{{ classNamePrefix }}ReqDto)
+  }
+
+  @Delete('/delete/:id')
+  @HasPermission('{{ moduleSplitName.[1] }}:{{ moduleSplitName.[2] }}:delete')
+  @ApiOperation({ summary: '刪除{{ unitName }}' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('刪除{{ unitName }}成功')
+  delete(@Param('id', ParseBigIntPipe) id: string) {
+    return this.{{ camelName }}Service.delete(id)
+  }
+
+  @Put('/block/:id')
+  @HasPermission('{{ moduleSplitName.[1] }}:{{ moduleSplitName.[2] }}:block')
+  @ApiOperation({ summary: '封鎖{{ unitName }}' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('封鎖{{ unitName }}成功')
+  block(@Param('id', ParseBigIntPipe) id: string) {
+    return this.{{ camelName }}Service.block(id)
+  }
+
+  @Put('/unblock/:id')
+  @HasPermission('{{ moduleSplitName.[1] }}:{{ moduleSplitName.[2] }}:unblock')
+  @ApiOperation({ summary: '解封鎖{{ unitName }}' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('解封鎖{{ unitName }}成功')
+  unblock(@Param('id', ParseBigIntPipe) id: string) {
+    return this.{{ camelName }}Service.unblock(id)
+  }
+}
+</controller>
+
+<module>
+import { Module } from '@nestjs/common'
+import { TypeOrmModule } from '@nestjs/typeorm'
+
+import { {{ classNamePrefix }}Controller } from './{{ fileName }}.controller'
+import { {{ classNamePrefix }}Service } from './{{ fileName }}.service'
+import { {{ classNamePrefix }}Entity } from './entity/{{ fileName }}.entity'
+
+@Module({
+  imports: [TypeOrmModule.forFeature([{{ classNamePrefix }}Entity])],
+  controllers: [{{ classNamePrefix }}Controller],
+  providers: [{{ classNamePrefix }}Service],
+  exports: [{{ classNamePrefix }}Service],
+})
+export class {{ classNamePrefix }}Module {}
+</module>
+
+<service>
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+
+import { {{ classNamePrefix }}Entity } from './entity/{{ fileName }}.entity'
+import { Create{{ classNamePrefix }}ReqDto, Find{{ classNamePrefix }}ReqDto, Update{{ classNamePrefix }}ReqDto } from './dto/{{ fileName }}.req.dto'
+
+import { create, find, update, _delete } from '@/common/services/base.service'
+
+@Injectable()
+export class {{ classNamePrefix }}Service {
+  constructor(
+    @InjectRepository({{ classNamePrefix }}Entity)
+    private readonly {{ camelName }}Repository: Repository<{{ classNamePrefix }}Entity>,
+  ) {}
+
+  // 新增{{ unitName }}
+  async create(create{{ classNamePrefix }}ReqDto: Create{{ classNamePrefix }}ReqDto) {
+    const result = await create({
+      dto: create{{ classNamePrefix }}ReqDto,
+      repository: this.{{ camelName }}Repository,
+      modalName: '{{ unitName }}',
+    })
+
+    return { id: result.id }
+  }
+
+  // 查詢{{ unitName }}
+  async find(find{{ classNamePrefix }}ReqDto: Find{{ classNamePrefix }}ReqDto) {
+    const { list, total } = await find({
+      dto: find{{ classNamePrefix }}ReqDto,
+      repository: this.{{ camelName }}Repository,
+      where: {
+        isDeleted: 0,
+      },
+    })
+
+    return {
+      total,
+      list,
+    }
+  }
+
+  // 更新{{ unitName }}
+  async update(update{{ classNamePrefix }}ReqDto: Update{{ classNamePrefix }}ReqDto) {
+    await update({
+      dto: update{{ classNamePrefix }}ReqDto,
+      repository: this.{{ camelName }}Repository,
+      existenceCondition: ['id'],
+      modalName: '{{ unitName }}',
+    })
+  }
+
+  // 刪除{{ unitName }}
+  async delete(id: string) {
+    await _delete({
+      id,
+      repository: this.{{ camelName }}Repository,
+      modalName: '{{ unitName }}',
+    })
+  }
+
+  // 封鎖{{ unitName }}
+  async block(id: string) {
+    await update({
+      dto: { id, status: 0 },
+      repository: this.{{ camelName }}Repository,
+      existenceCondition: ['id'],
+      modalName: '{{ unitName }}',
+    })
+  }
+
+  // 解封鎖{{ unitName }}
+  async unblock(id: string) {
+    await update({
+      dto: { id, status: 1 },
+      repository: this.{{ camelName }}Repository,
+      existenceCondition: ['id'],
+      modalName: '{{ unitName }}',
+    })
+  }
+}
+</service>

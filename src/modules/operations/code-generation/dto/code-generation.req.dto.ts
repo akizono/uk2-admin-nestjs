@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsArray, IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator'
+import { IsArray, IsNotEmpty, IsNumber, IsObject, IsString, Max, Min } from 'class-validator'
 import { Transform, Type } from 'class-transformer'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
@@ -151,5 +151,76 @@ export class GetEntityCustomFieldsReqDto {
   @ApiProperty({ description: '分割的模組標識', example: 'student' })
   @IsNotEmpty()
   @IsString()
-  moduleNameSplit: string
+  moduleSplitName: string
+}
+
+export class PreviewBackendCodeReqDto {
+  @ApiProperty({ description: '檔案名稱', example: 'demo-student' })
+  @IsNotEmpty()
+  @IsString()
+  fileName: string
+
+  @ApiProperty({ description: '駝峰命名', example: 'demoStudent' })
+  @IsNotEmpty()
+  @IsString()
+  camelName: string
+
+  @ApiProperty({ description: '時間戳', example: '1753369205113' })
+  @IsNotEmpty()
+  @IsString()
+  timestamp: string
+
+  @ApiProperty({ description: '分割後的名稱', example: ['demo', 'student'] })
+  @IsNotEmpty()
+  @IsArray()
+  moduleSplitName: string[]
+
+  @ApiProperty({ description: '類名稱', example: 'DemoStudent' })
+  @IsNotEmpty()
+  @IsString()
+  classNamePrefix: string
+
+  @ApiProperty({
+    description: '範例資料',
+    type: 'object',
+    additionalProperties: true,
+    example: { id: '10', age: '18', name: '張三' },
+  })
+  @IsNotEmpty()
+  @IsObject()
+  exampleData: Record<string, any>
+
+  @ApiProperty({ description: '單元名稱', example: '學生' })
+  @IsNotEmpty()
+  @IsString()
+  unitName: string
+
+  @ApiProperty({
+    description: '欄位',
+    example: {
+      'id': {
+        'label': 'id主鍵',
+        'type': 'string',
+        'nullable': false,
+      },
+      'name': {
+        'label': '姓名',
+        'type': 'string',
+        'nullable': false,
+      },
+      'age': {
+        'label': '年齡',
+        'type': 'number',
+        'nullable': true,
+      },
+      'idCard': {
+        'label': '證件號碼',
+        'type': 'string',
+        'nullable': true,
+      },
+    },
+  })
+  @IsNotEmpty()
+  @IsObject()
+  columns: Record<string, { label: string; type: string; nullable: boolean }>
 }
