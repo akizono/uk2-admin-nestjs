@@ -151,7 +151,7 @@ export class GetEntityCustomFieldsReqDto {
   @ApiProperty({ description: '分割的模組標識', example: 'student' })
   @IsNotEmpty()
   @IsString()
-  moduleSplitName: string
+  splitName: string
 }
 
 export class PreviewBackendCodeReqDto {
@@ -173,7 +173,7 @@ export class PreviewBackendCodeReqDto {
   @ApiProperty({ description: '分割後的名稱', example: ['demo', 'student'] })
   @IsNotEmpty()
   @IsArray()
-  moduleSplitName: string[]
+  splitName: string[]
 
   @ApiProperty({ description: '類名稱', example: 'DemoStudent' })
   @IsNotEmpty()
@@ -224,3 +224,5 @@ export class PreviewBackendCodeReqDto {
   @IsObject()
   columns: Record<string, { label: string; type: string; nullable: boolean }>
 }
+
+export class InsertBackendCodeReqDto extends PreviewBackendCodeReqDto {}

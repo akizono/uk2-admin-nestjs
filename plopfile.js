@@ -66,7 +66,7 @@ module.exports = function (plop) {
       {
         type: 'input',
         name: 'jsonInput',
-        message: 'hint::請輸入JSON配置::', // {"fileName":"demo-student","camelName":"demoStudent","timestamp":"1753369205113","moduleSplitName":["demo","student"],"classNamePrefix":"DemoStudent","exampleData":{"id":"10001","name":"香香","age":14,"idCard":"344422121221"},"unitName":"學生","columns":{"id":{"label":"id主鍵","type":"string","nullable":false},"name":{"label":"姓名","type":"string","nullable":false},"age":{"label":"年齡","type":"number","nullable":true},"idCard":{"label":"證件號碼","type":"string","nullable":true}}}
+        message: 'hint::請輸入JSON配置::', // {"fileName":"demo-student","camelName":"demoStudent","timestamp":"1753369205113","splitName":["demo","student"],"classNamePrefix":"DemoStudent","exampleData":{"id":"10001","name":"香香","age":14,"idCard":"344422121221"},"unitName":"學生","columns":{"id":{"label":"id主鍵","type":"string","nullable":false},"name":{"label":"姓名","type":"string","nullable":false},"age":{"label":"年齡","type":"number","nullable":true},"idCard":{"label":"證件號碼","type":"string","nullable":true}}}
       },
     ],
     actions: function (data) {

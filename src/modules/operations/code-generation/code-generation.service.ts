@@ -15,6 +15,7 @@ import {
   UpdateCodeGenerationReqDto,
   GetEntityCustomFieldsReqDto,
   PreviewBackendCodeReqDto,
+  InsertBackendCodeReqDto,
 } from './dto/code-generation.req.dto'
 
 import { StrGenerator } from '@/utils/str-generator'
@@ -95,9 +96,14 @@ export class CodeGenerationService {
     })
   }
 
-  async generateEntityCode(previewEntityCodeReqDto: PreviewEntityCodeReqDto) {
+  // ------------------------------ EntityCode - Start ------------------------------
+
+  // 生成 EntityCode
+  async generateEntityCode(params: PreviewEntityCodeReqDto) {
+    const { fileName, timestamp } = params
+
     await new Promise((resolve, reject) => {
-      const jsonInput = JSON.stringify(previewEntityCodeReqDto)
+      const jsonInput = JSON.stringify(params)
       const plop = spawn('npx', ['plop', 'entity'], { stdio: 'pipe' })
 
       // 設置超時（例如10秒）
@@ -145,10 +151,7 @@ export class CodeGenerationService {
       })
     })
 
-    const filePath = path.join(
-      __dirname,
-      `../../../../plop-templates/.cache/${previewEntityCodeReqDto.fileName}-${previewEntityCodeReqDto.timestamp}`,
-    )
+    const filePath = path.join(__dirname, `../../../../plop-templates/.cache/${fileName}-${timestamp}`)
     // 讀取文件
     const entityCode =
       (
@@ -240,7 +243,7 @@ export class CodeGenerationService {
     try {
       // 檢查文件是否存在
       await fs.promises.access(filePath)
-      throw new HttpException('文件已存在', HttpStatus.BAD_REQUEST)
+      throw new HttpException(`「${fileName}.entity.ts」 文件已存在，請刪除後再重試`, HttpStatus.BAD_REQUEST)
     } catch (error) {
       // 如果錯誤是 HttpException，則繼續拋出
       if (error instanceof HttpException) {
@@ -256,7 +259,7 @@ export class CodeGenerationService {
         const dirPath = path.dirname(filePath)
         await fs.promises.mkdir(dirPath, { recursive: true })
 
-        // 使用非同步寫入
+        // 寫入
         await fs.promises.writeFile(filePath, entityCode)
       } catch (error) {
         console.error('創建文件時發生錯誤：', error)
@@ -265,9 +268,11 @@ export class CodeGenerationService {
     }
   }
 
+  // ------------------------------ EntityCode - End ------------------------------
+
   // 獲取 Entity 中的所有自訂欄位
   async getEntityCustomFields(getEntityCustomFieldsReqDto: GetEntityCustomFieldsReqDto) {
-    const moduleSplitName = JSON.parse(getEntityCustomFieldsReqDto.moduleSplitName)
+    const splitName = JSON.parse(getEntityCustomFieldsReqDto.splitName)
 
     // 根目錄
     const rootDir = process.cwd()
@@ -275,10 +280,10 @@ export class CodeGenerationService {
     const filePath = path.join(
       rootDir,
       'src/modules',
-      moduleSplitName[0],
-      moduleSplitName[1],
+      splitName[0],
+      splitName[1],
       'entity',
-      `${moduleSplitName[0]}-${moduleSplitName[1]}.entity.ts`,
+      `${splitName[0]}-${splitName[1]}.entity.ts`,
     )
     // 讀取文件
     const entityCode = await fs.promises.readFile(filePath, 'utf-8')
@@ -360,6 +365,9 @@ export class CodeGenerationService {
     return extractProperties(entityCode)
   }
 
+  // ------------------------------ BackendCode - Start ------------------------------
+
+  // 生成 BackendCode
   async generateBackendCode(previewBackendCodeReqDto: PreviewBackendCodeReqDto) {
     await new Promise((resolve, reject) => {
       const jsonInput = JSON.stringify(previewBackendCodeReqDto)
@@ -457,12 +465,12 @@ export class CodeGenerationService {
             type: 'folder',
             children: [
               {
-                label: previewBackendCodeReqDto.moduleSplitName[0],
+                label: previewBackendCodeReqDto.splitName[0],
                 key: StrGenerator.generateAlphanumeric(8),
                 type: 'folder',
                 children: [
                   {
-                    label: previewBackendCodeReqDto.moduleSplitName[1],
+                    label: previewBackendCodeReqDto.splitName[1],
                     key: StrGenerator.generateAlphanumeric(8),
                     type: 'folder',
                     children: [
@@ -517,4 +525,134 @@ export class CodeGenerationService {
       treeData,
     }
   }
+
+  // 插入 後端代碼
+  async insertBackendCode(insertBackendCodeReqDto: InsertBackendCodeReqDto) {
+    const { splitName, fileName, classNamePrefix } = insertBackendCodeReqDto
+
+    const codes = await this.generateBackendCode(insertBackendCodeReqDto)
+
+    // 模組目錄
+    const moduleDir = path.join(process.cwd(), 'src/modules', splitName[0], splitName[1])
+
+    // 文件路徑
+    const filePaths = {
+      reqDto: path.join(moduleDir, `/dto/${fileName}.req.dto.ts`),
+      resDto: path.join(moduleDir, `/dto/${fileName}.res.dto.ts`),
+      controller: path.join(moduleDir, `/${fileName}.controller.ts`),
+      module: path.join(moduleDir, `/${fileName}.module.ts`),
+      service: path.join(moduleDir, `/${fileName}.service.ts`),
+    }
+
+    // 檢查文件是否存在
+    for (const [fileType, filePath] of Object.entries(filePaths)) {
+      try {
+        await fs.promises.access(filePath)
+        // 如果能正常存取，代表文件存在，立即拋出異常
+        const fileTypeMap = {
+          reqDto: `${fileName}.req.dto.ts`,
+          resDto: `${fileName}.res.dto.ts`,
+          controller: `${fileName}.controller.ts`,
+          module: `${fileName}.module.ts`,
+          service: `${fileName}.service.ts`,
+        }
+        throw new HttpException(`「${fileTypeMap[fileType]}」 文件已存在，請刪除後再重試`, HttpStatus.BAD_REQUEST)
+      } catch (error) {
+        // 如果是我們自己拋出的異常，直接重新拋出
+        if (error instanceof HttpException) {
+          throw error
+        }
+        // 如果是文件不存在的錯誤(ENOENT)，繼續檢查下一個文件
+        // 其他錯誤也忽略，繼續檢查
+      }
+    }
+
+    // 所有文件都不存在，繼續執行創建操作
+    try {
+      /** 寫入檔案 */
+      for (const [fileType, filePath] of Object.entries(filePaths)) {
+        // 確保目錄存在
+        const dirPath = path.dirname(filePath)
+        await fs.promises.mkdir(dirPath, { recursive: true })
+
+        // 修改本模組的isGenerateBackendCode為1
+        await this.codeGenerationRepository.update({ code: fileName }, { isGenerateBackendCode: 1 })
+
+        // 寫入檔案
+        await fs.promises.writeFile(filePath, codes[fileType + 'Code'])
+      }
+
+      /** 註冊模組 */
+      // 模組的相對路徑
+      const moduleRelativePath = `./modules/${splitName[0]}/${splitName[1]}/${fileName}.module`
+
+      // app.module.ts 文件路徑
+      const appModuleFilePath = path.join(process.cwd(), 'src/app.module.ts')
+
+      // 讀取 app.module.ts 文件內容
+      const appModuleContent = await fs.promises.readFile(appModuleFilePath, 'utf-8')
+
+      // 構建 import 語句
+      const importStatement = `import { ${classNamePrefix}Module } from '${moduleRelativePath}'`
+
+      // 檢查是否已經存在該 import
+      if (!appModuleContent.includes(importStatement)) {
+        // 在 import 定位註解前插入 import 語句
+        const importLocation = '/** ---- Code generation location: import ---- */'
+        const importIndex = appModuleContent.indexOf(importLocation)
+
+        if (importIndex !== -1) {
+          const beforeImportLocation = appModuleContent.substring(0, importIndex)
+          const afterImportLocation = appModuleContent.substring(importIndex)
+
+          // 找到註解前最後一個非空行的位置
+          const lines = beforeImportLocation.split('\n')
+          let insertIndex = lines.length - 1
+
+          // 向前找到最後一個非空行
+          while (insertIndex >= 0 && lines[insertIndex].trim() === '') {
+            insertIndex--
+          }
+
+          // 在最後一個非空行後插入新的 import 語句
+          lines.splice(insertIndex + 1, 0, importStatement)
+
+          const updatedContentWithImport = lines.join('\n') + afterImportLocation
+
+          // 在 module 定位註解前插入模組名稱
+          const moduleLocation = '/** ---- Code generation location: module ---- */'
+          const moduleIndex = updatedContentWithImport.indexOf(moduleLocation)
+
+          if (moduleIndex !== -1) {
+            const beforeModuleLocation = updatedContentWithImport.substring(0, moduleIndex)
+            const afterModuleLocation = updatedContentWithImport.substring(moduleIndex)
+
+            // 檢查是否已經註冊了該模組
+            if (!beforeModuleLocation.includes(`${classNamePrefix}Module,`)) {
+              // 找到註解前最後一個非空行的位置
+              const lines = beforeModuleLocation.split('\n')
+              let insertIndex = lines.length - 1
+
+              // 向前找到最後一個非空行
+              while (insertIndex >= 0 && lines[insertIndex].trim() === '') {
+                insertIndex--
+              }
+
+              // 在最後一個非空行後插入新模組
+              lines.splice(insertIndex + 1, 0, `    ${classNamePrefix}Module,`)
+
+              const finalContent = lines.join('\n') + afterModuleLocation
+              // 寫回文件
+              await fs.promises.writeFile(appModuleFilePath, finalContent)
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('創建文件時發生錯誤：', error)
+      throw new Error(`文件創建失敗: ${error.message}`)
+    }
+  }
+
+  // ------------------------------ BackendCode - End ------------------------------
 }

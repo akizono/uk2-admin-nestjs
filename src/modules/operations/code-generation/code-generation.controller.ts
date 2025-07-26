@@ -10,12 +10,14 @@ import {
   InsertEntityCodeReqDto,
   GetEntityCustomFieldsReqDto,
   PreviewBackendCodeReqDto,
+  InsertBackendCodeReqDto,
 } from './dto/code-generation.req.dto'
 import {
   CreateCodeGenerationResDto,
   FindCodeGenerationResDto,
   GetEntityCustomFieldsResDto,
   PreviewEntityCodeResDto,
+  PreviewBackendCodeResDto,
 } from './dto/code-generation.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
@@ -113,9 +115,18 @@ export class CodeGenerationController {
   @Post('/preview-backend-code')
   @HasPermission('operations:code-generation:update')
   @ApiOperation({ summary: '預覽後端代碼' })
-  // @ApiResponse({ type: PreviewBackendCodeResDto })
+  @ApiResponse({ type: PreviewBackendCodeResDto })
   @ResponseMessage('預覽後端代碼成功')
   previewBackendCode(@Body() previewBackendCodeReqDto: PreviewBackendCodeReqDto) {
     return this.codeGenerationService.previewBackendCode(previewBackendCodeReqDto)
+  }
+
+  @Post('/insert-backend-code')
+  @HasPermission('operations:code-generation:update')
+  @ApiOperation({ summary: '插入後端代碼' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('插入後端代碼成功')
+  insertBackendCode(@Body() insertBackendCodeReqDto: InsertBackendCodeReqDto) {
+    return this.codeGenerationService.insertBackendCode(insertBackendCodeReqDto)
   }
 }

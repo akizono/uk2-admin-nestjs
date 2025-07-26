@@ -9,6 +9,14 @@ import { EnvHelper } from '@/utils/env-helper'
 
 export class {{ classNamePrefix }}ReqDto extends BaseReqDto {
 {{#each columns}}
+{{#if (eq @key 'id')}}
+  @ApiProperty({ description: '主鍵ID' })
+  @IsNotEmpty()
+  @Transform(({ value }) => new ParseBigIntPipe().transform(value))
+  {{@key}}: {{this.type}}{{#unless @last}}
+
+{{/unless}}
+{{else}}
   @ApiProperty({ description: '{{this.label}}' }){{#if this.nullable}}
   @IsOptional(){{else}}
   @IsNotEmpty(){{/if}}{{#if (eq this.type 'number')}}
@@ -20,6 +28,7 @@ export class {{ classNamePrefix }}ReqDto extends BaseReqDto {
   {{@key}}: {{this.type}}{{#unless @last}}
 
 {{/unless}}
+{{/if}}
 {{/each}}
 
 }
@@ -70,7 +79,6 @@ export class Find{{ classNamePrefix }}ResDto extends PaginatedResponseDto({
 <controller>
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseInterceptors, Req } from '@nestjs/common'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
-import { Request } from 'express'
 
 import { {{ classNamePrefix }}Service } from './{{ fileName }}.service'
 import { Create{{ classNamePrefix }}ReqDto, Find{{ classNamePrefix }}ReqDto, Update{{ classNamePrefix }}ReqDto } from './dto/{{ fileName }}.req.dto'
@@ -82,13 +90,13 @@ import { MsgResponseDto } from '@/utils/response-dto'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 
-@Controller('/{{ moduleSplitName.[0] }}/{{ moduleSplitName.[1] }}')
+@Controller('/{{ splitName.[0] }}/{{ splitName.[1] }}')
 @UseInterceptors(TransformInterceptor)
 export class {{ classNamePrefix }}Controller {
   constructor(private readonly {{ camelName }}Service: {{ classNamePrefix }}Service) {}
 
   @Post('/create')
-  @HasPermission('{{ moduleSplitName.[0] }}:{{ moduleSplitName.[2] }}:create')
+  @HasPermission('{{ splitName.[0] }}:{{ splitName.[2] }}:create')
   @ApiOperation({ summary: '建立{{ unitName }}' })
   @ApiResponse({ type: Create{{ classNamePrefix }}ResDto })
   @ResponseMessage('建立{{ unitName }}成功')
@@ -97,7 +105,7 @@ export class {{ classNamePrefix }}Controller {
   }
 
   @Get('/page')
-  @HasPermission('{{ moduleSplitName.[1] }}:{{ moduleSplitName.[2] }}:page')
+  @HasPermission('{{ splitName.[1] }}:{{ splitName.[2] }}:page')
   @ApiOperation({ summary: '取得{{ unitName }}分頁列表' })
   @ApiResponse({ type: Find{{ classNamePrefix }}ResDto })
   @ResponseMessage('取得{{ unitName }}分頁列表成功')
@@ -106,7 +114,7 @@ export class {{ classNamePrefix }}Controller {
   }
 
   @Put('/update')
-  @HasPermission('{{ moduleSplitName.[1] }}:{{ moduleSplitName.[2] }}:update')
+  @HasPermission('{{ splitName.[1] }}:{{ splitName.[2] }}:update')
   @ApiOperation({ summary: '更新{{ unitName }}' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('更新{{ unitName }}成功')
@@ -115,7 +123,7 @@ export class {{ classNamePrefix }}Controller {
   }
 
   @Delete('/delete/:id')
-  @HasPermission('{{ moduleSplitName.[1] }}:{{ moduleSplitName.[2] }}:delete')
+  @HasPermission('{{ splitName.[1] }}:{{ splitName.[2] }}:delete')
   @ApiOperation({ summary: '刪除{{ unitName }}' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('刪除{{ unitName }}成功')
@@ -124,7 +132,7 @@ export class {{ classNamePrefix }}Controller {
   }
 
   @Put('/block/:id')
-  @HasPermission('{{ moduleSplitName.[1] }}:{{ moduleSplitName.[2] }}:block')
+  @HasPermission('{{ splitName.[1] }}:{{ splitName.[2] }}:block')
   @ApiOperation({ summary: '封鎖{{ unitName }}' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('封鎖{{ unitName }}成功')
@@ -133,7 +141,7 @@ export class {{ classNamePrefix }}Controller {
   }
 
   @Put('/unblock/:id')
-  @HasPermission('{{ moduleSplitName.[1] }}:{{ moduleSplitName.[2] }}:unblock')
+  @HasPermission('{{ splitName.[1] }}:{{ splitName.[2] }}:unblock')
   @ApiOperation({ summary: '解封鎖{{ unitName }}' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('解封鎖{{ unitName }}成功')

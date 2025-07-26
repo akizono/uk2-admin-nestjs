@@ -18,7 +18,9 @@ import { DictTypeModule } from './modules/system/dict-type/dict-type.module'
 import { DictDataModule } from './modules/system/dict-data/dict-data.module'
 import { LanguageModule } from './modules/system/language/language.module'
 import { MultilingualFieldsModule } from './modules/system/multilingual-fields/multilingual-fields.module'
-import { CodeGenerationModule } from './modules/operations/code-generation/code-generation.module';
+import { CodeGenerationModule } from './modules/operations/code-generation/code-generation.module'
+
+/** ---- Code generation location: import ---- */ // 請勿刪除此處註解
 
 @Module({
   imports: [
@@ -56,6 +58,8 @@ import { CodeGenerationModule } from './modules/operations/code-generation/code-
     LanguageModule,
     MultilingualFieldsModule,
     CodeGenerationModule,
+
+    /** ---- Code generation location: module ---- */ // 請勿刪除此處註解
   ],
 
   controllers: [AppController],
