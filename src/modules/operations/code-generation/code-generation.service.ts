@@ -96,8 +96,6 @@ export class CodeGenerationService {
     })
   }
 
-  // ------------------------------ EntityCode - Start ------------------------------
-
   // 生成 EntityCode
   async generateEntityCode(params: PreviewEntityCodeReqDto) {
     const { fileName, timestamp } = params
@@ -268,8 +266,6 @@ export class CodeGenerationService {
     }
   }
 
-  // ------------------------------ EntityCode - End ------------------------------
-
   // 獲取 Entity 中的所有自訂欄位
   async getEntityCustomFields(getEntityCustomFieldsReqDto: GetEntityCustomFieldsReqDto) {
     const splitName = JSON.parse(getEntityCustomFieldsReqDto.splitName)
@@ -365,8 +361,6 @@ export class CodeGenerationService {
     return extractProperties(entityCode)
   }
 
-  // ------------------------------ BackendCode - Start ------------------------------
-
   // 生成 BackendCode
   async generateBackendCode(previewBackendCodeReqDto: PreviewBackendCodeReqDto) {
     await new Promise((resolve, reject) => {
@@ -451,6 +445,83 @@ export class CodeGenerationService {
   async previewBackendCode(previewBackendCodeReqDto: PreviewBackendCodeReqDto) {
     const { reqDtoCode, resDtoCode, controllerCode, moduleCode, serviceCode } =
       await this.generateBackendCode(previewBackendCodeReqDto)
+    let appModuleCode = ''
+
+    const { splitName, fileName, classNamePrefix } = previewBackendCodeReqDto
+
+    // 模組的相對路徑
+    const moduleRelativePath = `./modules/${splitName[0]}/${splitName[1]}/${fileName}.module`
+    // app.module.ts 文件路徑
+    const appModuleFilePath = path.join(process.cwd(), 'src/app.module.ts')
+
+    // 讀取 app.module.ts 文件內容
+    const appModuleContent = await fs.promises.readFile(appModuleFilePath, 'utf-8')
+
+    // 構建 import 語句
+    const importStatement = `import { ${classNamePrefix}Module } from '${moduleRelativePath}'`
+
+    try {
+      // 生成 app.module.ts 的 diff 預覽代碼
+      let updatedAppModuleContent = appModuleContent
+
+      // 檢查是否已經存在該 import
+      if (!appModuleContent.includes(importStatement)) {
+        // 在 import 定位註解前插入 import 語句
+        const importLocation = '/** ---- Code generation location: import ---- */'
+        const importIndex = appModuleContent.indexOf(importLocation)
+
+        if (importIndex !== -1) {
+          const beforeImportLocation = appModuleContent.substring(0, importIndex)
+          const afterImportLocation = appModuleContent.substring(importIndex)
+
+          // 找到註解前最後一個非空行的位置
+          const lines = beforeImportLocation.split('\n')
+          let insertIndex = lines.length - 1
+
+          // 向前找到最後一個非空行
+          while (insertIndex >= 0 && lines[insertIndex].trim() === '') {
+            insertIndex--
+          }
+
+          // 在最後一個非空行後插入新的 import 語句（帶有 + 前綴）
+          lines.splice(insertIndex + 1, 0, `+${importStatement}`)
+
+          updatedAppModuleContent = lines.join('\n') + afterImportLocation
+        }
+      }
+
+      // 在 module 定位註解前插入模組名稱
+      const moduleLocation = '/** ---- Code generation location: module ---- */'
+      const moduleIndex = updatedAppModuleContent.indexOf(moduleLocation)
+
+      if (moduleIndex !== -1) {
+        const beforeModuleLocation = updatedAppModuleContent.substring(0, moduleIndex)
+        const afterModuleLocation = updatedAppModuleContent.substring(moduleIndex)
+
+        // 檢查是否已經註冊了該模組
+        if (!beforeModuleLocation.includes(`${classNamePrefix}Module,`)) {
+          // 找到註解前最後一個非空行的位置
+          const lines = beforeModuleLocation.split('\n')
+          let insertIndex = lines.length - 1
+
+          // 向前找到最後一個非空行
+          while (insertIndex >= 0 && lines[insertIndex].trim() === '') {
+            insertIndex--
+          }
+
+          // 在最後一個非空行後插入新模組（帶有 + 前綴）
+          lines.splice(insertIndex + 1, 0, `+    ${classNamePrefix}Module,`)
+
+          updatedAppModuleContent = lines.join('\n') + afterModuleLocation
+        }
+      }
+
+      // 將更新後的內容賦值給 appModuleCode
+      appModuleCode = updatedAppModuleContent
+    } catch (error) {
+      console.error('讀取 app.module.ts時發生錯誤：', error)
+      throw new Error(`讀取 app.module.ts時發生錯誤: ${error.message}`)
+    }
 
     /** 生成代碼預覽頁面的文件樹 */
     const treeData = [
@@ -475,7 +546,7 @@ export class CodeGenerationService {
                     type: 'folder',
                     children: [
                       {
-                        label: 'dot',
+                        label: 'dto',
                         key: StrGenerator.generateAlphanumeric(8),
                         type: 'folder',
                         children: [
@@ -516,6 +587,12 @@ export class CodeGenerationService {
                 ],
               },
             ],
+          },
+          {
+            label: 'app.module.ts.diff',
+            key: StrGenerator.generateAlphanumeric(8),
+            type: 'file',
+            code: appModuleCode,
           },
         ],
       },
@@ -653,6 +730,4 @@ export class CodeGenerationService {
       throw new Error(`文件創建失敗: ${error.message}`)
     }
   }
-
-  // ------------------------------ BackendCode - End ------------------------------
 }
