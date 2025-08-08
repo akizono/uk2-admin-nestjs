@@ -16,6 +16,7 @@ import {
   GetEntityCustomFieldsReqDto,
   PreviewBackendCodeReqDto,
   InsertBackendCodeReqDto,
+  GetEntityAllFieldsReqDto,
 } from './dto/code-generation.req.dto'
 
 import { StrGenerator } from '@/utils/str-generator'
@@ -266,6 +267,80 @@ export class CodeGenerationService {
     }
   }
 
+  // 提取實體中的所有欄位
+  extractProperties(entityCode: string): Record<string, { label: string; type: string; nullable: boolean }> {
+    const result: Record<string, { label: string; type: string; nullable: boolean }> = {}
+
+    // 匹配 @Column 和 @PrimaryGeneratedColumn 裝飾器
+    const columnRegex = /@(?:Column|PrimaryGeneratedColumn|PrimaryColumn)\({([\s\S]*?)}\)[\s\S]*?\n\s*(\w+):/g
+
+    let match
+    while ((match = columnRegex.exec(entityCode)) !== null) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [_, params, propertyName] = match
+
+      // 提取參數
+      const paramObj: Record<string, any> = {}
+      const paramPairs = params.split(',').flatMap(p => p.split('\n'))
+
+      for (const pair of paramPairs) {
+        const trimmed = pair.trim()
+        if (!trimmed) continue
+
+        const colonIndex = trimmed.indexOf(':')
+        if (colonIndex === -1) continue
+
+        const key = trimmed.substring(0, colonIndex).trim()
+        let value = trimmed.substring(colonIndex + 1).trim()
+
+        // 處理值中的引號和註釋
+        if (value.startsWith("'") || value.startsWith('"')) {
+          value = value.substring(1, value.lastIndexOf("'") !== -1 ? value.lastIndexOf("'") : value.lastIndexOf('"'))
+        } else if (value.endsWith(',')) {
+          value = value.substring(0, value.length - 1).trim()
+        }
+
+        // 處理布林值
+        if (value === 'true') {
+          value = true
+        } else if (value === 'false') {
+          value = false
+        }
+
+        paramObj[key] = value
+      }
+
+      // 確定類型
+      let type = 'string' // 默認類型
+      if (paramObj.type) {
+        if (paramObj.type === 'int' || paramObj.type === 'integer' || paramObj.type === 'number') {
+          type = 'number'
+        } else if (paramObj.type === 'boolean') {
+          type = 'boolean'
+        } else if (paramObj.type === 'date' || paramObj.type === 'datetime') {
+          type = 'date'
+        }
+        // 其他情況保持默認的 string 類型
+      }
+
+      // 處理 nullable 屬性
+      let nullable = false // 預設為 false
+      // 檢查是否為 @Column 且有 nullable 屬性
+      if (match[0].startsWith('@Column') && paramObj.hasOwnProperty('nullable')) {
+        nullable = paramObj.nullable === true
+      }
+      // 對於 @PrimaryGeneratedColumn 和 @PrimaryColumn，nullable 預設為 false
+
+      result[propertyName] = {
+        label: paramObj.comment || propertyName,
+        type: type,
+        nullable: nullable,
+      }
+    }
+
+    return result
+  }
+
   // 獲取 Entity 中的所有自訂欄位
   async getEntityCustomFields(getEntityCustomFieldsReqDto: GetEntityCustomFieldsReqDto) {
     const splitName = JSON.parse(getEntityCustomFieldsReqDto.splitName)
@@ -284,81 +359,7 @@ export class CodeGenerationService {
     // 讀取文件
     const entityCode = await fs.promises.readFile(filePath, 'utf-8')
 
-    // 提取實體中的所有自訂欄位
-    function extractProperties(entityCode: string): Record<string, { label: string; type: string; nullable: boolean }> {
-      const result: Record<string, { label: string; type: string; nullable: boolean }> = {}
-
-      // 匹配 @Column 和 @PrimaryGeneratedColumn 裝飾器
-      const columnRegex = /@(?:Column|PrimaryGeneratedColumn|PrimaryColumn)\({([\s\S]*?)}\)[\s\S]*?\n\s*(\w+):/g
-
-      let match
-      while ((match = columnRegex.exec(entityCode)) !== null) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [_, params, propertyName] = match
-
-        // 提取參數
-        const paramObj: Record<string, any> = {}
-        const paramPairs = params.split(',').flatMap(p => p.split('\n'))
-
-        for (const pair of paramPairs) {
-          const trimmed = pair.trim()
-          if (!trimmed) continue
-
-          const colonIndex = trimmed.indexOf(':')
-          if (colonIndex === -1) continue
-
-          const key = trimmed.substring(0, colonIndex).trim()
-          let value = trimmed.substring(colonIndex + 1).trim()
-
-          // 處理值中的引號和註釋
-          if (value.startsWith("'") || value.startsWith('"')) {
-            value = value.substring(1, value.lastIndexOf("'") !== -1 ? value.lastIndexOf("'") : value.lastIndexOf('"'))
-          } else if (value.endsWith(',')) {
-            value = value.substring(0, value.length - 1).trim()
-          }
-
-          // 處理布林值
-          if (value === 'true') {
-            value = true
-          } else if (value === 'false') {
-            value = false
-          }
-
-          paramObj[key] = value
-        }
-
-        // 確定類型
-        let type = 'string' // 默認類型
-        if (paramObj.type) {
-          if (paramObj.type === 'int' || paramObj.type === 'integer' || paramObj.type === 'number') {
-            type = 'number'
-          } else if (paramObj.type === 'boolean') {
-            type = 'boolean'
-          } else if (paramObj.type === 'date' || paramObj.type === 'datetime') {
-            type = 'date'
-          }
-          // 其他情況保持默認的 string 類型
-        }
-
-        // 處理 nullable 屬性
-        let nullable = false // 預設為 false
-        // 檢查是否為 @Column 且有 nullable 屬性
-        if (match[0].startsWith('@Column') && paramObj.hasOwnProperty('nullable')) {
-          nullable = paramObj.nullable === true
-        }
-        // 對於 @PrimaryGeneratedColumn 和 @PrimaryColumn，nullable 預設為 false
-
-        result[propertyName] = {
-          label: paramObj.comment || propertyName,
-          type: type,
-          nullable: nullable,
-        }
-      }
-
-      return result
-    }
-
-    return extractProperties(entityCode)
+    return this.extractProperties(entityCode)
   }
 
   // 生成 BackendCode
@@ -728,6 +729,37 @@ export class CodeGenerationService {
     } catch (error) {
       console.error('創建文件時發生錯誤：', error)
       throw new Error(`文件創建失敗: ${error.message}`)
+    }
+  }
+
+  // 獲取指定的Entity 中 所有字段
+  async getEntityAllFields(getEntityAllFieldsReqDto: GetEntityAllFieldsReqDto) {
+    const splitName = JSON.parse(getEntityAllFieldsReqDto.splitName)
+
+    // 根目錄
+    const rootDir = process.cwd()
+
+    // 讀取Entity文件
+    const entityFilePath = path.join(
+      rootDir,
+      'src/modules',
+      splitName[0],
+      splitName[1],
+      'entity',
+      `${splitName[0]}-${splitName[1]}.entity.ts`,
+    )
+    const entityCode = await fs.promises.readFile(entityFilePath, 'utf-8')
+
+    // 讀取Base.Entity文件
+    const baseEntityFilePath = path.join(rootDir, 'src/common/entities/base.entity.ts')
+    const baseEntityCode = await fs.promises.readFile(baseEntityFilePath, 'utf-8')
+
+    const entityFields = this.extractProperties(entityCode)
+    const baseEntityFields = this.extractProperties(baseEntityCode)
+
+    return {
+      ...entityFields,
+      ...baseEntityFields,
     }
   }
 }

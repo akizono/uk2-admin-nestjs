@@ -11,6 +11,7 @@ import {
   GetEntityCustomFieldsReqDto,
   PreviewBackendCodeReqDto,
   InsertBackendCodeReqDto,
+  GetEntityAllFieldsReqDto,
 } from './dto/code-generation.req.dto'
 import {
   CreateCodeGenerationResDto,
@@ -18,6 +19,7 @@ import {
   GetEntityCustomFieldsResDto,
   PreviewEntityCodeResDto,
   PreviewBackendCodeResDto,
+  GetEntityAllFieldsResDto,
 } from './dto/code-generation.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
@@ -128,5 +130,14 @@ export class CodeGenerationController {
   @ResponseMessage('插入後端代碼成功')
   insertBackendCode(@Body() insertBackendCodeReqDto: InsertBackendCodeReqDto) {
     return this.codeGenerationService.insertBackendCode(insertBackendCodeReqDto)
+  }
+
+  @Get('/get-entity-all-fields')
+  @HasPermission('operations:code-generation:update')
+  @ApiOperation({ summary: '獲取實體的所有字段' })
+  @ApiResponse({ type: GetEntityAllFieldsResDto })
+  @ResponseMessage('獲取實體的所有字段成功')
+  getEntityAllFields(@Query() getEntityAllFieldsReqDto: GetEntityAllFieldsReqDto) {
+    return this.codeGenerationService.getEntityAllFields(getEntityAllFieldsReqDto)
   }
 }

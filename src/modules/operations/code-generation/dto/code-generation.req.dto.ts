@@ -226,3 +226,10 @@ export class PreviewBackendCodeReqDto {
 }
 
 export class InsertBackendCodeReqDto extends PreviewBackendCodeReqDto {}
+
+export class GetEntityAllFieldsReqDto {
+  @ApiProperty({ description: '分割的模組標識', example: 'student' })
+  @IsNotEmpty()
+  @IsString()
+  splitName: string
+}

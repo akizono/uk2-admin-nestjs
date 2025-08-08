@@ -75,18 +75,22 @@ export class GetEntityCustomFieldsResDto extends SingleResponseDto({
   'id': {
     'label': 'id主鍵',
     'type': 'string',
+    'nullable': false,
   },
   'name': {
     'label': '姓名',
     'type': 'string',
+    'nullable': false,
   },
   'age': {
     'label': '年齡',
     'type': 'number',
+    'nullable': true,
   },
   'idCard': {
     'label': '證件號碼',
     'type': 'string',
+    'nullable': true,
   },
 }) {}
 
@@ -163,4 +167,27 @@ export class PreviewBackendCodeResDto extends SingleResponseDto({
       ],
     },
   ],
+}) {}
+
+export class GetEntityAllFieldsResDto extends SingleResponseDto({
+  'id': {
+    'label': 'id主鍵',
+    'type': 'string',
+    'nullable': false,
+  },
+  'name': {
+    'label': '姓名',
+    'type': 'string',
+    'nullable': false,
+  },
+  'age': {
+    'label': '年齡',
+    'type': 'number',
+    'nullable': true,
+  },
+  'idCard': {
+    'label': '證件號碼',
+    'type': 'string',
+    'nullable': true,
+  },
 }) {}
