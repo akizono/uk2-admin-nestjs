@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common'
 import { Repository } from 'typeorm'
 
-import { MultilingualFieldsEntity } from '@/modules/system/multilingual-fields/entity/multilingual-fields.entity'
+import { MultilingualFieldsEntity } from '@/modules/admin-api/system/multilingual-fields/entity/multilingual-fields.entity'
 import { fillNonEmptyWithDefaults } from '@/utils/entity-utils'
 
 interface CreateParams {

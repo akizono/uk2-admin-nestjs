@@ -28,7 +28,7 @@ import { MsgResponseDto } from '@/utils/response-dto'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 
-@Controller('/operations/code-generation')
+@Controller('/admin-api/operations/code-generation')
 @UseInterceptors(TransformInterceptor)
 export class CodeGenerationController {
   constructor(private readonly codeGenerationService: CodeGenerationService) {}
