@@ -1,16 +1,17 @@
-import { Body, Controller, Get, Query, Post, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Get, Query, Post, UseInterceptors, Put, Delete, Param } from '@nestjs/common'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 import { RoleService } from './role.service'
-import { CreateRoleReqDto, FindRoleReqDto } from './dto/role.req.dto'
+import { CreateRoleReqDto, FindRoleReqDto, UpdateRoleReqDto } from './dto/role.req.dto'
 import { FindRoleResDto } from './dto/role.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { MsgResponseDto } from '@/utils/response-dto'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
+import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 
-@Controller('/role')
+@Controller('/system/role')
 @UseInterceptors(TransformInterceptor)
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
@@ -31,5 +32,41 @@ export class RoleController {
   @ResponseMessage('取得角色分頁列表成功')
   find(@Query() findRoleReqDto: FindRoleReqDto) {
     return this.roleService.find(findRoleReqDto)
+  }
+
+  @Put('/update')
+  @HasPermission('system:role:update')
+  @ApiOperation({ summary: '更新角色' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('更新角色成功')
+  update(@Body() updateRoleReqDto: UpdateRoleReqDto) {
+    return this.roleService.update(updateRoleReqDto)
+  }
+
+  @Delete('/delete/:id')
+  @HasPermission('system:role:delete')
+  @ApiOperation({ summary: '刪除角色' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('刪除角色成功')
+  delete(@Param('id', ParseBigIntPipe) id: string) {
+    return this.roleService.delete(id)
+  }
+
+  @Put('/block/:id')
+  @HasPermission('system:role:block')
+  @ApiOperation({ summary: '封鎖角色' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('封鎖角色成功')
+  block(@Param('id', ParseBigIntPipe) id: string) {
+    return this.roleService.block(id)
+  }
+
+  @Put('/unblock/:id')
+  @HasPermission('system:role:unblock')
+  @ApiOperation({ summary: '解封鎖角色' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('解封鎖角色成功')
+  unblock(@Param('id', ParseBigIntPipe) id: string) {
+    return this.roleService.unblock(id)
   }
 }

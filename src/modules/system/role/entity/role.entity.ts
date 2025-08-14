@@ -18,4 +18,7 @@ export class RoleEntity extends BaseEntity {
 
   @OneToMany(() => RoleMenuEntity, roleMenu => roleMenu.role)
   roleMenus: RoleMenuEntity[]
+
+  @Column({ type: 'int', comment: '排序', default: 0 })
+  sort: number
 }

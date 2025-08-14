@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
@@ -26,6 +26,11 @@ class RoleReqDto extends BaseReqDto {
   @IsOptional()
   @IsString()
   description: string
+
+  @ApiProperty({ description: '排序', example: 1 })
+  @IsNotEmpty()
+  @IsNumber()
+  sort: number
 }
 
 export class CreateRoleReqDto extends PartialType(
@@ -45,3 +50,5 @@ export class FindRoleReqDto extends PartialType(RoleReqDto) {
   @Max(EnvHelper.getNumber('MAX_PAGE_NUMBER'))
   currentPage?: number = 1
 }
+
+export class UpdateRoleReqDto extends PartialType(OmitType(RoleReqDto, ['multilingualFields', ...disableEditFields])) {}

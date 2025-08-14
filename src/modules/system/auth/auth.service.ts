@@ -20,7 +20,7 @@ export class AuthService {
 
   async validateUser(username: string, inputPassword: string): Promise<AuthenticatedUser | null> {
     const { list } = await this.userService.find({ username }, true)
-    if (list.length === 0) throw new NotFoundException('使用者名稱或密碼錯誤')
+    if (list.length === 0) throw new UnauthorizedException('使用者名稱或密碼錯誤')
 
     const user = list[0]
     const { hashedPassword } = encryptPassword(inputPassword, user.salt)

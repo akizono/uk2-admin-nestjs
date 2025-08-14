@@ -3,9 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { RoleEntity } from './entity/role.entity'
-import { CreateRoleReqDto, FindRoleReqDto } from './dto/role.req.dto'
+import { CreateRoleReqDto, FindRoleReqDto, UpdateRoleReqDto } from './dto/role.req.dto'
 
-import { create } from '@/common/services/base.service'
+import { _delete, create, find, update } from '@/common/services/base.service'
 
 @Injectable()
 export class RoleService {
@@ -15,40 +15,29 @@ export class RoleService {
   ) {}
 
   async create(createRoleReqDto: CreateRoleReqDto) {
-    await create({
+    const result = await create({
       dto: createRoleReqDto,
       repository: this.roleRepository,
       repeatCondition: ['code'],
       modalName: '角色',
     })
+
+    return { id: result.id }
   }
 
   async find(findRoleReqDto: FindRoleReqDto) {
-    const { pageSize = 10, currentPage = 1, ...remain } = findRoleReqDto
-
-    const conditions = Object.keys(remain).length > 0 ? remain : undefined
-    const skip = pageSize === 0 ? undefined : (currentPage - 1) * pageSize
-    const take = pageSize === 0 ? undefined : pageSize
-
-    const [role, total] = await this.roleRepository.findAndCount({
-      select: {
-        id: true,
-        code: true,
-        name: true,
-        description: true,
-        status: true,
-      },
+    // 查詢選單
+    const { list, total } = await find({
+      dto: findRoleReqDto,
+      repository: this.roleRepository,
       where: {
         isDeleted: 0,
-        ...conditions,
       },
-      skip,
-      take,
     })
 
     return {
       total,
-      list: role,
+      list,
     }
   }
 
@@ -64,5 +53,44 @@ export class RoleService {
     })
     if (!role) return []
     return role.roleMenus?.map(roleMenu => roleMenu.menu.permission).filter(Boolean) || []
+  }
+
+  // 更新角色
+  async update(updateRoleReqDto: UpdateRoleReqDto) {
+    await update({
+      dto: updateRoleReqDto,
+      repository: this.roleRepository,
+      existenceCondition: ['id'],
+      modalName: '角色',
+    })
+  }
+
+  // 刪除角色
+  async delete(id: string) {
+    await _delete({
+      id,
+      repository: this.roleRepository,
+      modalName: '角色',
+    })
+  }
+
+  // 封鎖角色
+  async block(id: string) {
+    await update({
+      dto: { id, status: 0 },
+      repository: this.roleRepository,
+      existenceCondition: ['id'],
+      modalName: '角色',
+    })
+  }
+
+  // 解封鎖角色
+  async unblock(id: string) {
+    await update({
+      dto: { id, status: 1 },
+      repository: this.roleRepository,
+      existenceCondition: ['id'],
+      modalName: '角色',
+    })
   }
 }
