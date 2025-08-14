@@ -27,6 +27,12 @@ export class MenuService {
       modalName: '選單',
     })
 
+    // 默認為「超級管理員」綁定
+    await this.roleMenuService.create({
+      roleId: '1',
+      menuId: result.id,
+    })
+
     return { id: result.id }
   }
 
