@@ -44,7 +44,7 @@ export class GlobalSubscriber implements EntitySubscriberInterface<BaseEntity & 
     event: InsertEvent<T> | UpdateEvent<T>,
     columnName: keyof BaseEntityWithUser,
   ) {
-    const currentUserId = this.isSwagger ? '-1' : this.getCurrentUserId()
+    const currentUserId = this.isSwagger() ? '-1' : this.getCurrentUserId()
     const metadata = event.metadata
     const hasColumn = metadata.columns.some(column => column.propertyName === columnName)
     if (hasColumn && currentUserId) {

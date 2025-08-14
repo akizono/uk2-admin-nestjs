@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsNotEmpty, Max, Min } from 'class-validator'
+import { IsArray, IsNotEmpty, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
@@ -41,6 +41,14 @@ export class FindRoleMenuReqDto extends PartialType(RoleMenuReqDto) {
   currentPage?: number = 1
 }
 
-export class UpdateRoleMenuReqDto extends PartialType(
-  OmitType(RoleMenuReqDto, ['multilingualFields', ...disableEditFields]),
-) {}
+export class BatchUpdateRoleMenuReqDto {
+  @ApiProperty({ description: '角色ID' })
+  @IsNotEmpty()
+  @Transform(({ value }) => new ParseBigIntPipe().transform(value))
+  roleId: string
+
+  @ApiProperty({ description: '菜單IDs' })
+  @IsNotEmpty()
+  @IsArray()
+  menuIds: string[]
+}

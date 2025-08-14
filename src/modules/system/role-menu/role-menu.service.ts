@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { RoleMenuEntity } from './entity/role-menu.entity'
-import { CreateRoleMenuReqDto, FindRoleMenuReqDto } from './dto/role-menu.req.dto'
+import { BatchUpdateRoleMenuReqDto, CreateRoleMenuReqDto, FindRoleMenuReqDto } from './dto/role-menu.req.dto'
 
 import { MenuEntity } from '@/modules/system/menu/entity/menu.entity'
 import { RoleEntity } from '@/modules/system/role/entity/role.entity'
@@ -54,6 +54,27 @@ export class RoleMenuService {
     return {
       total,
       list,
+    }
+  }
+
+  async batchUpdate(batchUpdateRoleMenuReqDto: BatchUpdateRoleMenuReqDto) {
+    try {
+      const { roleId, menuIds } = batchUpdateRoleMenuReqDto
+
+      // 1. 先刪除角色原有的菜單（真實刪除 不是邏輯刪除）
+      await this.roleMenuRepository.delete({
+        roleId,
+      })
+
+      // 2. 再新增新的菜單
+      for (const menuId of menuIds) {
+        await this.create({
+          roleId,
+          menuId,
+        })
+      }
+    } catch (error) {
+      throw new BadRequestException(error.message)
     }
   }
 }
