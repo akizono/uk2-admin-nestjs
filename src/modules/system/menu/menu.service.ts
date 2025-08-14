@@ -83,8 +83,8 @@ export class MenuService {
     // 4. 過濾使用者有權限的菜單
     // 如果菜單的 permission 為 null 或空字符串，則不進行權限校驗，直接加入
     const filteredMenus = allMenus.list.filter(menu => {
-      // 如果 類型為0 或 沒有權限標識(permission為null或空字符串)，則不需要校驗
-      if (menu.type === 0 || !menu.permission) {
+      // 如果 類型為0，則不需要校驗
+      if (menu.type === 0) {
         return true
       }
       // 否則，檢查用戶是否有此菜單的權限
