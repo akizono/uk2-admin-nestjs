@@ -13,6 +13,6 @@ export class MultilingualFieldsEntity extends BaseEntity {
   @Column({ length: 50, comment: '對應語言' })
   language: string
 
-  @Column({ length: 50, comment: '欄位值' })
+  @Column({ length: 255, comment: '欄位值' })
   value: string
 }
