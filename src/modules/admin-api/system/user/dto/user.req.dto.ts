@@ -54,7 +54,7 @@ class UserReqDto extends BaseReqDto {
   deptId: string
 
   @ApiProperty({ description: '角色ID陣列' })
-  @IsOptional()
+  @IsNotEmpty()
   @IsArray()
   roleIds: string[]
 }

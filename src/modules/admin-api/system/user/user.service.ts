@@ -27,6 +27,10 @@ export class UserService {
     const { roleIds } = createUserReqDto
     delete createUserReqDto.roleIds
 
+    if (!roleIds || roleIds.length === 0) {
+      throw new BadRequestException('角色不能為空')
+    }
+
     // 創建使用者
     const { hashedPassword, salt } = encryptPassword(createUserReqDto.password)
     const result = await create({
@@ -120,6 +124,10 @@ export class UserService {
   async update(updateUserReqDto: UpdateUserReqDto) {
     const { id, roleIds, ...remain } = updateUserReqDto
 
+    if (!roleIds || roleIds.length === 0) {
+      throw new BadRequestException('角色不能為空')
+    }
+
     // 檢查使用者是否存在
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')
@@ -155,6 +163,8 @@ export class UserService {
     const currentUserId = request['user'].sub
     if (currentUserId === id) throw new BadRequestException('禁止刪除自己')
 
+    if (id === '1') throw new BadRequestException('禁止刪除「初始管理員」')
+
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')
 
@@ -166,6 +176,8 @@ export class UserService {
     const { request } = requestContext.getStore()
     const currentUserId = request['user'].sub
     if (currentUserId === id) throw new BadRequestException('禁止封鎖自己')
+
+    if (id === '1') throw new BadRequestException('禁止封鎖「初始管理員」')
 
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')
