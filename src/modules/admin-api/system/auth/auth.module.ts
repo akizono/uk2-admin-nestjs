@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { JwtModule } from '@nestjs/jwt'
 import { APP_GUARD } from '@nestjs/core'
+import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { AuthGuard } from './guards/auth.guard'
 import { AuthController } from './auth.controller'
@@ -8,6 +9,7 @@ import { AuthService } from './auth.service'
 
 import { EnvHelper } from '@/utils/env-helper'
 import { UserModule } from '@/modules/admin-api/system/user/user.module'
+import { UserEntity } from '@/modules/admin-api/system/user/entity/user.entity'
 import { TokenBlacklistModule } from '@/modules/admin-api/system/token-blacklist/token-blacklist.module'
 import { HasPermissionGuard } from '@/modules/admin-api/system/auth/guards/has-permission.guard'
 import { RoleModule } from '@/modules/admin-api/system/role/role.module'
@@ -20,6 +22,7 @@ import { RoleModule } from '@/modules/admin-api/system/role/role.module'
         secret: EnvHelper.getString('JWT_SECRET'),
       }),
     }),
+    TypeOrmModule.forFeature([UserEntity]),
     UserModule,
     TokenBlacklistModule,
     RoleModule,

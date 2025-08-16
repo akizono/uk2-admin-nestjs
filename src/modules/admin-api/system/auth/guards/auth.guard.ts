@@ -3,11 +3,14 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 import { JwtRequest } from '../types'
 
 import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator'
 import { TokenBlacklistService } from '@/modules/admin-api/system/token-blacklist/token-blacklist.service'
+import { UserEntity } from '@/modules/admin-api/system/user/entity/user.entity'
 
 function getToken(request, tokenType: 'authorization' | 'refresh-token') {
   const [type, token] = request.headers[tokenType]?.split(' ') ?? []
@@ -21,10 +24,51 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
     private readonly tokenBlacklistService: TokenBlacklistService,
     private readonly configService: ConfigService,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   private isPublicRoute(context: ExecutionContext): boolean {
     return this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [context.getHandler(), context.getClass()])
+  }
+
+  /**
+   * 驗證使用者狀態（是否被封禁或刪除）
+   * @param userId 使用者ID
+   * @returns 是否通過驗證
+   */
+  private async validateUserStatus(userId: string): Promise<boolean> {
+    try {
+      // 1、查詢使用者
+      const user = await this.userRepository.findOne({
+        where: { id: userId },
+        select: ['id', 'status', 'isDeleted'],
+      })
+
+      // 2、如果查詢不到這個使用者 則拋出異常（代表使用者不存在）
+      if (!user) {
+        throw new UnauthorizedException('使用者不存在')
+      }
+
+      // 3、如果查詢到了這個使用者
+      // 3.1 如果status 為0，則拋出異常（代表使用者被封禁）
+      if (user.status === 0) {
+        throw new UnauthorizedException('使用者已被封禁')
+      }
+
+      // 3.2 如果isDeleted 為1，則拋出異常（代表使用者被刪除）
+      if (user.isDeleted === 1) {
+        throw new UnauthorizedException('使用者已被刪除')
+      }
+
+      // 4、放行
+      return true
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error
+      }
+      throw new UnauthorizedException('驗證使用者狀態失敗')
+    }
   }
 
   private async validateRefreshToken(request: JwtRequest): Promise<boolean> {
@@ -138,13 +182,24 @@ export class AuthGuard implements CanActivate {
 
       // 判斷是否是刷新 token 的介面，如果是則驗證 refreshToken 和 accessToken
       if (await this.validateRefreshToken(request)) {
-        return true
+        // 驗證使用者狀態
+        const userId = request.refreshPayload?.sub
+        if (userId && (await this.validateUserStatus(userId))) {
+          return true
+        }
       }
 
       // 驗證 accessToken
       if (await this.validateAccessToken(request)) {
-        return true
+        // 驗證使用者狀態
+        const userId = request.user?.sub
+        if (userId && (await this.validateUserStatus(userId))) {
+          return true
+        }
       }
+
+      // 如果所有驗證都失敗，返回 false
+      return false
     } catch (error) {
       throw error
     }
