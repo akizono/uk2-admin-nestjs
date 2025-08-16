@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -19,7 +19,14 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, inputPassword: string): Promise<AuthenticatedUser | null> {
-    const { list } = await this.userService.find({ username }, true)
+    const { list } = await this.userService.find(
+      {
+        username,
+        isDeleted: 0,
+        status: 1,
+      },
+      true,
+    )
     if (list.length === 0) throw new UnauthorizedException('使用者名稱或密碼錯誤')
 
     const user = list[0]

@@ -61,6 +61,10 @@ export class RoleMenuService {
     try {
       const { roleId, menuIds } = batchUpdateRoleMenuReqDto
 
+      if (roleId === '1') {
+        throw new BadRequestException('「超級管理員」的權限禁止修改')
+      }
+
       // 1. 先刪除角色原有的菜單（真實刪除 不是邏輯刪除）
       await this.roleMenuRepository.delete({
         roleId,

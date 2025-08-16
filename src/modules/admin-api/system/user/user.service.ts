@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
@@ -8,6 +8,7 @@ import { UserRoleEntity } from '../user-role/entity/user-role.entity'
 import { UserEntity } from './entity/user.entity'
 import { CreateUserReqDto, FindUserReqDto, UpdateUserReqDto } from './dto/user.req.dto'
 
+import { requestContext } from '@/utils/request-context'
 import { encryptPassword } from '@/utils/crypto'
 import { create } from '@/common/services/base.service'
 
@@ -148,8 +149,12 @@ export class UserService {
     }
   }
 
-  // 邏輯刪除
+  // 刪除使用者
   async delete(id: string) {
+    const { request } = requestContext.getStore()
+    const currentUserId = request['user'].sub
+    if (currentUserId === id) throw new BadRequestException('禁止刪除自己')
+
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')
 
@@ -158,6 +163,10 @@ export class UserService {
 
   // 封鎖使用者
   async block(id: string) {
+    const { request } = requestContext.getStore()
+    const currentUserId = request['user'].sub
+    if (currentUserId === id) throw new BadRequestException('禁止封鎖自己')
+
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')
     await this.userRepository.update({ id }, { status: 0 })

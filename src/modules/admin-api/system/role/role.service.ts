@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
@@ -67,6 +67,9 @@ export class RoleService {
 
   // 刪除角色
   async delete(id: string) {
+    if (id === '1') throw new BadRequestException('禁止刪除「super_admin」')
+    if (id === '11') throw new BadRequestException('禁止刪除「common」')
+
     await _delete({
       id,
       repository: this.roleRepository,
