@@ -61,26 +61,61 @@ export class UserService {
   }
 
   async find(findUserReqDto: FindUserReqDto, isShowPassword = false) {
-    const { pageSize = 10, currentPage = 1, ...remain } = findUserReqDto
+    const { pageSize = 10, currentPage = 1, roleIds, ...remain } = findUserReqDto
 
     const conditions = Object.keys(remain).length > 0 ? remain : undefined
     const skip = pageSize === 0 ? undefined : (currentPage - 1) * pageSize
     const take = pageSize === 0 ? undefined : pageSize
 
-    const [users, total] = await this.userRepository.findAndCount({
-      where: {
-        isDeleted: 0,
-        ...conditions,
-      },
-      relations: {
-        userRoles: {
-          role: true,
+    let users: UserEntity[]
+    let total: number
+
+    // 如果有 roleIds 參數，需要進行聯表查詢
+    if (roleIds && roleIds.length > 0) {
+      const queryBuilder = this.userRepository
+        .createQueryBuilder('user')
+        .leftJoinAndSelect('user.userRoles', 'userRole')
+        .leftJoinAndSelect('userRole.role', 'role')
+        .leftJoinAndSelect('user.dept', 'dept')
+        .where('user.isDeleted = :isDeleted', { isDeleted: 0 })
+        .andWhere('userRole.roleId IN (:...roleIds)', { roleIds })
+
+      // 添加其他篩選條件
+      if (conditions) {
+        Object.keys(conditions).forEach(key => {
+          queryBuilder.andWhere(`user.${key} = :${key}`, { [key]: conditions[key] })
+        })
+      }
+
+      // 分頁處理
+      if (skip !== undefined) {
+        queryBuilder.skip(skip)
+      }
+      if (take !== undefined) {
+        queryBuilder.take(take)
+      }
+
+      users = await queryBuilder.getMany()
+      total = await queryBuilder.getCount()
+    } else {
+      // 原有的查詢邏輯
+      const [usersResult, totalResult] = await this.userRepository.findAndCount({
+        where: {
+          isDeleted: 0,
+          ...conditions,
         },
-        dept: true,
-      },
-      skip,
-      take,
-    })
+        relations: {
+          userRoles: {
+            role: true,
+          },
+          dept: true,
+        },
+        skip,
+        take,
+      })
+      users = usersResult
+      total = totalResult
+    }
 
     const list = await Promise.all(
       users.map(async user => {
