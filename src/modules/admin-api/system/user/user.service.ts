@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { MultilingualFieldsEntity } from '../multilingual-fields/entity/multilingual-fields.entity'
+import { UserRoleEntity } from '../user-role/entity/user-role.entity'
 
 import { UserEntity } from './entity/user.entity'
 import { CreateUserReqDto, FindUserReqDto, UpdateUserReqDto } from './dto/user.req.dto'
@@ -17,9 +18,15 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
     @InjectRepository(MultilingualFieldsEntity)
     private readonly multilingualFieldsRepository: Repository<MultilingualFieldsEntity>,
+    @InjectRepository(UserRoleEntity)
+    private readonly userRoleRepository: Repository<UserRoleEntity>,
   ) {}
 
   async create(createUserReqDto: CreateUserReqDto) {
+    const { roleIds } = createUserReqDto
+    delete createUserReqDto.roleIds
+
+    // 創建使用者
     const { hashedPassword, salt } = encryptPassword(createUserReqDto.password)
     const result = await create({
       dto: {
@@ -31,6 +38,16 @@ export class UserService {
       repeatCondition: ['username'],
       modalName: '使用者',
     })
+
+    // 使用者綁定角色
+    if (roleIds && roleIds.length > 0) {
+      for (const roleId of roleIds) {
+        await this.userRoleRepository.save({
+          userId: result.id,
+          roleId,
+        })
+      }
+    }
 
     return {
       id: result.id,
@@ -100,8 +117,9 @@ export class UserService {
   }
 
   async update(updateUserReqDto: UpdateUserReqDto) {
-    const { id, ...remain } = updateUserReqDto
+    const { id, roleIds, ...remain } = updateUserReqDto
 
+    // 檢查使用者是否存在
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')
 
@@ -113,7 +131,21 @@ export class UserService {
       updateData.salt = salt
     }
 
+    // 更新使用者
     await this.userRepository.update({ id }, updateData)
+
+    // 更新使用者綁定的角色
+    // 1、刪除使用者綁定的所有角色
+    await this.userRoleRepository.delete({ userId: id })
+    // 2、新增使用者綁定的角色
+    if (roleIds && roleIds.length > 0) {
+      for (const roleId of roleIds) {
+        await this.userRoleRepository.save({
+          userId: id,
+          roleId,
+        })
+      }
+    }
   }
 
   // 邏輯刪除

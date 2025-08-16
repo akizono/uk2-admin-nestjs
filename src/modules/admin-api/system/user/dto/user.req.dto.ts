@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
+import { IsArray, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
 import { StrGenerator } from '@/utils/str-generator'
@@ -52,6 +52,11 @@ class UserReqDto extends BaseReqDto {
   @IsOptional()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   deptId: string
+
+  @ApiProperty({ description: '角色ID陣列' })
+  @IsOptional()
+  @IsArray()
+  roleIds: string[]
 }
 
 export class CreateUserReqDto extends PartialType(
