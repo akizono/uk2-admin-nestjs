@@ -6,7 +6,7 @@ import { MultilingualFieldsEntity } from '../multilingual-fields/entity/multilin
 import { UserRoleEntity } from '../user-role/entity/user-role.entity'
 
 import { UserEntity } from './entity/user.entity'
-import { CreateUserReqDto, FindUserReqDto, UpdateUserReqDto } from './dto/user.req.dto'
+import { CreateUserReqDto, FindUserReqDto, UpdatePasswordReqDto, UpdateUserReqDto } from './dto/user.req.dto'
 
 import { requestContext } from '@/utils/request-context'
 import { encryptPassword } from '@/utils/crypto'
@@ -190,6 +190,18 @@ export class UserService {
         })
       }
     }
+  }
+
+  async updatePassword(updatePasswordReqDto: UpdatePasswordReqDto, isCheckUserExist = true) {
+    const { userId, password } = updatePasswordReqDto
+
+    if (isCheckUserExist) {
+      const existUser = await this.userRepository.findOne({ where: { id: userId, isDeleted: 0, status: 1 } })
+      if (!existUser) throw new NotFoundException('請檢查帳號是否正確')
+    }
+
+    const { hashedPassword, salt } = encryptPassword(password)
+    await this.userRepository.update({ id: userId }, { password: hashedPassword, salt })
   }
 
   // 刪除使用者

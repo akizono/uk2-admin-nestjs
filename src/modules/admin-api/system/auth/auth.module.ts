@@ -13,6 +13,7 @@ import { UserEntity } from '@/modules/admin-api/system/user/entity/user.entity'
 import { TokenBlacklistModule } from '@/modules/admin-api/system/token-blacklist/token-blacklist.module'
 import { HasPermissionGuard } from '@/modules/admin-api/system/auth/guards/has-permission.guard'
 import { RoleModule } from '@/modules/admin-api/system/role/role.module'
+import { VerifyCodeModule } from '@/modules/admin-api/system/verify-code/verify-code.module'
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { RoleModule } from '@/modules/admin-api/system/role/role.module'
     UserModule,
     TokenBlacklistModule,
     RoleModule,
+    VerifyCodeModule,
   ],
   controllers: [AuthController],
   providers: [

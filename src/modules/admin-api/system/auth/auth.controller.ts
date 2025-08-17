@@ -1,10 +1,16 @@
-import { Body, Controller, Post, UseInterceptors, Req } from '@nestjs/common'
+import { Body, Controller, Post, UseInterceptors, Req, Get, Query } from '@nestjs/common'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { ApiHeader } from '@nestjs/swagger'
 
 import { AuthService } from './auth.service'
-import { LoginReqDto } from './dto/auth.req.dto'
-import { LoginResDto } from './dto/auth.res.dto'
+import {
+  CheckUserHasMobileOrEmailReqDto,
+  LoginReqDto,
+  SendResetPasswordEmailReqDto,
+  SendResetPasswordMobileReqDto,
+  UpdatePasswordReqDto,
+} from './dto/auth.req.dto'
+import { CheckUserHasMobileOrEmailResDto, LoginResDto } from './dto/auth.res.dto'
 
 import { Public } from '@/common/decorators/public.decorator'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
@@ -31,5 +37,41 @@ export class AuthController {
   @ResponseMessage('成功刷新Token')
   async refreshTokenMethod(@Req() request) {
     return await this.authService.refreshTokenMethod(request)
+  }
+
+  @Public()
+  @Get('/check-user-has-mobile-or-email')
+  @ApiOperation({ summary: '檢查使用者是否擁有手機號碼或者信箱' })
+  @ApiResponse({ type: CheckUserHasMobileOrEmailResDto })
+  @ResponseMessage('檢查成功')
+  async checkUserHasMobileOrEmail(@Query() checkUserHasMobileOrEmailReqDto: CheckUserHasMobileOrEmailReqDto) {
+    return await this.authService.checkUserHasMobileOrEmail(checkUserHasMobileOrEmailReqDto)
+  }
+
+  @Public()
+  @Post('/send-reset-password-email')
+  @ApiOperation({ summary: '發送「驗證碼」到使用者信箱' })
+  @ApiResponse({ type: String })
+  @ResponseMessage('發送成功')
+  async sendResetPasswordEmail(@Body() sendResetPasswordEmailReqDto: SendResetPasswordEmailReqDto) {
+    return await this.authService.sendResetPasswordEmail(sendResetPasswordEmailReqDto)
+  }
+
+  @Public()
+  @Post('/send-reset-password-mobile')
+  @ApiOperation({ summary: '發送「驗證碼」到使用者手機' })
+  @ApiResponse({ type: String })
+  @ResponseMessage('發送成功')
+  async sendResetPasswordMobile(@Body() sendResetPasswordMobileReqDto: SendResetPasswordMobileReqDto) {
+    return await this.authService.sendResetPasswordMobile(sendResetPasswordMobileReqDto)
+  }
+
+  @Public()
+  @Post('/update-password')
+  @ApiOperation({ summary: '修改密碼' })
+  @ApiResponse({ type: String })
+  @ResponseMessage('修改成功')
+  async updatePassword(@Body() updatePasswordReqDto: UpdatePasswordReqDto) {
+    return await this.authService.updatePassword(updatePasswordReqDto)
   }
 }

@@ -19,3 +19,8 @@ export class LoginResDto extends SingleResponseDto({
     refreshToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   },
 }) {}
+
+export class CheckUserHasMobileOrEmailResDto extends SingleResponseDto({
+  hasMobile: true,
+  hasEmail: true,
+}) {}

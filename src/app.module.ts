@@ -19,6 +19,7 @@ import { DictDataModule } from './modules/admin-api/system/dict-data/dict-data.m
 import { LanguageModule } from './modules/admin-api/system/language/language.module'
 import { MultilingualFieldsModule } from './modules/admin-api/system/multilingual-fields/multilingual-fields.module'
 import { CodeGenerationModule } from './modules/operations/code-generation/code-generation.module'
+import { VerifyCodeModule } from './modules/admin-api/system/verify-code/verify-code.module';
 
 /** ---- Code generation location: import ---- */ // 請勿刪除此處註解
 
@@ -58,6 +59,7 @@ import { CodeGenerationModule } from './modules/operations/code-generation/code-
     LanguageModule,
     MultilingualFieldsModule,
     CodeGenerationModule,
+    VerifyCodeModule,
 
     /** ---- Code generation location: module ---- */ // 請勿刪除此處註解
   ],

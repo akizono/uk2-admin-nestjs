@@ -63,4 +63,34 @@ export class StrGenerator {
 
     return result
   }
+
+  /**
+   * 生成純數字的隨機字串
+   * @param length 字串長度，預設為6
+   * @returns 生成的數字字串
+   *
+   * 特點：
+   * 1. 使用密碼學安全的隨機數生成器（crypto.getRandomValues）
+   * 2. 僅包含數字字元（0-9）
+   * 3. 常用於驗證碼、數字ID等場景
+   *
+   * @example
+   * StrGenerator.generateNumeric(6); // "942758"
+   * StrGenerator.generateNumeric(4); // "1847"
+   */
+  public static generateNumeric(length: number = 6): string {
+    const charset = this.NUMBERS
+    const randomValues = new Uint32Array(length)
+
+    // 使用密碼學安全的隨機數生成器
+    crypto.getRandomValues(randomValues)
+
+    let result = ''
+    for (let i = 0; i < length; i++) {
+      // 使用模運算確保均勻分布
+      result += charset[randomValues[i] % charset.length]
+    }
+
+    return result
+  }
 }
