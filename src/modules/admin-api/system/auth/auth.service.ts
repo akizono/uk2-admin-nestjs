@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common'
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -6,14 +6,17 @@ import { JwtRequest, AuthenticatedUser, Payload } from './types'
 import {
   CheckUserHasMobileOrEmailReqDto,
   LoginReqDto,
+  RegisterReqDto,
+  SendRegisterEmailReqDto,
+  SendRegisterMobileReqDto,
   SendResetPasswordEmailReqDto,
   SendResetPasswordMobileReqDto,
   UpdatePasswordReqDto,
 } from './dto/auth.req.dto'
 
-import { StrGenerator } from '@/utils/str-generator'
 import { encryptPassword } from '@/utils/crypto'
 import { EnvHelper } from '@/utils/env-helper'
+import { VerifyCodeUtils } from '@/utils/verify-code-utils'
 import { UserService } from '@/modules/admin-api/system/user/user.service'
 import { VerifyCodeService } from '@/modules/admin-api/system/verify-code/verify-code.service'
 import { TokenBlacklistService } from '@/modules/admin-api/system/token-blacklist/token-blacklist.service'
@@ -105,15 +108,78 @@ export class AuthService {
     }
   }
 
+  // ------------------------------------------------------------
+  // 以下是「註冊」的相關方法
+  // ------------------------------------------------------------
+
+  /** 發送註冊的「驗證碼」到使用者信箱 */
+  async sendRegisterEmail(sendRegisterEmailReqDto: SendRegisterEmailReqDto) {
+    const { email } = sendRegisterEmailReqDto
+    const type = 'email'
+    const scene = 'register'
+
+    // 查詢信箱是否被使用
+    const user = await this.userService.find({ email })
+    if (user.total > 0) throw new ConflictException('信箱已被使用')
+
+    // 生成驗證碼並發送（註冊場景使用 email 作為 userId）
+    await VerifyCodeUtils.generateVerifyCodeAndSend({
+      verifyCodeService: this.verifyCodeService,
+      type,
+      scene,
+      userEmail: email,
+    })
+  }
+
+  /** 發送註冊的「驗證碼」到使用者手機 */
+  async sendRegisterMobile(sendRegisterMobileReqDto: SendRegisterMobileReqDto) {
+    const { mobile } = sendRegisterMobileReqDto
+    const type = 'mobile'
+    const scene = 'register'
+
+    // 查詢手機是否被使用
+    const user = await this.userService.find({ mobile })
+    if (user.total > 0) throw new ConflictException('手機已被使用')
+
+    // 生成驗證碼並發送（註冊場景使用 mobile 作為 userId）
+    await VerifyCodeUtils.generateVerifyCodeAndSend({
+      verifyCodeService: this.verifyCodeService,
+      type,
+      scene,
+      userMobile: mobile,
+    })
+  }
+
+  /** 註冊 */
+  async register(_registerReqDto: RegisterReqDto) {
+    const { verifyCode, verifyCodeType, ...registerReqDto } = _registerReqDto
+
+    // 驗證驗證碼
+    const data = {
+      verifyCodeService: this.verifyCodeService,
+      type: verifyCodeType,
+      scene: 'register',
+      inputCode: verifyCode,
+    }
+    if (verifyCodeType === 'email') data['userEmail'] = registerReqDto.email
+    else if (verifyCodeType === 'mobile') data['userMobile'] = registerReqDto.mobile
+    await VerifyCodeUtils.validateVerifyCode(data)
+
+    // 校驗成功: 開始註冊
+    await this.userService.create({
+      ...registerReqDto,
+      roleIds: ['11'], // 註冊使用者預設為「普通用戶」
+    })
+  }
+
+  // ------------------------------------------------------------
+  // 以下是「密碼找回」的相關方法
+  // ------------------------------------------------------------
+
   /** 檢查使用者是否擁有手機號碼或者信箱 */
   async checkUserHasMobileOrEmail(checkUserHasMobileOrEmailReqDto: CheckUserHasMobileOrEmailReqDto) {
     const { username } = checkUserHasMobileOrEmailReqDto
-
-    // 查詢使用者
-    const userResponse = await this.userService.find({ username, isDeleted: 0 })
-    if (!userResponse || userResponse.total === 0) throw new ConflictException('請檢查帳號是否正確')
-    const user = userResponse.list[0]
-    if (user.status === 0) throw new ConflictException('該帳號已被封禁')
+    const user = await this.userService.getActiveUserByUsername(username)
 
     return {
       hasMobile: user.mobile ? true : false,
@@ -121,87 +187,42 @@ export class AuthService {
     }
   }
 
-  /** 生成驗證碼並發送 */
-  async generateVerifyCodeAndSend(userId: string, type: string, scene: string) {
-    // 查詢該使用者在此場景下的所有驗證碼
-    const verifyCodeResponse = await this.verifyCodeService.find({
-      pageSize: 0,
-      userId,
-      type,
-      scene,
-    })
-
-    // 如果沒有驗證碼
-    if (verifyCodeResponse.total === 0) {
-      // 則創建驗證碼
-      await this.verifyCodeService.create({
-        code: StrGenerator.generateNumeric(6),
-        userId,
-        type,
-        scene,
-      })
-
-      // TODO：在此處執行發送驗證碼的邏輯
-    }
-
-    // 如果有驗證碼
-    else if (verifyCodeResponse.total > 0) {
-      // 則從所有驗證碼中拿到日期最新的那條驗證碼的數據
-      const verifyCodeData = verifyCodeResponse.list.sort((a, b) => b.createTime - a.createTime)[0]
-
-      // 檢查驗證碼的「創建時間」距離現在是否小於60秒
-      // 如果是，則返回錯誤
-      if (verifyCodeData.createTime > new Date(Date.now() - 60 * 1000)) {
-        throw new BadRequestException('操作過於頻繁，請稍後再試')
-      }
-      // 如果不是
-      else {
-        // 刪除所有驗證碼
-        await this.verifyCodeService.deleteUserAllVerifyCodes(userId)
-
-        // 創建新的驗證碼
-        await this.verifyCodeService.create({
-          code: StrGenerator.generateNumeric(6),
-          userId,
-          type,
-          scene,
-        })
-
-        // TODO：在此處執行發送驗證碼的邏輯
-      }
-    }
-  }
-
-  /** 發送「驗證碼」到使用者信箱 */
+  /** 發送找回密碼的「驗證碼」到使用者信箱 */
   async sendResetPasswordEmail(sendResetPasswordEmailReqDto: SendResetPasswordEmailReqDto) {
     const { username } = sendResetPasswordEmailReqDto
     const scene = 'retrieve-password'
     const type = 'email'
 
     // 查詢使用者
-    const userResponse = await this.userService.find({ username, isDeleted: 0 })
-    if (!userResponse || userResponse.total === 0) throw new ConflictException('請檢查帳號是否正確')
-    const user = userResponse.list[0]
-    if (user.status === 0) throw new ConflictException('該帳號已被封禁')
+    const user = await this.userService.getActiveUserByUsername(username)
 
     // 生成驗證碼並發送
-    await this.generateVerifyCodeAndSend(user.id, type, scene)
+    await VerifyCodeUtils.generateVerifyCodeAndSend({
+      verifyCodeService: this.verifyCodeService,
+      userId: user.id,
+      type,
+      scene,
+      userEmail: user.email,
+    })
   }
 
-  /** 發送「驗證碼」到使用者手機 */
+  /** 發送找回密碼的「驗證碼」到使用者手機 */
   async sendResetPasswordMobile(sendResetPasswordMobileReqDto: SendResetPasswordMobileReqDto) {
     const { username } = sendResetPasswordMobileReqDto
     const scene = 'retrieve-password'
     const type = 'mobile'
 
     // 查詢使用者
-    const userResponse = await this.userService.find({ username, isDeleted: 0 })
-    if (!userResponse || userResponse.total === 0) throw new ConflictException('請檢查帳號是否正確')
-    const user = userResponse.list[0]
-    if (user.status === 0) throw new ConflictException('該帳號已被封禁')
+    const user = await this.userService.getActiveUserByUsername(username)
 
     // 生成驗證碼並發送
-    await this.generateVerifyCodeAndSend(user.id, type, scene)
+    await VerifyCodeUtils.generateVerifyCodeAndSend({
+      verifyCodeService: this.verifyCodeService,
+      userId: user.id,
+      type,
+      scene,
+      userMobile: user.mobile,
+    })
   }
 
   /** 修改密碼 */
@@ -210,40 +231,19 @@ export class AuthService {
     const scene = 'retrieve-password'
 
     // 查詢使用者
-    const userResponse = await this.userService.find({ username, isDeleted: 0 })
-    if (!userResponse || userResponse.total === 0) throw new ConflictException('請檢查帳號是否正確')
-    const user = userResponse.list[0]
-    if (user.status === 0) throw new ConflictException('該帳號已被封禁')
+    const user = await this.userService.getActiveUserByUsername(username)
 
-    // 查詢該使用者在此場景下的所有驗證碼
-    const verifyCodeResponse = await this.verifyCodeService.find({
-      pageSize: 0,
+    // 驗證驗證碼
+    const data = {
+      verifyCodeService: this.verifyCodeService,
       userId: user.id,
       type: verifyCodeType,
       scene,
-    })
-
-    // 如果沒有驗證碼
-    if (verifyCodeResponse.total === 0) {
-      // 提示「驗證碼錯誤」就可以了，使用者多次錯誤後應該會重新發送的吧@_@
-      throw new BadRequestException('驗證碼錯誤')
+      inputCode: verifyCode,
     }
-
-    // 如果有驗證碼
-    else if (verifyCodeResponse.total > 0) {
-      // 則從所有驗證碼中拿到日期最新的那條驗證碼的數據
-      const verifyCodeData = verifyCodeResponse.list.sort((a, b) => b.createTime - a.createTime)[0]
-
-      // 檢查驗證碼是否過期：「創建時間」距離現在是否大於900秒
-      if (verifyCodeData.createTime < new Date(Date.now() - 900 * 1000)) {
-        throw new BadRequestException('驗證碼錯誤')
-      }
-
-      // 檢查驗證碼是否正確
-      if (verifyCodeData.code !== verifyCode) {
-        throw new BadRequestException('驗證碼錯誤')
-      }
-    }
+    if (verifyCodeType === 'email') data['userEmail'] = user.email
+    else if (verifyCodeType === 'mobile') data['userMobile'] = user.mobile
+    await VerifyCodeUtils.validateVerifyCode(data)
 
     // 校驗成功: 開始更新密碼
     await this.userService.updatePassword({ userId: user.id, password }, false)

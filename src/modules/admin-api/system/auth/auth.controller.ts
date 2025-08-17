@@ -6,6 +6,9 @@ import { AuthService } from './auth.service'
 import {
   CheckUserHasMobileOrEmailReqDto,
   LoginReqDto,
+  RegisterReqDto,
+  SendRegisterEmailReqDto,
+  SendRegisterMobileReqDto,
   SendResetPasswordEmailReqDto,
   SendResetPasswordMobileReqDto,
   UpdatePasswordReqDto,
@@ -37,6 +40,33 @@ export class AuthController {
   @ResponseMessage('成功刷新Token')
   async refreshTokenMethod(@Req() request) {
     return await this.authService.refreshTokenMethod(request)
+  }
+
+  @Public()
+  @Post('/send-register-email')
+  @ApiOperation({ summary: '發送「驗證碼」到使用者信箱' })
+  @ApiResponse({ type: String })
+  @ResponseMessage('發送成功')
+  async sendRegisterEmail(@Body() sendRegisterEmailReqDto: SendRegisterEmailReqDto) {
+    return await this.authService.sendRegisterEmail(sendRegisterEmailReqDto)
+  }
+
+  @Public()
+  @Post('/send-register-mobile')
+  @ApiOperation({ summary: '發送「驗證碼」到使用者手機' })
+  @ApiResponse({ type: String })
+  @ResponseMessage('發送成功')
+  async sendRegisterMobile(@Body() sendRegisterMobileReqDto: SendRegisterMobileReqDto) {
+    return await this.authService.sendRegisterMobile(sendRegisterMobileReqDto)
+  }
+
+  @Public()
+  @Post('/register')
+  @ApiOperation({ summary: '註冊' })
+  @ApiResponse({ type: String })
+  @ResponseMessage('註冊成功')
+  async register(@Body() registerReqDto: RegisterReqDto) {
+    return await this.authService.register(registerReqDto)
   }
 
   @Public()

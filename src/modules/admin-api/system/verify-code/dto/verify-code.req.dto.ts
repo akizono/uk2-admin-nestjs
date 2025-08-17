@@ -18,7 +18,7 @@ export class VerifyCodeReqDto extends BaseReqDto {
   code: string
 
   @ApiProperty({ description: '使用者id', example: '1' })
-  @IsNotEmpty()
+  @IsOptional()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   userId: string
 

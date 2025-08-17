@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
@@ -192,18 +192,6 @@ export class UserService {
     }
   }
 
-  async updatePassword(updatePasswordReqDto: UpdatePasswordReqDto, isCheckUserExist = true) {
-    const { userId, password } = updatePasswordReqDto
-
-    if (isCheckUserExist) {
-      const existUser = await this.userRepository.findOne({ where: { id: userId, isDeleted: 0, status: 1 } })
-      if (!existUser) throw new NotFoundException('請檢查帳號是否正確')
-    }
-
-    const { hashedPassword, salt } = encryptPassword(password)
-    await this.userRepository.update({ id: userId }, { password: hashedPassword, salt })
-  }
-
   // 刪除使用者
   async delete(id: string) {
     const { request } = requestContext.getStore()
@@ -236,5 +224,28 @@ export class UserService {
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')
     await this.userRepository.update({ id }, { status: 1 })
+  }
+
+  // 更新密碼
+  async updatePassword(updatePasswordReqDto: UpdatePasswordReqDto, isCheckUserExist = true) {
+    const { userId, password } = updatePasswordReqDto
+
+    if (isCheckUserExist) {
+      const existUser = await this.userRepository.findOne({ where: { id: userId, isDeleted: 0, status: 1 } })
+      if (!existUser) throw new NotFoundException('請檢查帳號是否正確')
+    }
+
+    const { hashedPassword, salt } = encryptPassword(password)
+    await this.userRepository.update({ id: userId }, { password: hashedPassword, salt })
+  }
+
+  // 根據使用者名稱查詢某個使用者的狀態是否正常並返回資料（正常指status === 1 && isDeleted === 0）
+  async getActiveUserByUsername(username: string, isShowPassword = false) {
+    const userResponse = await this.find({ username, isDeleted: 0 }, isShowPassword)
+    if (!userResponse || userResponse.total === 0) throw new ConflictException('請檢查帳號是否正確')
+    const user = userResponse.list[0]
+    if (user.status === 0) throw new ConflictException('該帳號已被封禁')
+
+    return user
   }
 }

@@ -10,7 +10,7 @@ export class VerifyCodeEntity extends BaseEntity {
   @Column({ length: 50, comment: '驗證碼' })
   code: string
 
-  @Column({ length: 50, comment: '使用者id' })
+  @Column({ length: 50, comment: '使用者id', nullable: true })
   userId: string
 
   @Column({ length: 50, comment: '驗證碼類型: email / mobile' })
