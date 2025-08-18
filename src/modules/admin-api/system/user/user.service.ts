@@ -11,6 +11,7 @@ import { CreateUserReqDto, FindUserReqDto, UpdatePasswordReqDto, UpdateUserReqDt
 import { requestContext } from '@/utils/request-context'
 import { encryptPassword } from '@/utils/crypto'
 import { create } from '@/common/services/base.service'
+import { EnvHelper } from '@/utils/env-helper'
 
 @Injectable()
 export class UserService {
@@ -198,7 +199,8 @@ export class UserService {
     const currentUserId = request['user'].sub
     if (currentUserId === id) throw new BadRequestException('禁止刪除自己')
 
-    if (id === '1') throw new BadRequestException('禁止刪除「初始管理員」')
+    if (id === EnvHelper.getString('DB_CONSTANT_DEFAULT_SUPER_ADMIN_USER_ID'))
+      throw new BadRequestException('禁止刪除「系統預設的超級管理員」')
 
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')
@@ -212,7 +214,8 @@ export class UserService {
     const currentUserId = request['user'].sub
     if (currentUserId === id) throw new BadRequestException('禁止封鎖自己')
 
-    if (id === '1') throw new BadRequestException('禁止封鎖「初始管理員」')
+    if (id === EnvHelper.getString('DB_CONSTANT_DEFAULT_SUPER_ADMIN_USER_ID'))
+      throw new BadRequestException('禁止封鎖「系統預設的超級管理員」')
 
     const existUser = await this.userRepository.findOne({ where: { id } })
     if (!existUser) throw new NotFoundException('使用者不存在')

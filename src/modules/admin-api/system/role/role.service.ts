@@ -6,6 +6,7 @@ import { RoleEntity } from './entity/role.entity'
 import { CreateRoleReqDto, FindRoleReqDto, UpdateRoleReqDto } from './dto/role.req.dto'
 
 import { _delete, create, find, update } from '@/common/services/base.service'
+import { EnvHelper } from '@/utils/env-helper'
 
 @Injectable()
 export class RoleService {
@@ -67,8 +68,12 @@ export class RoleService {
 
   // 刪除角色
   async delete(id: string) {
-    if (id === '1') throw new BadRequestException('禁止刪除「super_admin」')
-    if (id === '11') throw new BadRequestException('禁止刪除「common」')
+    if (id === EnvHelper.getString('DB_CONSTANT_SUPER_ADMIN_ROLE_ID')) {
+      throw new BadRequestException('禁止刪除「super_admin」')
+    }
+    if (id === EnvHelper.getString('DB_CONSTANT_COMMON_ROLE_ID')) {
+      throw new BadRequestException('禁止刪除「common」')
+    }
 
     await _delete({
       id,

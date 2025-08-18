@@ -168,7 +168,7 @@ export class AuthService {
     // 校驗成功: 開始註冊
     await this.userService.create({
       ...registerReqDto,
-      roleIds: ['11'], // 註冊使用者預設為「一般使用者」
+      roleIds: [EnvHelper.getString('DB_CONSTANT_COMMON_ROLE_ID')], // 新使用者的預設角色為「一般使用者」
     })
   }
 

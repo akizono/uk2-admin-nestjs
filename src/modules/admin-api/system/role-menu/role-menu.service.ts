@@ -8,6 +8,7 @@ import { BatchUpdateRoleMenuReqDto, CreateRoleMenuReqDto, FindRoleMenuReqDto } f
 import { MenuEntity } from '@/modules/admin-api/system/menu/entity/menu.entity'
 import { RoleEntity } from '@/modules/admin-api/system/role/entity/role.entity'
 import { create, find } from '@/common/services/base.service'
+import { EnvHelper } from '@/utils/env-helper'
 
 @Injectable()
 export class RoleMenuService {
@@ -61,7 +62,7 @@ export class RoleMenuService {
     try {
       const { roleId, menuIds } = batchUpdateRoleMenuReqDto
 
-      if (roleId === '1') {
+      if (roleId === EnvHelper.getString('DB_CONSTANT_SUPER_ADMIN_ROLE_ID')) {
         throw new BadRequestException('「超級管理員」的權限禁止修改')
       }
 

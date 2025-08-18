@@ -9,6 +9,7 @@ import { MenuEntity } from './entity/menu.entity'
 import { CreateMenuReqDto, FindMenuReqDto, UpdateMenuReqDto } from './dto/menu.req.dto'
 
 import { create, find, update, _delete } from '@/common/services/base.service'
+import { EnvHelper } from '@/utils/env-helper'
 
 @Injectable()
 export class MenuService {
@@ -29,7 +30,7 @@ export class MenuService {
 
     // 默認為「超級管理員」綁定
     await this.roleMenuService.create({
-      roleId: '1',
+      roleId: EnvHelper.getString('DB_CONSTANT_SUPER_ADMIN_ROLE_ID'),
       menuId: result.id,
     })
 
