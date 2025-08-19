@@ -113,4 +113,13 @@ export class UserController {
   async updatePersonalInfo(@Body() updatePersonalInfoReqDto: UpdatePersonalInfoReqDto) {
     return this.userService.updatePersonalInfo(updatePersonalInfoReqDto)
   }
+
+  @Get('/get-personal-info')
+  @HasPermission('system:user:get-personal-info')
+  @ApiOperation({ summary: '獲取個人資訊' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('獲取個人資訊成功')
+  async getPersonalInfo() {
+    return this.userService.getPersonalInfo()
+  }
 }
