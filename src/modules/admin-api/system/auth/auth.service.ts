@@ -88,22 +88,29 @@ export class AuthService {
   async refreshTokenMethod(request: JwtRequest) {
     const { accessPayload, refreshPayload, accessToken, refreshToken } = request
 
-    // 如果過期則更新 Token 否則返回原 Token
-    const renewTokenIfExpiringSoon = async (payload: Payload, token: string) => {
-      // 計算當前時間到過期時間的剩餘秒數
-      const timeUntilExpiry = payload.exp - Math.floor(Date.now() / 1000)
-
-      // 如果剩餘時間小於 1800秒
-      if (timeUntilExpiry < 1800) {
-        if (timeUntilExpiry > 0) await this.tokenBlacklistService.create(payload) // 將未過期的 Token 加入黑名單
-        return await this.generateToken(payload.sub, payload.type) // 返回新的 Token
+    const generateFun = async (payload: Payload, token: string) => {
+      // 如果是refresh-token,直接返回新的token
+      if (payload.type === 'refresh') {
+        return await this.generateToken(payload.sub, payload.type)
       }
-      return token
+
+      // 如果是access-token, 則需要檢查是否過期。 如果過期則更新 Token 否則返回原 Token
+      else if (payload.type === 'access') {
+        // 計算當前時間到過期時間的剩餘秒數
+        const timeUntilExpiry = payload.exp - Math.floor(Date.now() / 1000)
+
+        // 如果剩餘時間小於 30 分鐘
+        if (timeUntilExpiry < 60 * 30) {
+          if (timeUntilExpiry > 0) await this.tokenBlacklistService.create(payload) // 將未過期的 Token 加入黑名單
+          return await this.generateToken(payload.sub, payload.type) // 返回新的 Token
+        }
+        return token
+      }
     }
 
     return {
-      accessToken: await renewTokenIfExpiringSoon(accessPayload, accessToken),
-      refreshToken: await renewTokenIfExpiringSoon(refreshPayload, refreshToken),
+      accessToken: await generateFun(accessPayload, accessToken),
+      refreshToken: await generateFun(refreshPayload, refreshToken),
     }
   }
 
