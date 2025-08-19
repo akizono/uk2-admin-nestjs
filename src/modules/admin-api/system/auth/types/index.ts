@@ -20,7 +20,6 @@ export interface Payload {
   jti: string
   iat: number
   exp: number
-  role: string[]
 }
 
 // 包含 jwt 資訊的請求頭

@@ -3,14 +3,12 @@ import { Reflector } from '@nestjs/core'
 
 import { HAS_PERMISSION_KEY } from '@/common/decorators/has-permission.decorator'
 import { RoleService } from '@/modules/admin-api/system/role/role.service'
-import { UserService } from '@/modules/admin-api/system/user/user.service'
 
 @Injectable()
 export class HasPermissionGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     private roleService: RoleService,
-    private userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -18,11 +16,9 @@ export class HasPermissionGuard implements CanActivate {
     const permission = this.reflector.get<string>(HAS_PERMISSION_KEY, context.getHandler())
     if (!permission) return true
 
+    // 獲取使用者資訊
     const request = context.switchToHttp().getRequest()
-    const userId = request.user.sub
-
-    // 獲取角色資訊
-    const user = await this.userService.getActiveUserById(userId)
+    const user = request['user']
 
     // 查詢使用者所有角色綁定的菜單權限標識
     const roleHasPermissions = await Promise.all(

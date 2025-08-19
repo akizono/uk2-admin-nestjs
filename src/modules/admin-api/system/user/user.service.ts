@@ -209,14 +209,14 @@ export class UserService {
   // 刪除使用者
   async delete(id: string) {
     const { request } = requestContext.getStore()
-    const currentUserId = request['user'].sub
+    const currentUserId = request['user'].id
     if (currentUserId === id) throw new BadRequestException('禁止刪除自己')
 
     if (id === EnvHelper.getString('DB_CONSTANT_DEFAULT_SUPER_ADMIN_USER_ID'))
       throw new BadRequestException('禁止刪除「系統預設的超級管理員」')
 
-    const existUser = await this.userRepository.findOne({ where: { id } })
-    if (!existUser) throw new NotFoundException('使用者不存在')
+    const userResponse = await this.find({ id })
+    if (!userResponse || userResponse.total === 0) throw new NotFoundException('使用者不存在')
 
     await this.userRepository.update({ id }, { isDeleted: 1 })
   }
@@ -224,21 +224,23 @@ export class UserService {
   // 封鎖使用者
   async block(id: string) {
     const { request } = requestContext.getStore()
-    const currentUserId = request['user'].sub
+    const currentUserId = request['user'].id
     if (currentUserId === id) throw new BadRequestException('禁止封鎖自己')
 
     if (id === EnvHelper.getString('DB_CONSTANT_DEFAULT_SUPER_ADMIN_USER_ID'))
       throw new BadRequestException('禁止封鎖「系統預設的超級管理員」')
 
-    const existUser = await this.userRepository.findOne({ where: { id } })
-    if (!existUser) throw new NotFoundException('使用者不存在')
+    const userResponse = await this.find({ id })
+    if (!userResponse || userResponse.total === 0) throw new NotFoundException('使用者不存在')
+
     await this.userRepository.update({ id }, { status: 0 })
   }
 
   // 解封使用者
   async unblock(id: string) {
-    const existUser = await this.userRepository.findOne({ where: { id } })
-    if (!existUser) throw new NotFoundException('使用者不存在')
+    const userResponse = await this.find({ id })
+    if (!userResponse || userResponse.total === 0) throw new NotFoundException('使用者不存在')
+
     await this.userRepository.update({ id }, { status: 1 })
   }
 
@@ -247,8 +249,8 @@ export class UserService {
     const { userId, password } = updatePasswordReqDto
 
     if (isCheckUserExist) {
-      const existUser = await this.userRepository.findOne({ where: { id: userId, isDeleted: 0, status: 1 } })
-      if (!existUser) throw new NotFoundException('請檢查帳號是否正確')
+      const userResponse = await this.find({ id: userId, status: 1 })
+      if (!userResponse || userResponse.total === 0) throw new NotFoundException('使用者不存在')
     }
 
     const { hashedPassword, salt } = encryptPassword(password)
@@ -257,22 +259,96 @@ export class UserService {
 
   // 根據使用者名稱查詢某個使用者的狀態是否正常並返回資料（正常指status === 1 && isDeleted === 0）
   async getActiveUserByUsername(username: string, isShowPassword = false) {
-    const userResponse = await this.find({ username, isDeleted: 0 }, isShowPassword)
+    const userResponse = await this.find({ username, status: 1 }, isShowPassword)
     if (!userResponse || userResponse.total === 0) throw new ConflictException('請檢查帳號是否正確')
     const user = userResponse.list[0]
-    if (user.status === 0) throw new ConflictException('該帳號已被封禁')
 
     return user
   }
 
   // 根據使用者ID查詢某個使用者的狀態是否正常並返回資料（正常指status === 1 && isDeleted === 0）
   async getActiveUserById(id: string, isShowPassword = false) {
-    const userResponse = await this.find({ id, isDeleted: 0 }, isShowPassword)
+    const userResponse = await this.find({ id, status: 1 }, isShowPassword)
     if (!userResponse || userResponse.total === 0) throw new ConflictException('請檢查帳號是否正確')
     const user = userResponse.list[0]
-    if (user.status === 0) throw new ConflictException('該帳號已被封禁')
 
     return user
   }
 
+  /** 發送用於綁定信箱的「驗證碼」到使用者信箱 */
+  async sendBindEmail(sendBindEmailReqDto: SendBindEmailReqDto) {
+    const { email } = sendBindEmailReqDto
+    const type = 'email'
+    const scene = 'bind-email'
+
+    // 查詢信箱是否被使用
+    const user = await this.find({ email })
+    if (user.total > 0) throw new ConflictException('信箱已被使用')
+
+    // 生成驗證碼並發送
+    await VerifyCodeUtils.generateVerifyCodeAndSend({
+      verifyCodeService: this.verifyCodeService,
+      type,
+      scene,
+      userEmail: email,
+    })
+  }
+
+  /** 發送用於綁定手機號碼的「驗證碼」到使用者手機 */
+  async sendBindMobile(sendBindMobileReqDto: SendBindMobileReqDto) {
+    const { mobile } = sendBindMobileReqDto
+    const type = 'mobile'
+    const scene = 'bind-mobile'
+
+    // 查詢手機是否被使用
+    const user = await this.find({ mobile })
+    if (user.total > 0) throw new ConflictException('手機號碼已被使用')
+
+    // 生成驗證碼並發送
+    await VerifyCodeUtils.generateVerifyCodeAndSend({
+      verifyCodeService: this.verifyCodeService,
+      type,
+      scene,
+      userMobile: mobile,
+    })
+  }
+
+  /** 綁定信箱或者手機 */
+  async bindEmailOrMobile(_bindEmailOrMobileReqDto: BindEmailOrMobileReqDto) {
+    const { verifyCode, verifyCodeType, ...bindEmailOrMobileReqDto } = _bindEmailOrMobileReqDto
+
+    // 驗證驗證碼
+    const data = {
+      verifyCodeService: this.verifyCodeService,
+      type: verifyCodeType,
+      scene: verifyCodeType === 'email' ? 'bind-email' : 'bind-mobile',
+      inputCode: verifyCode,
+    }
+    if (verifyCodeType === 'email') data['userEmail'] = bindEmailOrMobileReqDto.email
+    else if (verifyCodeType === 'mobile') data['userMobile'] = bindEmailOrMobileReqDto.mobile
+    await VerifyCodeUtils.validateVerifyCode(data)
+
+    // 獲取自己的id
+    const { request } = requestContext.getStore()
+    const currentUserId = request['user'].id
+
+    // 更新自己的信箱或者手機
+    await this.userRepository.update(
+      { id: currentUserId },
+      {
+        email: bindEmailOrMobileReqDto.email,
+        mobile: bindEmailOrMobileReqDto.mobile,
+      },
+    )
+  }
+
+  /** 修改個人資訊 */
+  async updatePersonalInfo(updatePersonalInfoReqDto: UpdatePersonalInfoReqDto) {
+    const { request } = requestContext.getStore()
+    const currentUserId = request['user'].id
+
+    // console.log('currentUserId', currentUserId)
+
+    // await this.userRepository.update({ id: currentUserId }, updatePersonalInfoReqDto)
+  }
 }

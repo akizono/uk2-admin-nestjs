@@ -69,4 +69,13 @@ export class UserController {
   unblock(@Param('id', ParseBigIntPipe) id: string) {
     return this.userService.unblock(id)
   }
+
+  @Put('/update-personal-info')
+  @HasPermission('base:personal-info:update')
+  @ApiOperation({ summary: '修改個人資訊' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('修改個人資訊成功')
+  async updatePersonalInfo(@Body() updatePersonalInfoReqDto: UpdatePersonalInfoReqDto) {
+    return this.userService.updatePersonalInfo(updatePersonalInfoReqDto)
+  }
 }

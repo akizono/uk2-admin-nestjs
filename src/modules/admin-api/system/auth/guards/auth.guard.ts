@@ -3,14 +3,12 @@ import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
 
 import { JwtRequest } from '../types'
 
 import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator'
 import { TokenBlacklistService } from '@/modules/admin-api/system/token-blacklist/token-blacklist.service'
-import { UserEntity } from '@/modules/admin-api/system/user/entity/user.entity'
+import { UserService } from '@/modules/admin-api/system/user/user.service'
 import { EnvHelper } from '@/utils/env-helper'
 
 function getToken(request, tokenType: 'authorization' | 'refresh-token') {
@@ -25,8 +23,7 @@ export class AuthGuard implements CanActivate {
     private readonly reflector: Reflector,
     private readonly tokenBlacklistService: TokenBlacklistService,
     private readonly configService: ConfigService,
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    private readonly userService: UserService,
   ) {}
 
   private isPublicRoute(context: ExecutionContext): boolean {
@@ -38,18 +35,18 @@ export class AuthGuard implements CanActivate {
    * @param userId 使用者ID
    * @returns 是否通過驗證
    */
-  private async validateUserStatus(userId: string): Promise<boolean> {
+  private async validateUserStatus(request: JwtRequest, userId: string): Promise<boolean> {
     try {
       // 1、查詢使用者
-      const user = await this.userRepository.findOne({
-        where: { id: userId },
-        select: ['id', 'status', 'isDeleted'],
+      const userResponse = await this.userService.find({
+        id: userId,
       })
 
       // 2、如果查詢不到這個使用者 則拋出異常（代表使用者不存在）
-      if (!user) {
+      if (!userResponse || userResponse.list.length === 0) {
         throw new UnauthorizedException('使用者不存在')
       }
+      const user = userResponse.list[0]
 
       // 3、如果查詢到了這個使用者
       // 3.1 如果status 為0，則拋出異常（代表使用者被封禁）
@@ -62,7 +59,10 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException('使用者已被刪除')
       }
 
-      // 4、放行
+      // 4、將使用者資訊附加到 request 上
+      request['user'] = user
+
+      // 5、放行
       return true
     } catch (error) {
       if (error instanceof UnauthorizedException) {
@@ -75,7 +75,7 @@ export class AuthGuard implements CanActivate {
   private async validateRefreshToken(request: JwtRequest): Promise<boolean> {
     try {
       // 注意：request.url 與 auth.controller.ts:refreshTokenMethod() 存在耦合關係
-      if (!(request.url === '/system/auth/refreshTokenMethod' && request.method === 'POST')) {
+      if (!(request.url === '/admin-api/system/auth/refreshTokenMethod' && request.method === 'POST')) {
         return false
       }
 
@@ -138,7 +138,8 @@ export class AuthGuard implements CanActivate {
       const currentEnv = this.configService.get<string>('NODE_ENV')
       const isSwagger = request.headers['referer']?.indexOf('/api-docs') > -1
       if (currentEnv === 'dev' && isSwagger) {
-        request['user'] = {
+        // 因為swagger發起的請求不攜帶token，所以需要手動設置user資訊，這樣才能通過守衛的驗證
+        request['accessPayload'] = {
           sub: EnvHelper.getString('DB_CONSTANT_SWAGGER_DEDICATED_USER_ID'),
           type: 'access',
         }
@@ -156,7 +157,7 @@ export class AuthGuard implements CanActivate {
       }
 
       // 將驗證後的資料附加到 request 上
-      request['user'] = accessPayload
+      request['accessPayload'] = accessPayload
       return true
     } catch (error) {
       if (!(error instanceof UnauthorizedException)) {
@@ -184,7 +185,7 @@ export class AuthGuard implements CanActivate {
       if (await this.validateRefreshToken(request)) {
         // 驗證使用者狀態
         const userId = request.refreshPayload?.sub
-        if (userId && (await this.validateUserStatus(userId))) {
+        if (userId && (await this.validateUserStatus(request, userId))) {
           return true
         }
       }
@@ -192,8 +193,8 @@ export class AuthGuard implements CanActivate {
       // 驗證 accessToken
       if (await this.validateAccessToken(request)) {
         // 驗證使用者狀態
-        const userId = request.user?.sub
-        if (userId && (await this.validateUserStatus(userId))) {
+        const userId = request.accessPayload?.sub
+        if (userId && (await this.validateUserStatus(request, userId))) {
           return true
         }
       }

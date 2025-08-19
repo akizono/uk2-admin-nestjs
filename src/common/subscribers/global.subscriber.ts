@@ -26,7 +26,7 @@ export class GlobalSubscriber implements EntitySubscriberInterface<BaseEntity & 
    */
   private getCurrentUserId(): string | undefined {
     const { request } = requestContext.getStore()
-    return request['user']?.sub
+    return request['user']?.id
   }
 
   private isSwagger() {

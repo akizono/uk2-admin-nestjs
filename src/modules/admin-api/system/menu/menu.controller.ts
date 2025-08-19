@@ -40,7 +40,7 @@ export class MenuController {
   @ApiResponse({ type: FindMenuResDto })
   @ResponseMessage('取得當前使用者選單成功')
   getUserMenus(@Req() request: Request) {
-    const userId = request['user'].sub
+    const userId = request['user'].id
     return this.menuService.getUserMenus(userId)
   }
 
