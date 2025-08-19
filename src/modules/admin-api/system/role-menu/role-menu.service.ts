@@ -3,7 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { RoleMenuEntity } from './entity/role-menu.entity'
-import { BatchUpdateRoleMenuReqDto, CreateRoleMenuReqDto, FindRoleMenuReqDto } from './dto/role-menu.req.dto'
+import {
+  BatchUpdateRoleMenuReqDto,
+  CreateRoleMenuReqDto,
+  FindRoleMenuReqDto,
+  PhysicalDeleteRoleMenuReqDto,
+} from './dto/role-menu.req.dto'
 
 import { MenuEntity } from '@/modules/admin-api/system/menu/entity/menu.entity'
 import { RoleEntity } from '@/modules/admin-api/system/role/entity/role.entity'
@@ -58,6 +63,7 @@ export class RoleMenuService {
     }
   }
 
+  // 批次更新角色關聯菜單(會替換所有舊的關聯)
   async batchUpdate(batchUpdateRoleMenuReqDto: BatchUpdateRoleMenuReqDto) {
     try {
       const { roleId, menuIds } = batchUpdateRoleMenuReqDto
@@ -87,5 +93,10 @@ export class RoleMenuService {
     } catch (error) {
       throw new BadRequestException(error.message)
     }
+  }
+
+  // 物理刪除指定的數據
+  async physicalDelete(physicalDeleteRoleMenuReqDto: PhysicalDeleteRoleMenuReqDto) {
+    await this.roleMenuRepository.delete(physicalDeleteRoleMenuReqDto)
   }
 }

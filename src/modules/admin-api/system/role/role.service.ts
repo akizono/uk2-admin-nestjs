@@ -78,6 +78,9 @@ export class RoleService {
       throw new BadRequestException('禁止刪除「common」')
     }
 
+    // 移除角色的所有權限和選單
+    await this.roleMenuService.batchUpdate({ roleId: id, menuIds: [] })
+
     await _delete({
       id,
       repository: this.roleRepository,
@@ -95,10 +98,7 @@ export class RoleService {
     }
 
     // 移除角色的所有權限和選單
-    await this.roleMenuService.batchUpdate({
-      roleId: id,
-      menuIds: [],
-    })
+    await this.roleMenuService.batchUpdate({ roleId: id, menuIds: [] })
 
     await update({
       dto: { id, status: 0 },

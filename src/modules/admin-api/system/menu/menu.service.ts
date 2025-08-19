@@ -20,6 +20,14 @@ export class MenuService {
     private readonly roleMenuService: RoleMenuService,
   ) {}
 
+  // 預設為「超級管理員」綁定
+  async menuBindSuperAdmin(menuId: string) {
+    await this.roleMenuService.create({
+      roleId: EnvHelper.getString('DB_CONSTANT_SUPER_ADMIN_ROLE_ID'),
+      menuId,
+    })
+  }
+
   // 新增選單
   async create(createMenuReqDto: CreateMenuReqDto) {
     const result = await create({
@@ -28,11 +36,8 @@ export class MenuService {
       modalName: '選單',
     })
 
-    // 默認為「超級管理員」綁定
-    await this.roleMenuService.create({
-      roleId: EnvHelper.getString('DB_CONSTANT_SUPER_ADMIN_ROLE_ID'),
-      menuId: result.id,
-    })
+    // 預設為「超級管理員」綁定
+    await this.menuBindSuperAdmin(result.id)
 
     return { id: result.id }
   }
@@ -88,7 +93,7 @@ export class MenuService {
     }
 
     // 4. 過濾使用者有權限的菜單
-    // 如果菜單的 permission 為 null 或空字符串，則不進行權限校驗，直接加入
+    // 如果菜單的 permission 為 null 或空字串，則不進行權限校驗，直接加入
     const filteredMenus = allMenus.list.filter(menu => {
       // 如果 類型為0，則不需要校驗
       if (menu.type === 0) {
@@ -133,6 +138,9 @@ export class MenuService {
       repository: this.menuRepository,
       modalName: '選單',
     })
+
+    // 取消所有角色對該選單的關聯
+    await this.roleMenuService.physicalDelete({ menuId: id })
   }
 
   // 封鎖選單
@@ -143,6 +151,9 @@ export class MenuService {
       existenceCondition: ['id'],
       modalName: '選單',
     })
+
+    // 取消所有角色對該選單的關聯
+    await this.roleMenuService.physicalDelete({ menuId: id })
   }
 
   // 解封鎖選單
@@ -153,5 +164,8 @@ export class MenuService {
       existenceCondition: ['id'],
       modalName: '選單',
     })
+
+    // 預設為「超級管理員」綁定
+    await this.menuBindSuperAdmin(id)
   }
 }

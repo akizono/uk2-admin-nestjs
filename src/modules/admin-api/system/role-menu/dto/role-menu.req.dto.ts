@@ -52,3 +52,5 @@ export class BatchUpdateRoleMenuReqDto {
   @IsArray()
   menuIds: string[]
 }
+
+export class PhysicalDeleteRoleMenuReqDto extends PartialType(RoleMenuReqDto) {}
