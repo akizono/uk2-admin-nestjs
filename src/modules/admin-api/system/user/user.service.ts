@@ -6,12 +6,23 @@ import { MultilingualFieldsEntity } from '../multilingual-fields/entity/multilin
 import { UserRoleEntity } from '../user-role/entity/user-role.entity'
 
 import { UserEntity } from './entity/user.entity'
-import { CreateUserReqDto, FindUserReqDto, UpdatePasswordReqDto, UpdateUserReqDto } from './dto/user.req.dto'
+import {
+  BindEmailOrMobileReqDto,
+  CreateUserReqDto,
+  FindUserReqDto,
+  SendBindEmailReqDto,
+  SendBindMobileReqDto,
+  UpdatePasswordReqDto,
+  UpdatePersonalInfoReqDto,
+  UpdateUserReqDto,
+} from './dto/user.req.dto'
 
 import { requestContext } from '@/utils/request-context'
 import { encryptPassword } from '@/utils/crypto'
 import { create } from '@/common/services/base.service'
 import { EnvHelper } from '@/utils/env-helper'
+import { VerifyCodeUtils } from '@/utils/verify-code-utils'
+import { VerifyCodeService } from '@/modules/admin-api/system/verify-code/verify-code.service'
 
 @Injectable()
 export class UserService {
@@ -22,6 +33,7 @@ export class UserService {
     private readonly multilingualFieldsRepository: Repository<MultilingualFieldsEntity>,
     @InjectRepository(UserRoleEntity)
     private readonly userRoleRepository: Repository<UserRoleEntity>,
+    private readonly verifyCodeService: VerifyCodeService,
   ) {}
 
   async create(createUserReqDto: CreateUserReqDto) {
@@ -252,4 +264,15 @@ export class UserService {
 
     return user
   }
+
+  // 根據使用者ID查詢某個使用者的狀態是否正常並返回資料（正常指status === 1 && isDeleted === 0）
+  async getActiveUserById(id: string, isShowPassword = false) {
+    const userResponse = await this.find({ id, isDeleted: 0 }, isShowPassword)
+    if (!userResponse || userResponse.total === 0) throw new ConflictException('請檢查帳號是否正確')
+    const user = userResponse.list[0]
+    if (user.status === 0) throw new ConflictException('該帳號已被封禁')
+
+    return user
+  }
+
 }

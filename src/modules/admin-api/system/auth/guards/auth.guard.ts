@@ -11,6 +11,7 @@ import { JwtRequest } from '../types'
 import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator'
 import { TokenBlacklistService } from '@/modules/admin-api/system/token-blacklist/token-blacklist.service'
 import { UserEntity } from '@/modules/admin-api/system/user/entity/user.entity'
+import { EnvHelper } from '@/utils/env-helper'
 
 function getToken(request, tokenType: 'authorization' | 'refresh-token') {
   const [type, token] = request.headers[tokenType]?.split(' ') ?? []
@@ -138,8 +139,7 @@ export class AuthGuard implements CanActivate {
       const isSwagger = request.headers['referer']?.indexOf('/api-docs') > -1
       if (currentEnv === 'dev' && isSwagger) {
         request['user'] = {
-          sub: '1',
-          role: ['super_admin'],
+          sub: EnvHelper.getString('DB_CONSTANT_SWAGGER_DEDICATED_USER_ID'),
           type: 'access',
         }
         return true

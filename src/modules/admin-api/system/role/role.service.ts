@@ -46,9 +46,9 @@ export class RoleService {
   }
 
   // 查詢角色綁定的菜單權限標識
-  async findRoleHasPermissions(roleCode: string) {
+  async findRoleHasPermissions(roleId: string) {
     const role = await this.roleRepository.findOne({
-      where: { code: roleCode },
+      where: { id: roleId, isDeleted: 0, status: 1 },
       relations: {
         roleMenus: {
           menu: true,

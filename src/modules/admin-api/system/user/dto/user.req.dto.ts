@@ -97,3 +97,37 @@ export class UpdatePasswordReqDto {
   @IsString()
   password: string
 }
+
+export class SendBindEmailReqDto {
+  @ApiProperty({ description: '使用者信箱', example: 'test@example.com' })
+  @IsNotEmpty()
+  email: string
+}
+
+export class SendBindMobileReqDto {
+  @ApiProperty({ description: '使用者手機', example: '0912345678' })
+  @IsNotEmpty()
+  mobile: string
+}
+
+export class BindEmailOrMobileReqDto {
+  @ApiProperty({ description: '驗證碼', example: '123456' })
+  @IsNotEmpty()
+  verifyCode: string
+
+  @ApiProperty({ description: '驗證碼類型', example: 'email' })
+  @IsNotEmpty()
+  verifyCodeType: 'email' | 'mobile'
+
+  @ApiProperty({ description: '使用者信箱', example: 'test@example.com' })
+  @IsOptional()
+  email: string
+
+  @ApiProperty({ description: '使用者手機', example: '0912345678' })
+  @IsOptional()
+  mobile: string
+}
+
+export class UpdatePersonalInfoReqDto extends PartialType(
+  OmitType(UpdateUserReqDto, ['mobile', 'email', 'roleIds', 'deptId', 'id', 'status', 'remark']),
+) {}

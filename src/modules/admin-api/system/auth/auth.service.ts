@@ -54,10 +54,9 @@ export class AuthService {
     }
   }
 
-  async generateToken(userId: string, role: string[], type: 'access' | 'refresh') {
+  async generateToken(userId: string, type: 'access' | 'refresh') {
     const payload = {
       sub: userId,
-      role,
       type,
       jti: uuidv4(),
     }
@@ -79,8 +78,8 @@ export class AuthService {
     return {
       ...user,
       token: {
-        accessToken: await this.generateToken(user.id, user.role, 'access'),
-        refreshToken: await this.generateToken(user.id, user.role, 'refresh'),
+        accessToken: await this.generateToken(user.id, 'access'),
+        refreshToken: await this.generateToken(user.id, 'refresh'),
       },
     }
   }
@@ -97,7 +96,7 @@ export class AuthService {
       // 如果剩餘時間小於 1800秒
       if (timeUntilExpiry < 1800) {
         if (timeUntilExpiry > 0) await this.tokenBlacklistService.create(payload) // 將未過期的 Token 加入黑名單
-        return await this.generateToken(payload.sub, payload.role, payload.type) // 返回新的 Token
+        return await this.generateToken(payload.sub, payload.type) // 返回新的 Token
       }
       return token
     }
@@ -122,7 +121,7 @@ export class AuthService {
     const user = await this.userService.find({ email })
     if (user.total > 0) throw new ConflictException('信箱已被使用')
 
-    // 生成驗證碼並發送（註冊場景使用 email 作為 userId）
+    // 生成驗證碼並發送
     await VerifyCodeUtils.generateVerifyCodeAndSend({
       verifyCodeService: this.verifyCodeService,
       type,
@@ -139,9 +138,9 @@ export class AuthService {
 
     // 查詢手機是否被使用
     const user = await this.userService.find({ mobile })
-    if (user.total > 0) throw new ConflictException('手機已被使用')
+    if (user.total > 0) throw new ConflictException('手機號碼已被使用')
 
-    // 生成驗證碼並發送（註冊場景使用 mobile 作為 userId）
+    // 生成驗證碼並發送
     await VerifyCodeUtils.generateVerifyCodeAndSend({
       verifyCodeService: this.verifyCodeService,
       type,

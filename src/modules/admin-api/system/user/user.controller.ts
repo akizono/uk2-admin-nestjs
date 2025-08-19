@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Param, Get, Post, Put, UseInterceptors, Query
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 import { UserService } from './user.service'
-import { CreateUserReqDto, FindUserReqDto, UpdateUserReqDto } from './dto/user.req.dto'
+import { CreateUserReqDto, FindUserReqDto, UpdatePersonalInfoReqDto, UpdateUserReqDto } from './dto/user.req.dto'
 import { CreateUserResDto, FindUserResDto } from './dto/user.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'

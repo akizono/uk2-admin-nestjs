@@ -2,6 +2,7 @@ import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, Up
 import { ConfigService } from '@nestjs/config'
 
 import { requestContext } from '@/utils/request-context'
+import { EnvHelper } from '@/utils/env-helper'
 
 /** 定義基礎實體介面 */
 interface BaseEntityWithUser {
@@ -44,7 +45,9 @@ export class GlobalSubscriber implements EntitySubscriberInterface<BaseEntity & 
     event: InsertEvent<T> | UpdateEvent<T>,
     columnName: keyof BaseEntityWithUser,
   ) {
-    const currentUserId = this.isSwagger() ? '-1' : this.getCurrentUserId()
+    const currentUserId = this.isSwagger()
+      ? EnvHelper.getString('DB_CONSTANT_SWAGGER_DEDICATED_USER_ID')
+      : this.getCurrentUserId()
     const metadata = event.metadata
     const hasColumn = metadata.columns.some(column => column.propertyName === columnName)
     if (hasColumn && currentUserId) {
