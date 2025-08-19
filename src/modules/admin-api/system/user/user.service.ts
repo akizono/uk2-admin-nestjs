@@ -147,6 +147,7 @@ export class UserService {
           ...remain,
           role: userRoles?.map(item => item.role.code),
           roleIds: userRoles?.map(item => item.role.id),
+          roleNames: userRoles?.map(item => item.role.name),
         }
       }),
     )

@@ -66,6 +66,12 @@ export class RoleMenuService {
         throw new BadRequestException('「超級管理員」的權限禁止修改')
       }
 
+      // 查詢角色狀態
+      const role = await this.roleRepository.findOne({ where: { id: roleId } })
+      if (!role || role.status === 0 || role.isDeleted === 1) {
+        throw new BadRequestException('角色狀態異常')
+      }
+
       // 1. 先刪除角色原有的菜單（真實刪除 不是邏輯刪除）
       await this.roleMenuRepository.delete({
         roleId,

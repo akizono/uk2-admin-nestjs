@@ -83,4 +83,5 @@ export class FindUserResDto extends PaginatedResponseDto({
   deptName: 'multilingual-fe4fb523-86bf-46d8-bdb2-c7deed093767',
   role: ['common'],
   roleIds: ['11'],
+  roleNames: ['common'],
 }) {}

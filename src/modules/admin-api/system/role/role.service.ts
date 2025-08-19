@@ -2,6 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
+import { RoleMenuService } from '../role-menu/role-menu.service'
+
 import { RoleEntity } from './entity/role.entity'
 import { CreateRoleReqDto, FindRoleReqDto, UpdateRoleReqDto } from './dto/role.req.dto'
 
@@ -13,6 +15,7 @@ export class RoleService {
   constructor(
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
+    private readonly roleMenuService: RoleMenuService,
   ) {}
 
   async create(createRoleReqDto: CreateRoleReqDto) {
@@ -84,6 +87,19 @@ export class RoleService {
 
   // 封鎖角色
   async block(id: string) {
+    if (id === EnvHelper.getString('DB_CONSTANT_SUPER_ADMIN_ROLE_ID')) {
+      throw new BadRequestException('禁止封鎖「super_admin」')
+    }
+    if (id === EnvHelper.getString('DB_CONSTANT_COMMON_ROLE_ID')) {
+      throw new BadRequestException('禁止封鎖「common」')
+    }
+
+    // 移除角色的所有權限和選單
+    await this.roleMenuService.batchUpdate({
+      roleId: id,
+      menuIds: [],
+    })
+
     await update({
       dto: { id, status: 0 },
       repository: this.roleRepository,
