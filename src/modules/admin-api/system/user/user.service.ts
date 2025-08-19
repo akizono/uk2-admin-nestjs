@@ -347,8 +347,6 @@ export class UserService {
     const { request } = requestContext.getStore()
     const currentUserId = request['user'].id
 
-    // console.log('currentUserId', currentUserId)
-
-    // await this.userRepository.update({ id: currentUserId }, updatePersonalInfoReqDto)
+    await this.userRepository.update({ id: currentUserId }, updatePersonalInfoReqDto)
   }
 }

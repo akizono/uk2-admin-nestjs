@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
-import { IsEnum, IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator'
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
@@ -54,6 +54,11 @@ export class FindDictDataReqDto extends PartialType(DictDataReqDto) {
   @Min(0)
   @Max(EnvHelper.getNumber('MAX_PAGE_NUMBER'))
   currentPage?: number = 1
+
+  @ApiProperty({ description: '字典類型狀態', example: 1, required: false })
+  @IsOptional()
+  @IsNumber()
+  dictTypeStatus?: number
 }
 
 export class UpdateDictDataReqDto extends PartialType(

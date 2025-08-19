@@ -3,6 +3,7 @@ import { BadRequestException } from '@nestjs/common'
 import { StrGenerator } from './str-generator'
 
 import { VerifyCodeService } from '@/modules/admin-api/system/verify-code/verify-code.service'
+import { VerifyCodeType } from '@/modules/admin-api/system/verify-code/dto/verify-code.req.dto'
 
 /**
  * 生成驗證碼的參數介面
@@ -10,7 +11,7 @@ import { VerifyCodeService } from '@/modules/admin-api/system/verify-code/verify
 export interface GenerateVerifyCodeParams {
   verifyCodeService: VerifyCodeService
   userId?: string
-  type: 'email' | 'mobile'
+  type: VerifyCodeType
   scene: string
   userEmail?: string // 使用者信箱
   userMobile?: string // 使用者手機
@@ -21,7 +22,7 @@ export interface GenerateVerifyCodeParams {
  */
 export interface ValidateVerifyCodeParams {
   userId?: string
-  type: 'email' | 'mobile'
+  type: VerifyCodeType
   scene: string // 使用場景
   userEmail?: string // 使用者信箱
   userMobile?: string // 使用者手機

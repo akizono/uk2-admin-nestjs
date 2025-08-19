@@ -2,7 +2,15 @@ import { Body, Controller, Delete, Param, Get, Post, Put, UseInterceptors, Query
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 import { UserService } from './user.service'
-import { CreateUserReqDto, FindUserReqDto, UpdatePersonalInfoReqDto, UpdateUserReqDto } from './dto/user.req.dto'
+import {
+  BindEmailOrMobileReqDto,
+  CreateUserReqDto,
+  FindUserReqDto,
+  SendBindEmailReqDto,
+  SendBindMobileReqDto,
+  UpdatePersonalInfoReqDto,
+  UpdateUserReqDto,
+} from './dto/user.req.dto'
 import { CreateUserResDto, FindUserResDto } from './dto/user.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
@@ -70,8 +78,35 @@ export class UserController {
     return this.userService.unblock(id)
   }
 
+  @Post('/send-bind-email')
+  @HasPermission('system:user:send-bind-email')
+  @ApiOperation({ summary: '發送用於綁定信箱的「驗證碼」到使用者信箱' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('修改個人資訊成功')
+  async sendBindEmail(@Body() sendBindEmailReqDto: SendBindEmailReqDto) {
+    return this.userService.sendBindEmail(sendBindEmailReqDto)
+  }
+
+  @Post('/send-bind-mobile')
+  @HasPermission('system:user:send-bind-mobile')
+  @ApiOperation({ summary: '發送用於綁定手機號碼的「驗證碼」到使用者手機' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('發送用於綁定手機號碼的「驗證碼」到使用者手機成功')
+  async sendBindMobile(@Body() sendBindMobileReqDto: SendBindMobileReqDto) {
+    return this.userService.sendBindMobile(sendBindMobileReqDto)
+  }
+
+  @Put('/bind-email-or-mobile')
+  @HasPermission('system:user:bind-email-or-mobile')
+  @ApiOperation({ summary: '綁定信箱或者手機' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('綁定信箱或者手機成功')
+  async bindEmailOrMobile(@Body() bindEmailOrMobileReqDto: BindEmailOrMobileReqDto) {
+    return this.userService.bindEmailOrMobile(bindEmailOrMobileReqDto)
+  }
+
   @Put('/update-personal-info')
-  @HasPermission('base:personal-info:update')
+  @HasPermission('system:user:update-personal-info')
   @ApiOperation({ summary: '修改個人資訊' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('修改個人資訊成功')

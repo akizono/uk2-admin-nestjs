@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
+import { DictTypeService } from '../dict-type/dict-type.service'
+
 import { DictDataEntity } from './entity/dict-data.entity'
 import { CreateDictDataReqDto, FindDictDataReqDto, UpdateDictDataReqDto } from './dto/dict-data.req.dto'
 
@@ -12,6 +14,7 @@ export class DictDataService {
   constructor(
     @InjectRepository(DictDataEntity)
     private readonly dictDataRepository: Repository<DictDataEntity>,
+    private readonly dictTypeService: DictTypeService,
   ) {}
 
   // 新增字典類型
@@ -27,7 +30,23 @@ export class DictDataService {
   }
 
   // 查詢字典數據
-  async find(findDictDataReqDto: FindDictDataReqDto) {
+  async find(_findDictDataReqDto: FindDictDataReqDto) {
+    const { dictTypeStatus, ...findDictDataReqDto } = _findDictDataReqDto
+
+    // 查詢該字典類型的狀態
+    if (dictTypeStatus) {
+      const dictTypeResponse = await this.dictTypeService.find({
+        pageSize: 0,
+        type: findDictDataReqDto.dictType,
+        status: dictTypeStatus,
+      })
+
+      // 如果該字典類型不存在，則返回空
+      if (dictTypeResponse.total === 0) {
+        return { total: 0, list: [] }
+      }
+    }
+
     const { list, total } = await find({
       dto: findDictDataReqDto,
       repository: this.dictDataRepository,

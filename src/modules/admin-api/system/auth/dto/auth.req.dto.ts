@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { IsNotEmpty } from 'class-validator'
 
 import { CreateUserReqDto } from '@/modules/admin-api/system/user/dto/user.req.dto'
+import { VerifyCodeType } from '@/modules/admin-api/system/verify-code/dto/verify-code.req.dto'
 
 /** 登入測試帳號 */
 const testAuth = {
@@ -42,7 +43,7 @@ export class RegisterReqDto extends CreateUserReqDto {
 
   @ApiProperty({ description: '驗證碼類型', example: 'email' })
   @IsNotEmpty()
-  verifyCodeType: 'email' | 'mobile'
+  verifyCodeType: VerifyCodeType
 }
 
 // ------------------------------------------------------------
@@ -82,5 +83,5 @@ export class UpdatePasswordReqDto {
 
   @ApiProperty({ description: '驗證碼類型', example: 'email' })
   @IsNotEmpty()
-  verifyCodeType: 'email' | 'mobile'
+  verifyCodeType: VerifyCodeType
 }

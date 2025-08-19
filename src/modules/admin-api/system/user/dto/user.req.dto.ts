@@ -6,6 +6,7 @@ import { StrGenerator } from '@/utils/str-generator'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { EnvHelper } from '@/utils/env-helper'
+import { VerifyCodeType } from '@/modules/admin-api/system/verify-code/dto/verify-code.req.dto'
 
 class UserReqDto extends BaseReqDto {
   @ApiProperty({ description: '主鍵ID', required: true })
@@ -117,7 +118,7 @@ export class BindEmailOrMobileReqDto {
 
   @ApiProperty({ description: '驗證碼類型', example: 'email' })
   @IsNotEmpty()
-  verifyCodeType: 'email' | 'mobile'
+  verifyCodeType: VerifyCodeType
 
   @ApiProperty({ description: '使用者信箱', example: 'test@example.com' })
   @IsOptional()
