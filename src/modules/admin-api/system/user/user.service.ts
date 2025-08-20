@@ -317,15 +317,27 @@ export class UserService {
   async bindEmailOrMobile(_bindEmailOrMobileReqDto: BindEmailOrMobileReqDto) {
     const { verifyCode, verifyCodeType, ...bindEmailOrMobileReqDto } = _bindEmailOrMobileReqDto
 
-    // 驗證驗證碼
+    /* 檢查信箱或者手機是否被使用 */
+    if (verifyCodeType === 'email') {
+      const userResponse = await this.find({ email: bindEmailOrMobileReqDto.email })
+      if (userResponse.total > 0) throw new ConflictException('信箱已被使用')
+    } else if (verifyCodeType === 'mobile') {
+      const userResponse = await this.find({ mobile: bindEmailOrMobileReqDto.mobile })
+      if (userResponse.total > 0) throw new ConflictException('手機號碼已被使用')
+    }
+
+    /* 驗證驗證碼 */
     const data = {
       verifyCodeService: this.verifyCodeService,
       type: verifyCodeType,
       scene: verifyCodeType === 'email' ? 'bind-email' : 'bind-mobile',
       inputCode: verifyCode,
     }
-    if (verifyCodeType === 'email') data['userEmail'] = bindEmailOrMobileReqDto.email
-    else if (verifyCodeType === 'mobile') data['userMobile'] = bindEmailOrMobileReqDto.mobile
+    if (verifyCodeType === 'email') {
+      data['userEmail'] = bindEmailOrMobileReqDto.email
+    } else if (verifyCodeType === 'mobile') {
+      data['userMobile'] = bindEmailOrMobileReqDto.mobile
+    }
     await VerifyCodeUtils.validateVerifyCode(data)
 
     // 獲取自己的id
