@@ -85,7 +85,12 @@ export class FindUserReqDto extends PartialType(UserReqDto) {
 
 export class UpdateUserReqDto extends PartialType(
   OmitType(UserReqDto, ['username', 'multilingualFields', ...disableEditFields]),
-) {}
+) {
+  @ApiProperty({ description: '密碼', required: false })
+  @IsOptional()
+  @IsString()
+  password?: string
+}
 
 export class UpdatePasswordReqDto {
   @ApiProperty({ description: '用戶ID', required: true, example: '1' })
