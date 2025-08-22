@@ -9,6 +9,7 @@ import {
   SendBindEmailReqDto,
   SendBindMobileReqDto,
   UpdatePersonalInfoReqDto,
+  UpdatePersonalPasswordReqDto,
   UpdateUserReqDto,
 } from './dto/user.req.dto'
 import { CreateUserResDto, FindUserResDto } from './dto/user.res.dto'
@@ -121,5 +122,14 @@ export class UserController {
   @ResponseMessage('獲取個人資訊成功')
   async getPersonalInfo() {
     return this.userService.getPersonalInfo()
+  }
+
+  @Put('/update-personal-password')
+  @HasPermission('system:user:update-personal-password')
+  @ApiOperation({ summary: '修改個人密碼' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('修改個人密碼成功')
+  async updatePersonalPassword(@Body() updatePersonalPasswordReqDto: UpdatePersonalPasswordReqDto) {
+    return this.userService.updatePersonalPassword(updatePersonalPasswordReqDto)
   }
 }

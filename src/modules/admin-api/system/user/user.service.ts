@@ -1,9 +1,17 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
 import { MultilingualFieldsEntity } from '../multilingual-fields/entity/multilingual-fields.entity'
 import { UserRoleEntity } from '../user-role/entity/user-role.entity'
+import { AuthService } from '../auth/auth.service'
 
 import { UserEntity } from './entity/user.entity'
 import {
@@ -14,6 +22,7 @@ import {
   SendBindMobileReqDto,
   UpdatePasswordReqDto,
   UpdatePersonalInfoReqDto,
+  UpdatePersonalPasswordReqDto,
   UpdateUserReqDto,
 } from './dto/user.req.dto'
 
@@ -34,6 +43,8 @@ export class UserService {
     @InjectRepository(UserRoleEntity)
     private readonly userRoleRepository: Repository<UserRoleEntity>,
     private readonly verifyCodeService: VerifyCodeService,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
   ) {}
 
   async create(createUserReqDto: CreateUserReqDto) {
@@ -368,5 +379,28 @@ export class UserService {
 
     // 直接返回即可，在守衛中獲取使用者資料不過是幾十毫秒前的事情，基本上就是最新的資料了
     return request['user']
+  }
+
+  /** 修改個人密碼 */
+  async updatePersonalPassword(updatePersonalPasswordReqDto: UpdatePersonalPasswordReqDto) {
+    const { request } = requestContext.getStore()
+    const currentUserId = request['user'].id
+    const { oldPassword, newPassword } = updatePersonalPasswordReqDto
+
+    // 驗證舊密碼
+    const user = await this.authService.validateUser({
+      userId: currentUserId,
+      inputPassword: oldPassword,
+    })
+    if (!user) throw new BadRequestException('密碼錯誤')
+
+    // 更新密碼
+    await this.updatePassword(
+      {
+        userId: currentUserId,
+        password: newPassword,
+      },
+      false,
+    )
   }
 }

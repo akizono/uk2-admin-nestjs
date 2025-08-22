@@ -132,3 +132,15 @@ export class BindEmailOrMobileReqDto {
 export class UpdatePersonalInfoReqDto extends PartialType(
   OmitType(UpdateUserReqDto, ['mobile', 'email', 'roleIds', 'deptId', 'id', 'status', 'remark']),
 ) {}
+
+export class UpdatePersonalPasswordReqDto {
+  @ApiProperty({ description: '舊密碼', required: true, example: 'Abc123456!@#' })
+  @IsNotEmpty()
+  @IsString()
+  oldPassword: string
+
+  @ApiProperty({ description: '新密碼', required: true, example: 'def3333!@#' })
+  @IsNotEmpty()
+  @IsString()
+  newPassword: string
+}

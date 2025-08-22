@@ -1,4 +1,11 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common'
+import {
+  BadRequestException,
+  ConflictException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+  forwardRef,
+} from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -24,15 +31,29 @@ import { TokenBlacklistService } from '@/modules/admin-api/system/token-blacklis
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly tokenBlacklistService: TokenBlacklistService,
     private readonly verifyCodeService: VerifyCodeService,
   ) {}
 
-  async validateUser(username: string, inputPassword: string): Promise<AuthenticatedUser | null> {
+  // username: string, inputPassword: string
+  async validateUser({
+    userId,
+    username,
+    inputPassword,
+  }: {
+    userId?: string
+    username?: string
+    inputPassword: string
+  }): Promise<AuthenticatedUser | null> {
+    // username 和 userId 必須二選一
+    if (!userId && !username) throw new BadRequestException('缺少必要參數')
+
     const { list } = await this.userService.find(
       {
+        id: userId,
         username,
         isDeleted: 0,
         status: 1,
@@ -72,7 +93,10 @@ export class AuthService {
 
   /** 登入 */
   async login(loginReqDto: LoginReqDto) {
-    const user = await this.validateUser(loginReqDto.username, loginReqDto.password)
+    const user = await this.validateUser({
+      username: loginReqDto.username,
+      inputPassword: loginReqDto.password,
+    })
     if (!user) throw new UnauthorizedException('密碼錯誤')
 
     return {

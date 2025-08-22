@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, forwardRef } from '@nestjs/common'
 import { JwtModule } from '@nestjs/jwt'
 import { APP_GUARD } from '@nestjs/core'
 import { TypeOrmModule } from '@nestjs/typeorm'
@@ -24,7 +24,7 @@ import { VerifyCodeModule } from '@/modules/admin-api/system/verify-code/verify-
       }),
     }),
     TypeOrmModule.forFeature([UserEntity]),
-    UserModule,
+    forwardRef(() => UserModule),
     TokenBlacklistModule,
     RoleModule,
     VerifyCodeModule,
@@ -41,5 +41,6 @@ import { VerifyCodeModule } from '@/modules/admin-api/system/verify-code/verify-
       useClass: HasPermissionGuard,
     },
   ],
+  exports: [AuthService],
 })
 export class AuthModule {}
