@@ -226,6 +226,9 @@ export class UserService {
     if (id === EnvHelper.getString('DB_CONSTANT_DEFAULT_SUPER_ADMIN_USER_ID'))
       throw new BadRequestException('禁止刪除「系統預設的超級管理員」')
 
+    if (id === EnvHelper.getString('DB_CONSTANT_SWAGGER_DEDICATED_USER_ID'))
+      throw new BadRequestException('禁止刪除「Swagger專用使用者」')
+
     const userResponse = await this.find({ id })
     if (!userResponse || userResponse.total === 0) throw new NotFoundException('使用者不存在')
 
@@ -240,6 +243,9 @@ export class UserService {
 
     if (id === EnvHelper.getString('DB_CONSTANT_DEFAULT_SUPER_ADMIN_USER_ID'))
       throw new BadRequestException('禁止封鎖「系統預設的超級管理員」')
+
+    if (id === EnvHelper.getString('DB_CONSTANT_SWAGGER_DEDICATED_USER_ID'))
+      throw new BadRequestException('禁止封鎖「Swagger專用使用者」')
 
     const userResponse = await this.find({ id })
     if (!userResponse || userResponse.total === 0) throw new NotFoundException('使用者不存在')
