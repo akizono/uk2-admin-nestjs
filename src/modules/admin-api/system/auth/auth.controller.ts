@@ -18,6 +18,7 @@ import { CheckUserHasMobileOrEmailResDto, LoginResDto } from './dto/auth.res.dto
 import { Public } from '@/common/decorators/public.decorator'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
+import { Operation, OperationType } from '@/common/decorators/operation.decorator'
 
 @Controller('/admin-api/system/auth')
 @UseInterceptors(TransformInterceptor)
@@ -26,6 +27,11 @@ export class AuthController {
 
   @Public()
   @Post('/login')
+  @Operation({
+    type: OperationType.LOGIN,
+    name: '登入',
+    module: 'auth',
+  })
   @ApiOperation({ summary: '登入' })
   @ApiResponse({ type: LoginResDto })
   @ResponseMessage('登入成功')

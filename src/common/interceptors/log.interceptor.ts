@@ -77,7 +77,7 @@ export class LogInterceptor implements NestInterceptor {
     statusCode,
     errorMessage,
     errorStack,
-    isPublic,
+    // isPublic,
   }: {
     request: Request
     response: Response
@@ -97,11 +97,6 @@ export class LogInterceptor implements NestInterceptor {
       // 獲取使用者ID
       const user = request['user']
       const userId = user?.id
-
-      // 如果是公開路由且沒有使用者ID，則不記錄日誌
-      if (isPublic && !userId) {
-        return
-      }
 
       // 過濾敏感資訊
       const filteredBody = this.filterSensitiveInfo(request.body)
@@ -152,7 +147,6 @@ export class LogInterceptor implements NestInterceptor {
       'token',
       'refreshToken',
       'accessToken',
-      'refreshToken',
     ]
 
     // 遞迴過濾敏感資訊
