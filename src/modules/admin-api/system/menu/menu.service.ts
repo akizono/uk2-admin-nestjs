@@ -99,7 +99,7 @@ export class MenuService {
       if (menu.type === 0) {
         return true
       }
-      // 否則，檢查用戶是否有此菜單的權限
+      // 否則，檢查使用者是否有此菜單的權限
       return userMenuIds.has(menu.id)
     })
 

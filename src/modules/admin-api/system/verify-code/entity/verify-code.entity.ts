@@ -16,10 +16,10 @@ export class VerifyCodeEntity extends BaseEntity {
   @Column({ length: 50, comment: '驗證碼類型: email / mobile' })
   type: string
 
-  @Column({ length: 50, comment: '用戶信箱(type=email)', nullable: true })
+  @Column({ length: 50, comment: '使用者信箱(type=email)', nullable: true })
   userEmail: string
 
-  @Column({ length: 50, comment: '用戶手機(type=mobile)', nullable: true })
+  @Column({ length: 50, comment: '使用者手機(type=mobile)', nullable: true })
   userMobile: string
 
   @Column({ length: 50, comment: '使用場景（例如：retrieve-password）' })

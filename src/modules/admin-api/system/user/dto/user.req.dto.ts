@@ -93,7 +93,7 @@ export class UpdateUserReqDto extends PartialType(
 }
 
 export class UpdatePasswordReqDto {
-  @ApiProperty({ description: '用戶ID', required: true, example: '1' })
+  @ApiProperty({ description: '使用者ID', required: true, example: '1' })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   userId: string

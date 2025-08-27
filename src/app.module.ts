@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
+import { APP_INTERCEPTOR } from '@nestjs/core'
 
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
@@ -19,6 +20,8 @@ import { DictDataModule } from './modules/admin-api/system/dict-data/dict-data.m
 import { MultilingualFieldsModule } from './modules/admin-api/system/multilingual-fields/multilingual-fields.module'
 import { CodeGenerationModule } from './modules/operations/code-generation/code-generation.module'
 import { VerifyCodeModule } from './modules/admin-api/system/verify-code/verify-code.module'
+import { LogModule } from './modules/admin-api/system/log/log.module'
+import { LogInterceptor } from './common/interceptors/log.interceptor'
 
 /** ---- Code generation location: import ---- */ // 請勿刪除此處註解
 
@@ -45,6 +48,7 @@ import { VerifyCodeModule } from './modules/admin-api/system/verify-code/verify-
         synchronize: EnvHelper.getBoolean('DB_SYNCHRONIZE'),
       }),
     }),
+    LogModule, // LogModule 一定要在其他模組之前引入
     UserModule,
     AuthModule,
     TokenBlacklistModule,
@@ -64,6 +68,13 @@ import { VerifyCodeModule } from './modules/admin-api/system/verify-code/verify-
 
   controllers: [AppController],
 
-  providers: [AppService, GlobalSubscriber],
+  providers: [
+    AppService,
+    GlobalSubscriber,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LogInterceptor,
+    },
+  ],
 })
 export class AppModule {}

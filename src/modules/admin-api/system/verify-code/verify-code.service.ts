@@ -41,7 +41,7 @@ export class VerifyCodeService {
     }
   }
 
-  // 刪除某用戶的所有驗證碼
+  // 刪除某使用者的所有驗證碼
   async deleteUserAllVerifyCodes(userId: string) {
     await this.verifyCodeRepository.update({ userId }, { isDeleted: 1 })
   }

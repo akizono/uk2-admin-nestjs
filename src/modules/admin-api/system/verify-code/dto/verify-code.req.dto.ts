@@ -29,12 +29,12 @@ export class VerifyCodeReqDto extends BaseReqDto {
   @IsString()
   type: VerifyCodeType
 
-  @ApiProperty({ description: '用戶信箱(type=email)', example: 'test@gmail.com' })
+  @ApiProperty({ description: '使用者信箱(type=email)', example: 'test@gmail.com' })
   @IsOptional()
   @IsString()
   userEmail: string
 
-  @ApiProperty({ description: '用戶手機(type=mobile)', example: '0912345678' })
+  @ApiProperty({ description: '使用者手機(type=mobile)', example: '0912345678' })
   @IsOptional()
   @IsString()
   userMobile: string
