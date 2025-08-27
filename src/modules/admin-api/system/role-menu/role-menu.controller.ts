@@ -9,6 +9,7 @@ import { MsgResponseDto } from '@/utils/response-dto'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
+import { Operation, OperationType } from '@/common/decorators/operation.decorator'
 
 @Controller('/admin-api/system/role-menu')
 @UseInterceptors(TransformInterceptor)
@@ -17,27 +18,30 @@ export class RoleMenuController {
 
   @Post('/create')
   @HasPermission('system:role-menu:create')
-  @ApiOperation({ summary: '角色綁定菜單' })
+  @Operation({ type: OperationType.CREATE, name: '建立角色綁定選單', module: 'role-menu' })
+  @ApiOperation({ summary: '角色綁定選單' })
   @ApiResponse({ type: MsgResponseDto() })
-  @ResponseMessage('角色綁定菜單成功')
+  @ResponseMessage('角色綁定選單成功')
   async create(@Body() createRoleMenuReqDto: CreateRoleMenuReqDto) {
     await this.roleMenuService.create(createRoleMenuReqDto)
   }
 
   @Get('/page')
   @HasPermission('system:role-menu:page')
-  @ApiOperation({ summary: '分頁查詢角色綁定菜單' })
+  @Operation({ type: OperationType.READ, name: '分頁查詢角色綁定選單', module: 'role-menu' })
+  @ApiOperation({ summary: '分頁查詢角色綁定選單' })
   @ApiResponse({ type: FindRoleMenuResDto })
-  @ResponseMessage('分頁查詢角色綁定菜單成功')
+  @ResponseMessage('分頁查詢角色綁定選單成功')
   find(@Query() findRoleMenuReqDto: FindRoleMenuReqDto) {
     return this.roleMenuService.find(findRoleMenuReqDto)
   }
 
   @Put('/batch-update')
-  // @HasPermission('system:role-menu:update')
-  @ApiOperation({ summary: '批次更新角色綁定菜單' })
+  @HasPermission('system:role-menu:update')
+  @Operation({ type: OperationType.UPDATE, name: '批次更新角色綁定選單', module: 'role-menu' })
+  @ApiOperation({ summary: '批次更新角色綁定選單' })
   @ApiResponse({ type: MsgResponseDto() })
-  @ResponseMessage('批次更新角色綁定菜單成功')
+  @ResponseMessage('批次更新角色綁定選單成功')
   batchUpdate(@Body() batchUpdateRoleMenuReqDto: BatchUpdateRoleMenuReqDto) {
     return this.roleMenuService.batchUpdate(batchUpdateRoleMenuReqDto)
   }

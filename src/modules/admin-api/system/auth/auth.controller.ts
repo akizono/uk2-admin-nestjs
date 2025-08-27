@@ -27,11 +27,7 @@ export class AuthController {
 
   @Public()
   @Post('/login')
-  @Operation({
-    type: OperationType.LOGIN,
-    name: '登入',
-    module: 'auth',
-  })
+  @Operation({ type: OperationType.LOGIN, name: '登入', module: 'auth' })
   @ApiOperation({ summary: '登入' })
   @ApiResponse({ type: LoginResDto })
   @ResponseMessage('登入成功')
@@ -42,6 +38,7 @@ export class AuthController {
   @ApiHeader({ name: 'authorization' })
   @ApiHeader({ name: 'refresh-token' })
   @Post('/refreshTokenMethod') // 注意：此端點路徑與 auth.guard.ts:validateRefreshToken() 存在耦合關係
+  @Operation({ type: OperationType.OTHER, name: '刷新Token', module: 'auth' })
   @ApiOperation({ summary: '刷新Token', description: '！！該介面無法使用swagger測試，但是功能是正確生效的' })
   @ResponseMessage('成功刷新Token')
   async refreshTokenMethod(@Req() request) {
@@ -50,6 +47,7 @@ export class AuthController {
 
   @Public()
   @Post('/send-register-email')
+  @Operation({ type: OperationType.OTHER, name: '發送「驗證碼」到使用者信箱', module: 'auth' })
   @ApiOperation({ summary: '發送「驗證碼」到使用者信箱' })
   @ApiResponse({ type: String })
   @ResponseMessage('發送成功')
@@ -59,6 +57,7 @@ export class AuthController {
 
   @Public()
   @Post('/send-register-mobile')
+  @Operation({ type: OperationType.OTHER, name: '發送「驗證碼」到使用者手機', module: 'auth' })
   @ApiOperation({ summary: '發送「驗證碼」到使用者手機' })
   @ApiResponse({ type: String })
   @ResponseMessage('發送成功')
@@ -68,6 +67,7 @@ export class AuthController {
 
   @Public()
   @Post('/register')
+  @Operation({ type: OperationType.OTHER, name: '註冊', module: 'auth' })
   @ApiOperation({ summary: '註冊' })
   @ApiResponse({ type: String })
   @ResponseMessage('註冊成功')
@@ -77,6 +77,7 @@ export class AuthController {
 
   @Public()
   @Get('/check-user-has-mobile-or-email')
+  @Operation({ type: OperationType.OTHER, name: '檢查使用者是否擁有手機號碼或者信箱', module: 'auth' })
   @ApiOperation({ summary: '檢查使用者是否擁有手機號碼或者信箱' })
   @ApiResponse({ type: CheckUserHasMobileOrEmailResDto })
   @ResponseMessage('檢查成功')
@@ -86,6 +87,7 @@ export class AuthController {
 
   @Public()
   @Post('/send-reset-password-email')
+  @Operation({ type: OperationType.OTHER, name: '發送「驗證碼」到使用者信箱', module: 'auth' })
   @ApiOperation({ summary: '發送「驗證碼」到使用者信箱' })
   @ApiResponse({ type: String })
   @ResponseMessage('發送成功')
@@ -95,6 +97,7 @@ export class AuthController {
 
   @Public()
   @Post('/send-reset-password-mobile')
+  @Operation({ type: OperationType.OTHER, name: '發送「驗證碼」到使用者手機', module: 'auth' })
   @ApiOperation({ summary: '發送「驗證碼」到使用者手機' })
   @ApiResponse({ type: String })
   @ResponseMessage('發送成功')
@@ -104,6 +107,7 @@ export class AuthController {
 
   @Public()
   @Post('/update-password')
+  @Operation({ type: OperationType.OTHER, name: '修改密碼', module: 'auth' })
   @ApiOperation({ summary: '修改密碼' })
   @ApiResponse({ type: String })
   @ResponseMessage('修改成功')

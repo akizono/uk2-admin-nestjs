@@ -17,7 +17,7 @@ class RoleMenuReqDto extends BaseReqDto {
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   roleId: string
 
-  @ApiProperty({ description: '菜單ID' })
+  @ApiProperty({ description: '選單ID' })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   menuId: string
@@ -47,7 +47,7 @@ export class BatchUpdateRoleMenuReqDto {
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   roleId: string
 
-  @ApiProperty({ description: '菜單IDs' })
+  @ApiProperty({ description: '選單IDs' })
   @IsNotEmpty()
   @IsArray()
   menuIds: string[]

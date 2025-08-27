@@ -59,7 +59,7 @@ export class MenuService {
     }
   }
 
-  /** 獲取使用者有權限的菜單 */
+  /** 獲取使用者有權限的選單 */
   async getUserMenus(userId: string) {
     // 1. 先獲取使用者資訊及其角色
     const userInfo = await this.userService.find({ id: userId }, false)
@@ -68,15 +68,15 @@ export class MenuService {
     const user = userInfo.list[0]
     if (!user.roleIds || !user.roleIds.length) return { total: 0, list: [] }
 
-    // 2. 獲取所有菜單，設置分頁參數，pageSize為0表示不分頁
+    // 2. 獲取所有選單，設置分頁參數，pageSize為0表示不分頁
     const allMenus = await this.find({ pageSize: 0, currentPage: 1, status: 1 })
     if (!allMenus.list.length) return { total: 0, list: [] }
 
-    // 3. 獲取使用者所有角色的菜單ID
+    // 3. 獲取使用者所有角色的選單ID
     const userRoleIds = user.roleIds
     const userMenuIds = new Set<string>()
 
-    // 直接使用角色ID獲取菜單
+    // 直接使用角色ID獲取選單
     for (const roleId of userRoleIds) {
       const roleMenus = await this.roleMenuService.find({
         roleId,
@@ -92,14 +92,14 @@ export class MenuService {
       }
     }
 
-    // 4. 過濾使用者有權限的菜單
-    // 如果菜單的 permission 為 null 或空字串，則不進行權限校驗，直接加入
+    // 4. 過濾使用者有權限的選單
+    // 如果選單的 permission 為 null 或空字串，則不進行權限校驗，直接加入
     const filteredMenus = allMenus.list.filter(menu => {
       // 如果 類型為0，則不需要校驗
       if (menu.type === 0) {
         return true
       }
-      // 否則，檢查使用者是否有此菜單的權限
+      // 否則，檢查使用者是否有此選單的權限
       return userMenuIds.has(menu.id)
     })
 

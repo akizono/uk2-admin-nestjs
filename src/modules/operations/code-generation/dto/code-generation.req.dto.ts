@@ -37,7 +37,7 @@ export class CodeGenerationReqDto extends BaseReqDto {
   @IsNumber()
   isGenerateWebCode: number
 
-  @ApiProperty({ description: '是否導入菜單和權限', example: 0 })
+  @ApiProperty({ description: '是否導入選單和權限', example: 0 })
   @IsNotEmpty()
   @IsNumber()
   isImportMenuAndPermission: number

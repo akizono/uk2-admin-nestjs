@@ -8,6 +8,7 @@ import { MsgResponseDto } from '@/utils/response-dto'
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
+import { Operation, OperationType } from '@/common/decorators/operation.decorator'
 
 @Controller('/admin-api/user-role')
 @UseInterceptors(TransformInterceptor)
@@ -16,6 +17,7 @@ export class UserRoleController {
 
   @Post('/create')
   @HasPermission('system:user-role:create')
+  @Operation({ type: OperationType.CREATE, name: '使用者綁定角色', module: 'user-role' })
   @ApiOperation({ summary: '使用者綁定角色' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('使用者綁定角色成功')

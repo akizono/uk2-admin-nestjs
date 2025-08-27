@@ -22,7 +22,7 @@ export class CodeGenerationEntity extends BaseEntity {
   @Column({ type: 'tinyint', comment: '是否生成前端代碼', default: 0 })
   isGenerateWebCode: number
 
-  @Column({ type: 'tinyint', comment: '是否導入菜單和權限', default: 0 })
+  @Column({ type: 'tinyint', comment: '是否導入選單和權限', default: 0 })
   isImportMenuAndPermission: number
 
   @Column({ type: 'int', comment: '排序', default: 0 })

@@ -20,7 +20,7 @@ export class HasPermissionGuard implements CanActivate {
     const request = context.switchToHttp().getRequest()
     const user = request['user']
 
-    // 查詢使用者所有角色綁定的菜單權限標識
+    // 查詢使用者所有角色綁定的選單權限標識
     const roleHasPermissions = await Promise.all(
       user.roleIds.map(roleId => this.roleService.findRoleHasPermissions(roleId)),
     ).then(permissions => permissions.flat())

@@ -45,7 +45,7 @@ export class RoleService {
     }
   }
 
-  // 查詢角色綁定的菜單權限標識
+  // 查詢角色綁定的選單權限標識
   async findRoleHasPermissions(roleId: string) {
     const role = await this.roleRepository.findOne({
       where: { id: roleId, isDeleted: 0, status: 1 },

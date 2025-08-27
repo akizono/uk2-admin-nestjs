@@ -28,11 +28,7 @@ export class UserController {
 
   @Post('/create')
   @HasPermission('system:user:create')
-  @Operation({
-    type: OperationType.CREATE,
-    name: '建立使用者',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.CREATE, name: '建立使用者', module: 'user' })
   @ApiOperation({ summary: '建立使用者' })
   @ApiResponse({ type: CreateUserResDto })
   @ResponseMessage('建立使用者成功')
@@ -42,11 +38,7 @@ export class UserController {
 
   @Get('/page')
   @HasPermission('system:user:page')
-  @Operation({
-    type: OperationType.READ,
-    name: '取得使用者分頁列表',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.READ, name: '取得使用者分頁列表', module: 'user' })
   @ApiOperation({ summary: '取得使用者分頁列表' })
   @ApiResponse({ type: FindUserResDto })
   @ResponseMessage('取得使用者分頁列表成功')
@@ -56,11 +48,7 @@ export class UserController {
 
   @Put('/update')
   @HasPermission('system:user:update')
-  @Operation({
-    type: OperationType.UPDATE,
-    name: '更新使用者',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.UPDATE, name: '更新使用者', module: 'user' })
   @ApiOperation({ summary: '更新使用者' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('更新使用者成功')
@@ -70,11 +58,7 @@ export class UserController {
 
   @Delete('/delete/:id')
   @HasPermission('system:user:delete')
-  @Operation({
-    type: OperationType.DELETE,
-    name: '刪除使用者',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.DELETE, name: '刪除使用者', module: 'user' })
   @ApiOperation({ summary: '刪除使用者' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('刪除使用者成功')
@@ -84,11 +68,7 @@ export class UserController {
 
   @Put('/block/:id')
   @HasPermission('system:user:block')
-  @Operation({
-    type: OperationType.UPDATE,
-    name: '封鎖使用者',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.UPDATE, name: '封鎖使用者', module: 'user' })
   @ApiOperation({ summary: '封鎖使用者' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('封鎖使用者成功')
@@ -98,11 +78,7 @@ export class UserController {
 
   @Put('/unblock/:id')
   @HasPermission('system:user:unblock')
-  @Operation({
-    type: OperationType.UPDATE,
-    name: '解封使用者',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.UPDATE, name: '解封使用者', module: 'user' })
   @ApiOperation({ summary: '解封使用者' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('解封使用者成功')
@@ -112,11 +88,7 @@ export class UserController {
 
   @Post('/send-bind-email')
   @HasPermission('system:user:send-bind-email')
-  @Operation({
-    type: OperationType.OTHER,
-    name: '發送綁定信箱驗證碼',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.OTHER, name: '發送綁定信箱驗證碼', module: 'user' })
   @ApiOperation({ summary: '發送用於綁定信箱的「驗證碼」' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('修改個人資訊成功')
@@ -126,11 +98,7 @@ export class UserController {
 
   @Post('/send-bind-mobile')
   @HasPermission('system:user:send-bind-mobile')
-  @Operation({
-    type: OperationType.OTHER,
-    name: '發送綁定手機驗證碼',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.OTHER, name: '發送綁定手機驗證碼', module: 'user' })
   @ApiOperation({ summary: '發送綁定手機驗證碼' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('發送用於綁定手機號碼的「驗證碼」到使用者手機成功')
@@ -140,11 +108,7 @@ export class UserController {
 
   @Put('/bind-email-or-mobile')
   @HasPermission('system:user:bind-email-or-mobile')
-  @Operation({
-    type: OperationType.UPDATE,
-    name: '綁定信箱或者手機',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.UPDATE, name: '綁定信箱或者手機', module: 'user' })
   @ApiOperation({ summary: '綁定信箱或者手機' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('綁定信箱或者手機成功')
@@ -154,11 +118,7 @@ export class UserController {
 
   @Put('/update-personal-info')
   @HasPermission('system:user:update-personal-info')
-  @Operation({
-    type: OperationType.UPDATE,
-    name: '修改個人資訊',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.UPDATE, name: '修改個人資訊', module: 'user' })
   @ApiOperation({ summary: '修改個人資訊' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('修改個人資訊成功')
@@ -168,11 +128,7 @@ export class UserController {
 
   @Get('/get-personal-info')
   @HasPermission('system:user:get-personal-info')
-  @Operation({
-    type: OperationType.READ,
-    name: '獲取個人資訊',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.READ, name: '獲取個人資訊', module: 'user' })
   @ApiOperation({ summary: '獲取個人資訊' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('獲取個人資訊成功')
@@ -182,11 +138,7 @@ export class UserController {
 
   @Put('/update-personal-password')
   @HasPermission('system:user:update-personal-password')
-  @Operation({
-    type: OperationType.UPDATE,
-    name: '修改個人密碼',
-    module: 'user',
-  })
+  @Operation({ type: OperationType.UPDATE, name: '修改個人密碼', module: 'user' })
   @ApiOperation({ summary: '修改個人密碼' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('修改個人密碼成功')

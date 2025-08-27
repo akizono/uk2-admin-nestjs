@@ -12,7 +12,7 @@ export class RoleMenuEntity extends BaseEntity {
   @Column({ name: 'role_id', type: 'bigint', comment: '角色ID' })
   roleId: string
 
-  @Column({ name: 'menu_id', type: 'bigint', comment: '菜單ID' })
+  @Column({ name: 'menu_id', type: 'bigint', comment: '選單ID' })
   menuId: string
 
   @ManyToOne(() => RoleEntity)

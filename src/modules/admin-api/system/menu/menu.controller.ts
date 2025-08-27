@@ -11,6 +11,7 @@ import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { MsgResponseDto } from '@/utils/response-dto'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
+import { Operation, OperationType } from '@/common/decorators/operation.decorator'
 
 @Controller('/admin-api/system/menu')
 @UseInterceptors(TransformInterceptor)
@@ -19,6 +20,7 @@ export class MenuController {
 
   @Post('/create')
   @HasPermission('system:menu:create')
+  @Operation({ type: OperationType.CREATE, name: '建立選單', module: 'menu' })
   @ApiOperation({ summary: '建立選單' })
   @ApiResponse({ type: CreateMenuResDto })
   @ResponseMessage('建立選單成功')
@@ -28,6 +30,7 @@ export class MenuController {
 
   @Get('/page')
   @HasPermission('system:menu:page')
+  @Operation({ type: OperationType.READ, name: '取得選單分頁列表', module: 'menu' })
   @ApiOperation({ summary: '取得選單分頁列表' })
   @ApiResponse({ type: FindMenuResDto })
   @ResponseMessage('取得選單分頁列表成功')
@@ -36,6 +39,7 @@ export class MenuController {
   }
 
   @Get('/user-menus')
+  @Operation({ type: OperationType.READ, name: '取得當前使用者的選單', module: 'menu' })
   @ApiOperation({ summary: '取得當前使用者的選單' })
   @ApiResponse({ type: FindMenuResDto })
   @ResponseMessage('取得當前使用者選單成功')
@@ -46,6 +50,7 @@ export class MenuController {
 
   @Put('/update')
   @HasPermission('system:menu:update')
+  @Operation({ type: OperationType.UPDATE, name: '更新選單', module: 'menu' })
   @ApiOperation({ summary: '更新選單' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('更新選單成功')
@@ -55,6 +60,7 @@ export class MenuController {
 
   @Delete('/delete/:id')
   @HasPermission('system:menu:delete')
+  @Operation({ type: OperationType.DELETE, name: '刪除選單', module: 'menu' })
   @ApiOperation({ summary: '刪除選單' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('刪除選單成功')
@@ -64,6 +70,7 @@ export class MenuController {
 
   @Put('/block/:id')
   @HasPermission('system:menu:block')
+  @Operation({ type: OperationType.UPDATE, name: '封鎖選單', module: 'menu' })
   @ApiOperation({ summary: '封鎖選單' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('封鎖選單成功')
@@ -73,6 +80,7 @@ export class MenuController {
 
   @Put('/unblock/:id')
   @HasPermission('system:menu:unblock')
+  @Operation({ type: OperationType.UPDATE, name: '解封鎖選單', module: 'menu' })
   @ApiOperation({ summary: '解封鎖選單' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('解封鎖選單成功')

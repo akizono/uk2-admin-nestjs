@@ -8,6 +8,7 @@ import { FindLogResDto } from './dto/log.res.dto'
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
+import { Operation, OperationType } from '@/common/decorators/operation.decorator'
 
 @Controller('/admin-api/system/log')
 @UseInterceptors(TransformInterceptor)
@@ -16,6 +17,7 @@ export class LogController {
 
   @Get('/page')
   @HasPermission('system:log:page')
+  @Operation({ type: OperationType.READ, name: '取得日誌分頁列表', module: 'log' })
   @ApiOperation({ summary: '取得日誌分頁列表' })
   @ApiResponse({ type: FindLogResDto })
   @ResponseMessage('取得日誌分頁列表成功')

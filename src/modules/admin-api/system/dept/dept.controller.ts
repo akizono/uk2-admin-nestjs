@@ -10,6 +10,7 @@ import { TransformInterceptor } from '@/common/interceptors/transform.intercepto
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
 import { MsgResponseDto } from '@/utils/response-dto'
+import { Operation, OperationType } from '@/common/decorators/operation.decorator'
 
 @Controller('/admin-api/system/dept')
 @UseInterceptors(TransformInterceptor)
@@ -18,6 +19,7 @@ export class DeptController {
 
   @Post('/create')
   @HasPermission('system:dept:create')
+  @Operation({ type: OperationType.CREATE, name: '建立部門', module: 'dept' })
   @ApiOperation({ summary: '建立部門' })
   @ApiResponse({ type: CreateDeptResDto })
   @ResponseMessage('建立部門成功')
@@ -27,6 +29,7 @@ export class DeptController {
 
   @Get('/page')
   @HasPermission('system:dept:page')
+  @Operation({ type: OperationType.READ, name: '取得部門分頁列表', module: 'dept' })
   @ApiOperation({ summary: '取得部門分頁列表' })
   @ApiResponse({ type: FindDeptResDto })
   @ResponseMessage('取得部門分頁列表成功')
@@ -36,6 +39,7 @@ export class DeptController {
 
   @Put('/update')
   @HasPermission('system:dept:update')
+  @Operation({ type: OperationType.UPDATE, name: '更新部門', module: 'dept' })
   @ApiOperation({ summary: '更新部門' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('更新部門成功')
@@ -45,6 +49,7 @@ export class DeptController {
 
   @Delete('/delete/:id')
   @HasPermission('system:dept:delete')
+  @Operation({ type: OperationType.DELETE, name: '刪除部門', module: 'dept' })
   @ApiOperation({ summary: '刪除部門' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('刪除部門成功')
@@ -54,6 +59,7 @@ export class DeptController {
 
   @Put('/block/:id')
   @HasPermission('system:dept:block')
+  @Operation({ type: OperationType.UPDATE, name: '封鎖部門', module: 'dept' })
   @ApiOperation({ summary: '封鎖部門' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('封鎖部門成功')
@@ -63,6 +69,7 @@ export class DeptController {
 
   @Put('/unblock/:id')
   @HasPermission('system:dept:unblock')
+  @Operation({ type: OperationType.UPDATE, name: '解封鎖部門', module: 'dept' })
   @ApiOperation({ summary: '解封鎖部門' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('解封鎖部門成功')

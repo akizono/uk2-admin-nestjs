@@ -31,7 +31,7 @@ export class RoleMenuService {
       dto: createRoleMenuReqDto,
       repository: this.roleMenuRepository,
       repeatCondition: ['roleId', 'menuId'],
-      modalName: '角色關聯菜單',
+      modalName: '角色關聯選單',
       foreignKeyChecks: [
         {
           field: 'roleId',
@@ -41,7 +41,7 @@ export class RoleMenuService {
         {
           field: 'menuId',
           repository: this.menuRepository,
-          modalName: '菜單',
+          modalName: '選單',
         },
       ],
     })
@@ -63,7 +63,7 @@ export class RoleMenuService {
     }
   }
 
-  // 批次更新角色關聯菜單(會替換所有舊的關聯)
+  // 批次更新角色關聯選單(會替換所有舊的關聯)
   async batchUpdate(batchUpdateRoleMenuReqDto: BatchUpdateRoleMenuReqDto) {
     try {
       const { roleId, menuIds } = batchUpdateRoleMenuReqDto
@@ -78,12 +78,12 @@ export class RoleMenuService {
         throw new BadRequestException('角色狀態異常')
       }
 
-      // 1. 先刪除角色原有的菜單（真實刪除 不是邏輯刪除）
+      // 1. 先刪除角色原有的選單（真實刪除 不是邏輯刪除）
       await this.roleMenuRepository.delete({
         roleId,
       })
 
-      // 2. 再新增新的菜單
+      // 2. 再新增新的選單
       for (const menuId of menuIds) {
         await this.create({
           roleId,
