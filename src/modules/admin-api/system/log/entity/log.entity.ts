@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm'
 
 import { BaseEntity } from '@/common/entities/base.entity'
+import { UserEntity } from '@/modules/admin-api/system/user/entity/user.entity'
 
 @Entity('system_log')
 export class LogEntity extends BaseEntity {
@@ -34,6 +35,10 @@ export class LogEntity extends BaseEntity {
   // 使用者資訊
   @Column({ type: 'bigint', comment: '使用者ID', nullable: true })
   userId: string
+
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'userId' })
+  user: UserEntity
 
   @Column({ comment: '使用者IP位址', nullable: true })
   ip: string
