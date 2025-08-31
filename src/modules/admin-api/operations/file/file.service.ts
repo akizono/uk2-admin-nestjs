@@ -41,8 +41,12 @@ export class FileService {
     const savedFiles = await Promise.all(files.map(file => this.saveFile(file, fileStoragePath)))
 
     // 返回完整的檔案資料
+    const urlPrefix = EnvHelper.getString('FILE_SERVE_BASE_URL') + EnvHelper.getString('FILE_SERVE_ACCESS_PATH')
     return {
-      files: savedFiles,
+      files: savedFiles.map(file => ({
+        ...file,
+        url: urlPrefix + file.url,
+      })),
     }
   }
 

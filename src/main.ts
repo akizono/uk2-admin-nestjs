@@ -45,15 +45,15 @@ async function bootstrap() {
       throw new PayloadTooLargeException(`URL 路徑段數超過最大限制`)
     }
 
-    // 檢查 URL 每个片段的長度
+    // 檢查 URL 每個片段的長度
     for (let i = 0; i < url.length; i++) {
       // 檢查是否為最後一個 URL 片段
       if (i === url.length - 1) {
-        const urlParts = url[i].split('?') // 使用 '?' 作為分隔符將 URL 片段分割為基本路徑和查詢參數
+        const urlParts = url[i].split('?') // 使用 '?' 作為分隔符號將 URL 片段分割為基本路徑和查詢參數
         if (urlParts.length > 0) {
           // 如果存在查詢參數部分
           if (urlParts[1]) {
-            const queryParams = urlParts[1].split('&') // 使用 '&' 作為分隔符分割查詢參數
+            const queryParams = urlParts[1].split('&') // 使用 '&' 作為分隔符號分割查詢參數
 
             // 檢查每一個查詢參數的長度
             for (const param of queryParams) {
@@ -105,6 +105,11 @@ async function bootstrap() {
     .build()
   const document = SwaggerModule.createDocument(app, options)
   SwaggerModule.setup('api-docs', app, document)
+
+  // 配置靜態檔案服務
+  const fileServeAccessPath = EnvHelper.getString('FILE_SERVE_ACCESS_PATH') // 檔案服務訪問路徑
+  const fileStoragePath = EnvHelper.getString('FILE_STORAGE_PATH') // 檔案儲存路徑
+  app.use(fileServeAccessPath, express.static(fileStoragePath))
 
   await app.listen(EnvHelper.getNumber('SERVER_PORT'))
 }
