@@ -76,8 +76,13 @@ export class FileService {
       await fs.mkdir(fileStoragePath, { recursive: true })
     }
 
+    // 解決中文檔案名稱編碼問題
+    const originalName = file.originalname ? Buffer.from(file.originalname, 'latin1').toString('utf8') : ''
+    // console.log('Original filename:', file.originalname)
+    // console.log('Decoded filename:', originalName)
+
     // 生成唯一檔案名稱
-    const fileExtension = path.extname(file.originalname || '') // 副檔名
+    const fileExtension = path.extname(originalName) // 副檔名
     const fileName = `${uuidv4()}${fileExtension}` // 使用 「uuid + 副檔名」 作為 path 中的檔案名稱
     const relativePath = `./${fileName}` // 相對路徑
     const filePath = path.join(fileStoragePath, fileName) // 檔案的完整路徑
@@ -96,7 +101,7 @@ export class FileService {
 
     // 建立檔案記錄
     const fileEntity = this.fileRepository.create({
-      name: file.originalname || null,
+      name: originalName || null,
       path: relativePath,
       url: `/${fileName}`,
       type: file.mimetype || 'application/octet-stream',
