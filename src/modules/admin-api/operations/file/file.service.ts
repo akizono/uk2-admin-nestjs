@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import * as fs from 'fs/promises'
@@ -28,17 +28,34 @@ export class FileService {
     // 取得實際的檔案陣列
     const files = filesData.files || []
     // console.log('Files array:', files)
-    if (files.length > 0) {
-      // console.log('First file structure:', JSON.stringify(files[0]))
-    }
+    // if (files.length > 0) {
+    // console.log('First file structure:', JSON.stringify(files[0]))
+    // }
 
     // 如果沒有檔案，返回空陣列
     if (files.length === 0) {
       return { files: [] }
     }
 
-    // 儲存檔案到本地並建立資料庫記錄
-    const savedFiles = await Promise.all(files.map(file => this.saveFile(file, fileStoragePath)))
+    // 檢查是否有檔案大小超過限制
+    const maxFileSize = eval(EnvHelper.getString('MAX_FILE_SIZE'))
+    const oversizedFile = files.find(file => file.size > maxFileSize)
+    if (oversizedFile) {
+      // 解決中文檔案名稱編碼問題
+      const originalName = oversizedFile.originalname
+        ? Buffer.from(oversizedFile.originalname, 'latin1').toString('utf8')
+        : ''
+      const fileName = originalName || oversizedFile.originalname || '未命名檔案'
+
+      const errorMessage = `檔案 "${fileName}" 大小為 ${Math.round((oversizedFile.size / 1024 / 1024) * 100) / 100} MB，超過了 ${maxFileSize / (1024 * 1024)} MB 的限制`
+      throw new BadRequestException(errorMessage)
+    }
+
+    // 所有檔案都符合大小要求
+    const validFiles = files
+
+    // 儲存有效的檔案到本地並建立資料庫記錄
+    const savedFiles = await Promise.all(validFiles.map(file => this.saveFile(file, fileStoragePath)))
 
     // 返回完整的檔案資料
     const urlPrefix = EnvHelper.getString('FILE_SERVE_BASE_URL') + EnvHelper.getString('FILE_SERVE_ACCESS_PATH')

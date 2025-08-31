@@ -17,7 +17,7 @@ export class FileReqDto extends BaseReqDto {
   @IsString()
   name: string
 
-  @ApiProperty({ description: '檔案路徑' })
+  @ApiProperty({ description: '檔案路徑(FILE_STORAGE_PATH的相對路徑)' })
   @IsNotEmpty()
   @IsString()
   path: string
@@ -32,7 +32,7 @@ export class FileReqDto extends BaseReqDto {
   @IsString()
   type: string
 
-  @ApiProperty({ description: '檔案大小' })
+  @ApiProperty({ description: '檔案大小(kb)' })
   @IsNotEmpty()
   @IsNumber()
   size: number

@@ -10,7 +10,7 @@ export class FileEntity extends BaseEntity {
   @Column({ length: 255, comment: '檔案名稱', nullable: true })
   name: string
 
-  @Column({ length: 255, comment: '檔案路徑，FILE_STORAGE_PATH的相對路徑' })
+  @Column({ length: 255, comment: '檔案路徑(FILE_STORAGE_PATH的相對路徑)' })
   path: string
 
   @Column({ length: 255, comment: '檔案URL' })

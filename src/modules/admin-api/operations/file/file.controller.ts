@@ -12,6 +12,7 @@ import { MsgResponseDto } from '@/utils/response-dto'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { Operation, OperationType } from '@/common/decorators/operation.decorator'
+import { EnvHelper } from '@/utils/env-helper'
 
 @Controller('/admin-api/operations/file')
 @UseInterceptors(TransformInterceptor)
@@ -37,7 +38,7 @@ export class FileController {
       },
     },
   })
-  @UseInterceptors(FileFieldsInterceptor([{ name: 'files', maxCount: 10 }]))
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'files', maxCount: EnvHelper.getNumber('MAX_FILE_COUNT') }]))
   @ApiResponse({ type: CreateFileResDto })
   @ResponseMessage('上傳檔案成功')
   upload(@UploadedFiles() files: { files: Express.Multer.File[] }) {
