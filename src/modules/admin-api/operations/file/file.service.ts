@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import * as fs from 'fs'
+import * as fs from 'fs/promises'
 import * as path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -69,8 +69,11 @@ export class FileService {
     // console.log('File keys:', Object.keys(file))
 
     // 確保儲存目錄存在
-    if (!fs.existsSync(fileStoragePath)) {
-      fs.mkdirSync(fileStoragePath, { recursive: true })
+    try {
+      await fs.access(fileStoragePath)
+    } catch {
+      // 目錄不存在，創建它
+      await fs.mkdir(fileStoragePath, { recursive: true })
     }
 
     // 生成唯一檔案名稱
@@ -82,11 +85,11 @@ export class FileService {
     // 寫入檔案
     if (!file.buffer && file.path) {
       // 如果沒有 buffer 但有臨時檔案路徑，則讀取臨時檔案
-      const fileContent = fs.readFileSync(file.path)
-      fs.writeFileSync(filePath, fileContent)
+      const fileContent = await fs.readFile(file.path)
+      await fs.writeFile(filePath, fileContent)
     } else if (file.buffer) {
       // 如果有 buffer，直接使用
-      fs.writeFileSync(filePath, file.buffer)
+      await fs.writeFile(filePath, file.buffer)
     } else {
       throw new Error('No file content available')
     }
