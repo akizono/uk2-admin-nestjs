@@ -19,7 +19,7 @@ export class RoleController {
 
   @Post('/create')
   @HasPermission('system:role:create')
-  @Operation({ type: OperationType.CREATE, name: '建立角色', module: 'role' })
+  @Operation({ type: OperationType.CREATE, name: '建立角色', module: 'system-role' })
   @ApiOperation({ summary: '建立角色' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('建立角色成功')
@@ -29,7 +29,7 @@ export class RoleController {
 
   @Get('/page')
   @HasPermission('system:role:page')
-  @Operation({ type: OperationType.READ, name: '取得角色分頁列表', module: 'role' })
+  @Operation({ type: OperationType.READ, name: '取得角色分頁列表', module: 'system-role' })
   @ApiOperation({ summary: '取得角色分頁列表' })
   @ApiResponse({ type: FindRoleResDto })
   @ResponseMessage('取得角色分頁列表成功')
@@ -39,7 +39,7 @@ export class RoleController {
 
   @Put('/update')
   @HasPermission('system:role:update')
-  @Operation({ type: OperationType.UPDATE, name: '更新角色', module: 'role' })
+  @Operation({ type: OperationType.UPDATE, name: '更新角色', module: 'system-role' })
   @ApiOperation({ summary: '更新角色' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('更新角色成功')
@@ -49,7 +49,7 @@ export class RoleController {
 
   @Delete('/delete/:id')
   @HasPermission('system:role:delete')
-  @Operation({ type: OperationType.DELETE, name: '刪除角色', module: 'role' })
+  @Operation({ type: OperationType.DELETE, name: '刪除角色', module: 'system-role' })
   @ApiOperation({ summary: '刪除角色' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('刪除角色成功')
@@ -59,7 +59,7 @@ export class RoleController {
 
   @Put('/block/:id')
   @HasPermission('system:role:block')
-  @Operation({ type: OperationType.UPDATE, name: '封鎖角色', module: 'role' })
+  @Operation({ type: OperationType.UPDATE, name: '封鎖角色', module: 'system-role' })
   @ApiOperation({ summary: '封鎖角色' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('封鎖角色成功')
@@ -69,7 +69,7 @@ export class RoleController {
 
   @Put('/unblock/:id')
   @HasPermission('system:role:unblock')
-  @Operation({ type: OperationType.UPDATE, name: '解封鎖角色', module: 'role' })
+  @Operation({ type: OperationType.UPDATE, name: '解封鎖角色', module: 'system-role' })
   @ApiOperation({ summary: '解封鎖角色' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('解封鎖角色成功')

@@ -17,7 +17,7 @@ export class UserRoleController {
 
   @Post('/create')
   @HasPermission('system:user-role:create')
-  @Operation({ type: OperationType.CREATE, name: '使用者綁定角色', module: 'user-role' })
+  @Operation({ type: OperationType.CREATE, name: '使用者綁定角色', module: 'system-user-role' })
   @ApiOperation({ summary: '使用者綁定角色' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('使用者綁定角色成功')

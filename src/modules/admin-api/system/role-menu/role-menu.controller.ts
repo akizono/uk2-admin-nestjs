@@ -18,7 +18,7 @@ export class RoleMenuController {
 
   @Post('/create')
   @HasPermission('system:role-menu:create')
-  @Operation({ type: OperationType.CREATE, name: '建立角色綁定選單', module: 'role-menu' })
+  @Operation({ type: OperationType.CREATE, name: '建立角色綁定選單', module: 'system-role-menu' })
   @ApiOperation({ summary: '角色綁定選單' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('角色綁定選單成功')
@@ -28,7 +28,7 @@ export class RoleMenuController {
 
   @Get('/page')
   @HasPermission('system:role-menu:page')
-  @Operation({ type: OperationType.READ, name: '分頁查詢角色綁定選單', module: 'role-menu' })
+  @Operation({ type: OperationType.READ, name: '分頁查詢角色綁定選單', module: 'system-role-menu' })
   @ApiOperation({ summary: '分頁查詢角色綁定選單' })
   @ApiResponse({ type: FindRoleMenuResDto })
   @ResponseMessage('分頁查詢角色綁定選單成功')
@@ -38,7 +38,7 @@ export class RoleMenuController {
 
   @Put('/batch-update')
   @HasPermission('system:role-menu:update')
-  @Operation({ type: OperationType.UPDATE, name: '批次更新角色綁定選單', module: 'role-menu' })
+  @Operation({ type: OperationType.UPDATE, name: '批次更新角色綁定選單', module: 'system-role-menu' })
   @ApiOperation({ summary: '批次更新角色綁定選單' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('批次更新角色綁定選單成功')

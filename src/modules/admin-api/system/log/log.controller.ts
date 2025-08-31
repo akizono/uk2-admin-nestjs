@@ -17,7 +17,7 @@ export class LogController {
 
   @Get('/page')
   @HasPermission('system:log:page')
-  @Operation({ type: OperationType.READ, name: '取得日誌分頁列表', module: 'log' })
+  @Operation({ type: OperationType.READ, name: '取得日誌分頁列表', module: 'system-log' })
   @ApiOperation({ summary: '取得日誌分頁列表' })
   @ApiResponse({ type: FindLogResDto })
   @ResponseMessage('取得日誌分頁列表成功')

@@ -162,6 +162,7 @@ export class UserService {
             where: {
               fieldId: remain.dept.name,
               isDeleted: 0,
+              status: 1,
             },
           })
         }

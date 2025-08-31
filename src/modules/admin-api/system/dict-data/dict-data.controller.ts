@@ -19,7 +19,7 @@ export class DictDataController {
 
   @Post('/create')
   @HasPermission('system:dict-data:create')
-  @Operation({ type: OperationType.CREATE, name: '新增字典數據', module: 'dict-data' })
+  @Operation({ type: OperationType.CREATE, name: '新增字典數據', module: 'system-dict-data' })
   @ApiOperation({ summary: '新增字典數據' })
   @ApiResponse({ type: CreateDictDataResDto })
   @ResponseMessage('新增字典數據成功')
@@ -29,7 +29,7 @@ export class DictDataController {
 
   @Get('/page')
   @HasPermission('system:dict-data:page')
-  @Operation({ type: OperationType.READ, name: '分頁查詢字典數據', module: 'dict-data' })
+  @Operation({ type: OperationType.READ, name: '分頁查詢字典數據', module: 'system-dict-data' })
   @ApiOperation({ summary: '分頁查詢字典數據' })
   @ApiResponse({ type: FindDictDataResDto })
   @ResponseMessage('分頁查詢字典數據成功')
@@ -39,7 +39,7 @@ export class DictDataController {
 
   @Put('/update')
   @HasPermission('system:dict-data:update')
-  @Operation({ type: OperationType.UPDATE, name: '更新字典數據', module: 'dict-data' })
+  @Operation({ type: OperationType.UPDATE, name: '更新字典數據', module: 'system-dict-data' })
   @ApiOperation({ summary: '更新字典數據' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('更新字典數據成功')
@@ -49,7 +49,7 @@ export class DictDataController {
 
   @Delete('/delete/:id')
   @HasPermission('system:dict-data:delete')
-  @Operation({ type: OperationType.DELETE, name: '刪除字典數據', module: 'dict-data' })
+  @Operation({ type: OperationType.DELETE, name: '刪除字典數據', module: 'system-dict-data' })
   @ApiOperation({ summary: '刪除字典數據' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('刪除字典數據成功')
@@ -59,7 +59,7 @@ export class DictDataController {
 
   @Put('/block/:id')
   @HasPermission('system:dict-data:block')
-  @Operation({ type: OperationType.UPDATE, name: '封鎖字典數據', module: 'dict-data' })
+  @Operation({ type: OperationType.UPDATE, name: '封鎖字典數據', module: 'system-dict-data' })
   @ApiOperation({ summary: '封鎖字典數據' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('封鎖字典數據成功')
@@ -69,7 +69,7 @@ export class DictDataController {
 
   @Put('/unblock/:id')
   @HasPermission('system:dict-data:unblock')
-  @Operation({ type: OperationType.UPDATE, name: '解封字典數據', module: 'dict-data' })
+  @Operation({ type: OperationType.UPDATE, name: '解封字典數據', module: 'system-dict-data' })
   @ApiOperation({ summary: '解封字典數據' })
   @ApiResponse({ type: MsgResponseDto })
   @ResponseMessage('解封字典數據成功')
