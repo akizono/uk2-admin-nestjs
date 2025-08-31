@@ -91,6 +91,7 @@ export class LogService {
               where: {
                 fieldId: userRemain.dept.name,
                 isDeleted: 0,
+                status: 1,
               },
             })
           }

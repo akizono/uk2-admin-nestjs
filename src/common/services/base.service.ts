@@ -113,6 +113,8 @@ export async function find(params: FindParams) {
             await multilingualFieldsRepository.find({
               where: {
                 value,
+                isDeleted: 0,
+                status: 1,
               },
             })
           ).map(item => item.fieldId)
@@ -228,6 +230,7 @@ export async function find(params: FindParams) {
                 where: {
                   fieldId: item[field],
                   isDeleted: 0,
+                  status: 1,
                 },
               })
               // 將多語言資訊一併返回
