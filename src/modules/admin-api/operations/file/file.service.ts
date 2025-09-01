@@ -6,7 +6,7 @@ import * as path from 'path'
 import { v4 as uuidv4 } from 'uuid'
 
 import { FileEntity } from './entity/file.entity'
-import { CreateFileReqDto, FindFileReqDto } from './dto/file.req.dto'
+import { FindFileReqDto } from './dto/file.req.dto'
 
 import { find, _delete } from '@/common/services/base.service'
 import { EnvHelper } from '@/utils/env-helper'
@@ -65,18 +65,6 @@ export class FileService {
         url: urlPrefix + file.url,
       })),
     }
-  }
-
-  // 新增檔案
-  async create(createFileReqDtoList: CreateFileReqDto) {
-    const { files } = createFileReqDtoList
-    const savedFiles = await Promise.all(
-      files.map(fileDto => {
-        const fileEntity = this.fileRepository.create(fileDto)
-        return this.fileRepository.save(fileEntity)
-      }),
-    )
-    return { ids: savedFiles.map(file => file.id) }
   }
 
   // 儲存檔案到本地並建立資料庫記錄
@@ -143,7 +131,13 @@ export class FileService {
 
     return {
       total,
-      list,
+      list: list.map(item => {
+        const urlPrefix = EnvHelper.getString('FILE_SERVE_BASE_URL') + EnvHelper.getString('FILE_SERVE_ACCESS_PATH')
+        return {
+          ...item,
+          url: urlPrefix + item.url,
+        }
+      }),
     }
   }
 

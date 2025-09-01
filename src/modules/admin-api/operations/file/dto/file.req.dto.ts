@@ -1,9 +1,9 @@
-import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
+import { ApiProperty, PartialType } from '@nestjs/swagger'
 import { IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
-import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
+import { BaseReqDto } from '@/common/dtos/base.req.dto'
 import { EnvHelper } from '@/utils/env-helper'
 
 export class FileReqDto extends BaseReqDto {
@@ -36,18 +36,6 @@ export class FileReqDto extends BaseReqDto {
   @IsNotEmpty()
   @IsNumber()
   size: number
-}
-
-class FileItemDto extends PartialType(OmitType(FileReqDto, ['id', 'multilingualFields', ...disableEditFields])) {}
-
-export class CreateFileReqDto {
-  @ApiProperty({
-    description: '檔案數組',
-    type: FileItemDto,
-    isArray: true,
-  })
-  @IsNotEmpty()
-  files: FileItemDto[]
 }
 
 export class FindFileReqDto extends PartialType(FileReqDto) {
