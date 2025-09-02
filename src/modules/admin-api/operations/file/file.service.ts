@@ -104,14 +104,12 @@ export class FileService {
       throw new Error('No file content available')
     }
 
-    /** MAC系統下，Multer會自動使用原檔案名稱將文件儲存在fileStoragePath中，我們需要刪除這個檔案 */
-    if (process.platform === 'darwin') {
-      try {
-        await fs.unlink(file.path)
-      } catch (error) {
-        // 如果文件不存在或其他錯誤，略過不處理
-        console.warn(`無法刪除臨時文件 ${file.path}:`, error.message)
-      }
+    /** Multer會自動使用原檔案名稱將文件儲存在fileStoragePath中，我們需要刪除這個檔案 */
+    try {
+      await fs.unlink(file.path)
+    } catch (error) {
+      // 如果文件不存在或其他錯誤，略過不處理
+      console.warn(`無法刪除臨時文件 ${file.path}:`, error.message)
     }
 
     // 建立檔案記錄
