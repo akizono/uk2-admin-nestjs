@@ -6,7 +6,7 @@ import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { EnvHelper } from '@/utils/env-helper'
 
-export class MultilingualFieldsReqDto extends BaseReqDto {
+export class MultilingualFieldsReqDto extends PartialType(OmitType(BaseReqDto, ['multilingualFields'])) {
   @ApiProperty({ description: '主鍵ID' })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
@@ -29,7 +29,7 @@ export class MultilingualFieldsReqDto extends BaseReqDto {
 }
 
 export class CreateMultilingualFieldsReqDto extends PartialType(
-  OmitType(MultilingualFieldsReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+  OmitType(MultilingualFieldsReqDto, ['id', ...disableEditFields]),
 ) {}
 
 export class FindMultilingualFieldsReqDto extends PartialType(MultilingualFieldsReqDto) {
@@ -47,7 +47,7 @@ export class FindMultilingualFieldsReqDto extends PartialType(MultilingualFields
 }
 
 export class UpdateMultilingualFieldsReqDto extends PartialType(
-  OmitType(MultilingualFieldsReqDto, ['multilingualFields', ...disableEditFields]),
+  OmitType(MultilingualFieldsReqDto, [...disableEditFields]),
 ) {}
 
 export class ConvertLanguageReqDto {

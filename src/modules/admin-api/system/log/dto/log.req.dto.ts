@@ -6,7 +6,7 @@ import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { EnvHelper } from '@/utils/env-helper'
 
-export class LogReqDto extends BaseReqDto {
+export class LogReqDto extends PartialType(OmitType(BaseReqDto, ['multilingualFields'])) {
   @ApiProperty({ description: '主鍵ID' })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
@@ -98,9 +98,7 @@ export class LogReqDto extends BaseReqDto {
   resourceId: string
 }
 
-export class CreateLogReqDto extends PartialType(
-  OmitType(LogReqDto, ['id', 'multilingualFields', ...disableEditFields]),
-) {}
+export class CreateLogReqDto extends PartialType(OmitType(LogReqDto, ['id', ...disableEditFields])) {}
 
 export class FindLogReqDto extends PartialType(LogReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })

@@ -6,7 +6,7 @@ import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { EnvHelper } from '@/utils/env-helper'
 
-export class CodeGenerationReqDto extends BaseReqDto {
+export class CodeGenerationReqDto extends PartialType(OmitType(BaseReqDto, ['multilingualFields'])) {
   @ApiProperty({ description: '主鍵ID' })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
@@ -49,7 +49,7 @@ export class CodeGenerationReqDto extends BaseReqDto {
 }
 
 export class CreateCodeGenerationReqDto extends PartialType(
-  OmitType(CodeGenerationReqDto, ['id', 'multilingualFields', ...disableEditFields]),
+  OmitType(CodeGenerationReqDto, ['id', ...disableEditFields]),
 ) {}
 
 export class FindCodeGenerationReqDto extends PartialType(CodeGenerationReqDto) {

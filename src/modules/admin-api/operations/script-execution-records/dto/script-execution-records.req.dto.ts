@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger'
+import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger'
 import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator'
 import { Transform } from 'class-transformer'
 
@@ -6,7 +6,7 @@ import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto } from '@/common/dtos/base.req.dto'
 import { EnvHelper } from '@/utils/env-helper'
 
-export class ScriptExecutionRecordsReqDto extends BaseReqDto {
+export class ScriptExecutionRecordsReqDto extends PartialType(OmitType(BaseReqDto, ['multilingualFields'])) {
   @ApiProperty({ description: '主鍵ID' })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))

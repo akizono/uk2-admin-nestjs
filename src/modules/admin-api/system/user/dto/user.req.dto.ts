@@ -8,7 +8,7 @@ import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { EnvHelper } from '@/utils/env-helper'
 import { VerifyCodeType } from '@/modules/admin-api/system/verify-code/dto/verify-code.req.dto'
 
-class UserReqDto extends BaseReqDto {
+class UserReqDto extends PartialType(OmitType(BaseReqDto, ['multilingualFields'])) {
   @ApiProperty({ description: '主鍵ID', required: true })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
@@ -60,9 +60,7 @@ class UserReqDto extends BaseReqDto {
   roleIds: string[]
 }
 
-export class CreateUserReqDto extends PartialType(
-  OmitType(UserReqDto, ['id', 'multilingualFields', ...disableEditFields]),
-) {
+export class CreateUserReqDto extends PartialType(OmitType(UserReqDto, ['id', ...disableEditFields])) {
   @ApiProperty({ description: '密碼', required: false })
   @IsNotEmpty()
   @IsString()
@@ -83,9 +81,7 @@ export class FindUserReqDto extends PartialType(UserReqDto) {
   currentPage?: number = 1
 }
 
-export class UpdateUserReqDto extends PartialType(
-  OmitType(UserReqDto, ['username', 'multilingualFields', ...disableEditFields]),
-) {
+export class UpdateUserReqDto extends PartialType(OmitType(UserReqDto, ['username', ...disableEditFields])) {
   @ApiProperty({ description: '密碼', required: false })
   @IsOptional()
   @IsString()

@@ -6,7 +6,7 @@ import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { EnvHelper } from '@/utils/env-helper'
 
-class RoleMenuReqDto extends BaseReqDto {
+class RoleMenuReqDto extends PartialType(OmitType(BaseReqDto, ['multilingualFields'])) {
   @ApiProperty({ description: '主鍵ID' })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
@@ -23,9 +23,7 @@ class RoleMenuReqDto extends BaseReqDto {
   menuId: string
 }
 
-export class CreateRoleMenuReqDto extends PartialType(
-  OmitType(RoleMenuReqDto, ['id', 'multilingualFields', ...disableEditFields]),
-) {}
+export class CreateRoleMenuReqDto extends PartialType(OmitType(RoleMenuReqDto, ['id', ...disableEditFields])) {}
 
 export class FindRoleMenuReqDto extends PartialType(RoleMenuReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
