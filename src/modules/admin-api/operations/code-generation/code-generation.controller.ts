@@ -27,6 +27,7 @@ import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { MsgResponseDto } from '@/utils/response-dto'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
+import { Operation, OperationType } from '@/common/decorators/operation.decorator'
 
 @Controller('/admin-api/operations/code-generation')
 @UseInterceptors(TransformInterceptor)
@@ -35,6 +36,7 @@ export class CodeGenerationController {
 
   @Post('/create')
   @HasPermission('operations:code-generation:create')
+  @Operation({ type: OperationType.CREATE, name: '建立模組', module: 'operations-code-generation' })
   @ApiOperation({ summary: '建立模組' })
   @ApiResponse({ type: CreateCodeGenerationResDto })
   @ResponseMessage('建立模組成功')
@@ -44,6 +46,7 @@ export class CodeGenerationController {
 
   @Get('/page')
   @HasPermission('operations:code-generation:page')
+  @Operation({ type: OperationType.READ, name: '取得模組分頁列表', module: 'operations-code-generation' })
   @ApiOperation({ summary: '取得模組分頁列表' })
   @ApiResponse({ type: FindCodeGenerationResDto })
   @ResponseMessage('取得模組分頁列表成功')
@@ -53,6 +56,7 @@ export class CodeGenerationController {
 
   @Put('/update')
   @HasPermission('operations:code-generation:update')
+  @Operation({ type: OperationType.UPDATE, name: '更新模組', module: 'operations-code-generation' })
   @ApiOperation({ summary: '更新模組' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('更新模組成功')
@@ -62,6 +66,7 @@ export class CodeGenerationController {
 
   @Delete('/delete/:id')
   @HasPermission('operations:code-generation:delete')
+  @Operation({ type: OperationType.DELETE, name: '刪除模組', module: 'operations-code-generation' })
   @ApiOperation({ summary: '刪除模組' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('刪除模組成功')
@@ -71,6 +76,7 @@ export class CodeGenerationController {
 
   @Put('/block/:id')
   @HasPermission('operations:code-generation:block')
+  @Operation({ type: OperationType.UPDATE, name: '封鎖模組', module: 'operations-code-generation' })
   @ApiOperation({ summary: '封鎖模組' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('封鎖模組成功')
@@ -80,6 +86,7 @@ export class CodeGenerationController {
 
   @Put('/unblock/:id')
   @HasPermission('operations:code-generation:unblock')
+  @Operation({ type: OperationType.UPDATE, name: '解封鎖模組', module: 'operations-code-generation' })
   @ApiOperation({ summary: '解封鎖模組' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('解封鎖模組成功')
@@ -89,6 +96,7 @@ export class CodeGenerationController {
 
   @Post('/preview-entity-code')
   @HasPermission('operations:code-generation:update')
+  @Operation({ type: OperationType.OTHER, name: '預覽實體的程式碼', module: 'operations-code-generation' })
   @ApiOperation({ summary: '預覽實體的程式碼' })
   @ApiResponse({ type: PreviewEntityCodeResDto })
   @ResponseMessage('成功獲取實體程式碼')
@@ -98,6 +106,7 @@ export class CodeGenerationController {
 
   @Post('/insert-entity-code')
   @HasPermission('operations:code-generation:update')
+  @Operation({ type: OperationType.OTHER, name: '插入實體的程式碼', module: 'operations-code-generation' })
   @ApiOperation({ summary: '插入實體的程式碼' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('插入實體程式碼成功')
@@ -107,6 +116,7 @@ export class CodeGenerationController {
 
   @Get('/get-entity-custom-fields')
   @HasPermission('operations:code-generation:update')
+  @Operation({ type: OperationType.OTHER, name: '獲取實體的自訂欄位', module: 'operations-code-generation' })
   @ApiOperation({ summary: '獲取實體的自訂欄位' })
   @ApiResponse({ type: GetEntityCustomFieldsResDto })
   @ResponseMessage('獲取實體的自訂欄位成功')
@@ -116,6 +126,7 @@ export class CodeGenerationController {
 
   @Post('/preview-backend-code')
   @HasPermission('operations:code-generation:update')
+  @Operation({ type: OperationType.OTHER, name: '預覽後端代碼', module: 'operations-code-generation' })
   @ApiOperation({ summary: '預覽後端代碼' })
   @ApiResponse({ type: PreviewBackendCodeResDto })
   @ResponseMessage('預覽後端代碼成功')
@@ -125,6 +136,7 @@ export class CodeGenerationController {
 
   @Post('/insert-backend-code')
   @HasPermission('operations:code-generation:update')
+  @Operation({ type: OperationType.OTHER, name: '插入後端代碼', module: 'operations-code-generation' })
   @ApiOperation({ summary: '插入後端代碼' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('插入後端代碼成功')
@@ -134,6 +146,7 @@ export class CodeGenerationController {
 
   @Get('/get-entity-all-fields')
   @HasPermission('operations:code-generation:update')
+  @Operation({ type: OperationType.READ, name: '獲取實體的所有字段', module: 'operations-code-generation' })
   @ApiOperation({ summary: '獲取實體的所有字段' })
   @ApiResponse({ type: GetEntityAllFieldsResDto })
   @ResponseMessage('獲取實體的所有字段成功')

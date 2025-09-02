@@ -18,7 +18,7 @@ import { RoleMenuModule } from './modules/admin-api/system/role-menu/role-menu.m
 import { DictTypeModule } from './modules/admin-api/system/dict-type/dict-type.module'
 import { DictDataModule } from './modules/admin-api/system/dict-data/dict-data.module'
 import { MultilingualFieldsModule } from './modules/admin-api/system/multilingual-fields/multilingual-fields.module'
-import { CodeGenerationModule } from './modules/operations/code-generation/code-generation.module'
+import { CodeGenerationModule } from './modules/admin-api/operations/code-generation/code-generation.module'
 import { VerifyCodeModule } from './modules/admin-api/system/verify-code/verify-code.module'
 import { LogModule } from './modules/admin-api/system/log/log.module'
 import { LogInterceptor } from './common/interceptors/log.interceptor'
