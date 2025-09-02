@@ -1,6 +1,6 @@
 import { PaginatedResponseDto, SingleResponseDto } from '@/utils/response-dto'
 
-export class CreateFileResDto extends SingleResponseDto({
+export class UploadFileResDto extends SingleResponseDto({
   files: [
     {
       name: '2024_08_07_08_09_IMG_4768.JPG',

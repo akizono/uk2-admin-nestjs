@@ -14,13 +14,12 @@ import { FileFieldsInterceptor } from '@nestjs/platform-express'
 
 import { FileService } from './file.service'
 import { FindFileReqDto } from './dto/file.req.dto'
-import { CreateFileResDto, FindFileResDto } from './dto/file.res.dto'
+import { UploadFileResDto, FindFileResDto } from './dto/file.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { MsgResponseDto } from '@/utils/response-dto'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
-import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { Operation, OperationType } from '@/common/decorators/operation.decorator'
 import { EnvHelper } from '@/utils/env-helper'
 
@@ -49,7 +48,7 @@ export class FileController {
     },
   })
   @UseInterceptors(FileFieldsInterceptor([{ name: 'files', maxCount: EnvHelper.getNumber('MAX_FILE_COUNT') }]))
-  @ApiResponse({ type: CreateFileResDto })
+  @ApiResponse({ type: UploadFileResDto })
   @ResponseMessage('上傳檔案成功')
   upload(@UploadedFiles() files: { files: Express.Multer.File[] }) {
     return this.fileService.upload(files)
