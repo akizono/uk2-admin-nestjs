@@ -104,13 +104,30 @@ async function bootstrap() {
     .setVersion('1.0')
     .build()
   const document = SwaggerModule.createDocument(app, options)
-  SwaggerModule.setup('api-docs', app, document)
+  SwaggerModule.setup(EnvHelper.getString('SWAGGER_API_DOCS_PATH'), app, document)
 
   // 配置靜態檔案服務
   const fileServeAccessPath = EnvHelper.getString('FILE_SERVE_ACCESS_PATH') // 檔案服務訪問路徑
   const fileStoragePath = EnvHelper.getString('FILE_STORAGE_PATH') // 檔案儲存路徑
   app.use(fileServeAccessPath, express.static(fileStoragePath))
 
-  await app.listen(EnvHelper.getNumber('SERVER_PORT'))
+  const port = EnvHelper.getNumber('SERVER_PORT')
+  await app.listen(port)
+
+  // 啟動成功
+  console.log('')
+  console.log('🌸✨🎉 好耶（撒花）！！應用啟動大成功!!!! 🎉✨🌸')
+  console.log('')
+  console.log('           ∧__∧')
+  console.log('          (｀・ω・)つ🌼')
+  console.log('           /    🚀')
+  console.log('          /  ☁️')
+  console.log('         /   》》》')
+  console.log('📡 伺服器正在愉快奔跑喵: http://localhost:' + port)
+  console.log('📚 API說明書在這裡喵: http://localhost:' + port + '/' + EnvHelper.getString('SWAGGER_API_DOCS_PATH'))
+  console.log('📁 靜態文件小倉庫喵: http://localhost:' + port + fileServeAccessPath)
+  console.log('')
+  console.log('💫 願你今天寫的代碼都充滿貓咪魔法喵！(=^･ω･^=)')
+  console.log('')
 }
 bootstrap()
