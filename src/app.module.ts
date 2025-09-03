@@ -45,7 +45,8 @@ import { ScriptExecutionRecordsModule } from './modules/admin-api/operations/scr
         password: EnvHelper.getString('DB_PASSWORD'),
 
         poolSize: EnvHelper.getNumber('DB_POOL_SIZE'),
-        autoLoadEntities: EnvHelper.getBoolean('DB_AUTO_LOAD_ENTITIES'),
+        autoLoadEntities: false, // 關閉自動載入實體
+        entities: [__dirname + '/**/*.entity{.ts,.js}'], // 明確指定實體路徑，排除 script 目錄
         connectorPackage: EnvHelper.getString('DB_CONNECTOR_PACKAGE') as 'mysql' | 'mysql2',
         synchronize: EnvHelper.getBoolean('DB_SYNCHRONIZE'),
       }),
