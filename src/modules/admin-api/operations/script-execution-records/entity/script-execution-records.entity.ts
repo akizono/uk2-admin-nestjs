@@ -19,7 +19,7 @@ export class ScriptExecutionRecordsEntity extends BaseEntity {
   @Column({ type: 'text', comment: '錯誤資訊', nullable: true })
   error: string
 
-  @Column({ type: 'int', comment: '退出代碼', nullable: true })
+  @Column({ type: 'int', comment: '退出代碼(0: 成功, 1: 失敗)', nullable: true })
   exitCode: number
 
   @Column({ type: 'datetime', comment: '開始時間' })
