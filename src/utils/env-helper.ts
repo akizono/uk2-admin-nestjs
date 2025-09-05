@@ -7,7 +7,8 @@ export class EnvHelper {
   private static initialize() {
     if (this.initialized) return
 
-    const NODE_ENV = process.env.NODE_ENV || 'dev'
+    const NODE_ENV = process.env.NODE_ENV
+    console.log('[NODE_ENV]: ', process.env.NODE_ENV)
 
     // 依序嘗試載入環境變數，不需要檢查檔案是否存在
     config({ path: `.env.${NODE_ENV}` })

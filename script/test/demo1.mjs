@@ -1,6 +1,6 @@
 // 這個文件會脫離nestjs的腳手架運行 直接使用 `node ./script/demo1.mjs` 執行
 
-import { executeScriptWithRecord } from './common/script-executor.mjs'
+import { executeScriptWithRecord } from '../common/script-executor.mjs'
 
 // 定義要執行的腳本邏輯
 async function script() {

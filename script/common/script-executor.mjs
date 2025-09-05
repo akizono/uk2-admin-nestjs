@@ -8,6 +8,8 @@ import path from 'path'
 import { ScriptExecutionRecordsEntity } from '../../dist/modules/admin-api/operations/script-execution-records/entity/script-execution-records.entity.js'
 
 dotenv.config({ path: '.env.dev' })
+// dotenv.config({ path: '.env.prod' })
+// dotenv.config({ path: '.env.test' })
 
 /**
  * 腳本執行記錄的參數介面
