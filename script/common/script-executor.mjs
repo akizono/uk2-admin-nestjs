@@ -13,11 +13,11 @@ import { fileURLToPath } from 'url'
  * 關於環境變數，可在這裡進行修改
  * 操作方法： 對需要的一條環境變數解除註解，並註解其他條環境變數（環境變數不會同時生效）
  */
-process.env.NODE_ENV = '.env.dev'
-// process.env.NODE_ENV = '.env.prod'
-// process.env.NODE_ENV = '.env.test'
+process.env.NODE_ENV = 'dev'
+// process.env.NODE_ENV = 'prod'
+// process.env.NODE_ENV = 'test'
 
-dotenv.config({ path: process.env.NODE_ENV })
+dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
 
 // 自動載入所有實體
 async function loadAllEntities() {
