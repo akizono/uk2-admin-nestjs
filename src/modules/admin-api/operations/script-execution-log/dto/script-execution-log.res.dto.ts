@@ -1,10 +1,10 @@
 import { PaginatedResponseDto, SingleResponseDto } from '@/utils/response-dto'
 
-export class CreateScriptExecutionRecordsResDto extends SingleResponseDto({
+export class CreateScriptExecutionLogResDto extends SingleResponseDto({
   id: '100',
 }) {}
 
-export class FindScriptExecutionRecordsResDto extends PaginatedResponseDto({
+export class FindScriptExecutionLogResDto extends PaginatedResponseDto({
   id: '1',
   name: 'test_script.sh',
   path: '/home/user/scripts/test_script.sh',

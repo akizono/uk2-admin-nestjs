@@ -67,7 +67,7 @@ async function loadAllEntities() {
 /**
  * 腳本執行記錄的參數介面
  */
-export class ScriptRecordParams {
+export class ScriptLogParams {
   constructor({
     name,
     environment = 'testing',
@@ -177,37 +177,37 @@ export class ScriptExecutor {
   /**
    * 保存腳本執行記錄到資料庫
    */
-  async saveScriptRecord(params) {
-    const repository = this.dataSource.getRepository('ScriptExecutionRecordsEntity')
-    const scriptRecord = repository.create()
-    scriptRecord.name = params.name
-    scriptRecord.path = params.path
-    scriptRecord.result = params.result
-    scriptRecord.error = params.error
-    scriptRecord.exitCode = params.exitCode
-    scriptRecord.startTime = params.startTime
-    scriptRecord.endTime = params.endTime
-    scriptRecord.duration = params.duration
-    scriptRecord.environment = params.environment
-    scriptRecord.type = params.type
+  async saveScriptLog(params) {
+    const repository = this.dataSource.getRepository('ScriptExecutionLogEntity')
+    const scriptLog = repository.create()
+    scriptLog.name = params.name
+    scriptLog.path = params.path
+    scriptLog.result = params.result
+    scriptLog.error = params.error
+    scriptLog.exitCode = params.exitCode
+    scriptLog.startTime = params.startTime
+    scriptLog.endTime = params.endTime
+    scriptLog.duration = params.duration
+    scriptLog.environment = params.environment
+    scriptLog.type = params.type
 
-    const savedRecord = await repository.save(scriptRecord)
+    const savedLog = await repository.save(scriptLog)
 
-    return savedRecord
+    return savedLog
   }
 
   /**
    * 執行腳本並記錄結果
    * @param {Function} scriptFunction - 要執行的腳本函數
-   * @param {ScriptRecordParams} recordParams - 記錄參數
+   * @param {ScriptLogParams} logParams - 記錄參數
    * @returns {Object} 執行結果和保存的紀錄
    */
-  async executeScript(scriptFunction, recordParams) {
+  async executeScript(scriptFunction, logParams) {
     const startTime = new Date()
     let result = ''
     let error = null
     let exitCode = 0
-    let savedRecord = null
+    let savedLog = null
 
     try {
       // 初始化資料庫連接
@@ -220,28 +220,28 @@ export class ScriptExecutor {
       exitCode = 0 // 成功時退出碼為 0
 
       // 更新紀錄參數
-      recordParams.startTime = startTime
-      recordParams.endTime = new Date()
-      recordParams.duration = recordParams.endTime.getTime() - startTime.getTime()
-      recordParams.result = result
-      recordParams.error = error
-      recordParams.exitCode = exitCode
+      logParams.startTime = startTime
+      logParams.endTime = new Date()
+      logParams.duration = logParams.endTime.getTime() - startTime.getTime()
+      logParams.result = result
+      logParams.error = error
+      logParams.exitCode = exitCode
 
       // 保存記錄到資料庫
-      savedRecord = await this.saveScriptRecord(recordParams)
+      savedLog = await this.saveScriptLog(logParams)
 
       console.log('\r\n============ 保存的紀錄詳情 ===========')
       console.log({
-        id: savedRecord.id,
-        name: savedRecord.name,
-        path: savedRecord.path,
-        result: savedRecord.result,
-        startTime: savedRecord.startTime,
-        endTime: savedRecord.endTime,
-        duration: savedRecord.duration,
-        environment: savedRecord.environment,
-        type: savedRecord.type,
-        exitCode: savedRecord.exitCode,
+        id: savedLog.id,
+        name: savedLog.name,
+        path: savedLog.path,
+        result: savedLog.result,
+        startTime: savedLog.startTime,
+        endTime: savedLog.endTime,
+        duration: savedLog.duration,
+        environment: savedLog.environment,
+        type: savedLog.type,
+        exitCode: savedLog.exitCode,
       })
 
       console.log(`\r\n============ 執行結束 ===========\r\n`)
@@ -249,7 +249,7 @@ export class ScriptExecutor {
       return {
         success: true,
         result: scriptResult,
-        record: savedRecord,
+        log: savedLog,
         exitCode: exitCode,
       }
     } catch (err) {
@@ -258,23 +258,23 @@ export class ScriptExecutor {
       result = '腳本執行失敗'
 
       // 更新紀錄參數
-      recordParams.startTime = startTime
-      recordParams.endTime = new Date()
-      recordParams.duration = recordParams.endTime.getTime() - startTime.getTime()
-      recordParams.result = result
-      recordParams.error = error
-      recordParams.exitCode = exitCode
+      logParams.startTime = startTime
+      logParams.endTime = new Date()
+      logParams.duration = logParams.endTime.getTime() - startTime.getTime()
+      logParams.result = result
+      logParams.error = error
+      logParams.exitCode = exitCode
 
       try {
         // 即使出錯也要保存記錄
-        savedRecord = await this.saveScriptRecord(recordParams)
+        savedLog = await this.saveScriptLog(logParams)
         console.log('\r\n============ 錯誤記錄已保存 ===========')
         console.log({
-          id: savedRecord.id,
-          name: savedRecord.name,
-          error: savedRecord.error,
-          exitCode: savedRecord.exitCode,
-          result: savedRecord.result,
+          id: savedLog.id,
+          name: savedLog.name,
+          error: savedLog.error,
+          exitCode: savedLog.exitCode,
+          result: savedLog.result,
         })
         console.log(`=======================================\r\n`)
       } catch (saveError) {
@@ -291,7 +291,7 @@ export class ScriptExecutor {
         success: false,
         error: err,
         result: result,
-        record: savedRecord,
+        log: savedLog,
         exitCode: exitCode,
       }
     } finally {
@@ -304,14 +304,14 @@ export class ScriptExecutor {
 /**
  * 便捷函數：執行腳本並記錄
  * @param {Function} scriptFunction - 要執行的腳本函數
- * @param {Object} recordParams - 記錄參數物件
+ * @param {Object} logParams - 記錄參數物件
  * @returns {void} 內部會處理所有邏輯並退出進程
  */
-export async function executeScriptWithRecord(scriptFunction, recordParams) {
+export async function executeScriptWithRecord(scriptFunction, logParams) {
   const executor = new ScriptExecutor()
 
   try {
-    const result = await executor.executeScript(scriptFunction, new ScriptRecordParams(recordParams))
+    const result = await executor.executeScript(scriptFunction, new ScriptLogParams(logParams))
 
     if (result.success) {
       console.log('腳本執行成功，退出碼:', result.exitCode + '\r\n')

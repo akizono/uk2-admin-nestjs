@@ -6,7 +6,7 @@ import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto } from '@/common/dtos/base.req.dto'
 import { EnvHelper } from '@/utils/env-helper'
 
-export class ScriptExecutionRecordsReqDto extends PartialType(OmitType(BaseReqDto, ['multilingualFields'])) {
+export class ScriptExecutionLogReqDto extends PartialType(OmitType(BaseReqDto, ['multilingualFields'])) {
   @ApiProperty({ description: '主鍵ID' })
   @IsNotEmpty()
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
@@ -63,7 +63,7 @@ export class ScriptExecutionRecordsReqDto extends PartialType(OmitType(BaseReqDt
   type: string
 }
 
-export class FindScriptExecutionRecordsReqDto extends PartialType(ScriptExecutionRecordsReqDto) {
+export class FindScriptExecutionLogReqDto extends PartialType(ScriptExecutionLogReqDto) {
   @ApiProperty({ description: '分頁大小', example: 10, required: false })
   @IsNotEmpty()
   @Min(0)

@@ -2,8 +2,8 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
 import { BaseEntity } from '@/common/entities/base.entity'
 
-@Entity('operations_script_execution_records')
-export class ScriptExecutionRecordsEntity extends BaseEntity {
+@Entity('operations_script_execution_log')
+export class ScriptExecutionLogEntity extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: string
 

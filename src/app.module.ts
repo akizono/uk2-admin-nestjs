@@ -23,7 +23,7 @@ import { VerifyCodeModule } from './modules/admin-api/system/verify-code/verify-
 import { LogModule } from './modules/admin-api/system/log/log.module'
 import { LogInterceptor } from './common/interceptors/log.interceptor'
 import { FileModule } from './modules/admin-api/operations/file/file.module'
-import { ScriptExecutionRecordsModule } from './modules/admin-api/operations/script-execution-records/script-execution-records.module'
+import { ScriptExecutionLogModule } from './modules/admin-api/operations/script-execution-log/script-execution-log.module'
 
 /** ---- Code generation location: import ---- */ // 請勿刪除此處註解
 
@@ -66,7 +66,7 @@ import { ScriptExecutionRecordsModule } from './modules/admin-api/operations/scr
     CodeGenerationModule,
     VerifyCodeModule,
     FileModule,
-    ScriptExecutionRecordsModule,
+    ScriptExecutionLogModule,
 
     /** ---- Code generation location: module ---- */ // 請勿刪除此處註解
   ],
