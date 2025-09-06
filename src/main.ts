@@ -126,6 +126,7 @@ async function bootstrap() {
   console.log('📡 伺服器正在愉快奔跑喵: http://localhost:' + port)
   console.log('📚 API說明書在這裡喵: http://localhost:' + port + '/' + EnvHelper.getString('SWAGGER_API_DOCS_PATH'))
   console.log('📁 靜態文件小倉庫喵: http://localhost:' + port + fileServeAccessPath)
+  console.log('📦 環境變數: ', process.env.NODE_ENV)
   console.log('')
   console.log('💫 願你今天寫的代碼都充滿貓咪魔法喵！(=^･ω･^=)')
   console.log('')
