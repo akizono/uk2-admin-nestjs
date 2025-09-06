@@ -38,7 +38,8 @@ export class FileService {
     }
 
     // 檢查是否有檔案大小超過限制
-    const maxFileSize = eval(EnvHelper.getString('MAX_FILE_SIZE'))
+    const maxFileSize = EnvHelper.getNumber('MAX_FILE_SIZE')
+
     const oversizedFile = files.find(file => file.size > maxFileSize)
     if (oversizedFile) {
       // 解決中文檔案名稱編碼問題

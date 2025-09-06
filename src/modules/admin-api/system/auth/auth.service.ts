@@ -84,8 +84,8 @@ export class AuthService {
 
     // 設定 Token 過期時間
     let expiresIn: number
-    if (type === 'access') expiresIn = eval(EnvHelper.getString('JWT_ACCESS_TOKEN_EXPIRES_IN'))
-    if (type === 'refresh') expiresIn = eval(EnvHelper.getString('JWT_REFRESH_TOKEN_EXPIRES_IN'))
+    if (type === 'access') expiresIn = EnvHelper.getNumber('JWT_ACCESS_TOKEN_EXPIRES_IN')
+    if (type === 'refresh') expiresIn = EnvHelper.getNumber('JWT_REFRESH_TOKEN_EXPIRES_IN')
 
     // 返回Token
     return await this.jwtService.signAsync(payload, { expiresIn })

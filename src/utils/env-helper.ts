@@ -27,7 +27,7 @@ export class EnvHelper {
   static getNumber(targetName: string): number | undefined {
     this.initialize()
     const value = process.env[targetName]
-    return value ? parseInt(value, 10) : undefined
+    return value ? Number(eval(value.toString())) : undefined
   }
 
   // 獲取布爾類型環境變數

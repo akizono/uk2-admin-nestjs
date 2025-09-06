@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common'
 
 import { StrGenerator } from './str-generator'
+import { EnvHelper } from './env-helper'
 
 import { VerifyCodeService } from '@/modules/admin-api/system/verify-code/verify-code.service'
 import { VerifyCodeType } from '@/modules/admin-api/system/verify-code/dto/verify-code.req.dto'
@@ -29,7 +30,7 @@ export interface ValidateVerifyCodeParams {
 
   verifyCodeService: VerifyCodeService
   inputCode: string // 使用者輸入的驗證碼
-  expireTimeInSeconds?: number // 驗證碼過期時間
+  expireMs?: number // 驗證碼過期時間(毫秒)
 }
 
 /**
@@ -47,6 +48,7 @@ export class VerifyCodeUtils {
     // 查詢該使用者在此場景下的所有驗證碼
     const verifyCodeResponse = await verifyCodeService.find({
       pageSize: 0,
+
       userId,
       type,
       scene,
@@ -113,7 +115,7 @@ export class VerifyCodeUtils {
       type,
       scene,
       inputCode,
-      expireTimeInSeconds = 900,
+      expireMs = EnvHelper.getNumber('VERIFICATION_CODE_EXPIRE_MS'),
       userEmail,
       userMobile,
     } = params
@@ -139,7 +141,8 @@ export class VerifyCodeUtils {
       const verifyCodeData = verifyCodeResponse.list.sort((a, b) => b.createTime - a.createTime)[0]
 
       // 檢查驗證碼是否過期
-      if (verifyCodeData.createTime < new Date(Date.now() - expireTimeInSeconds * 1000)) {
+
+      if (verifyCodeData.createTime < new Date(Date.now() - expireMs)) {
         throw new BadRequestException('驗證碼錯誤')
       }
 
