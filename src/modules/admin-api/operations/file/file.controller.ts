@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Query,
-  UseInterceptors,
-  UploadedFiles,
-  ParseUUIDPipe,
-} from '@nestjs/common'
+import { Controller, Delete, Get, Param, Post, Query, UseInterceptors, UploadedFiles } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger'
 import { FileFieldsInterceptor } from '@nestjs/platform-express'
 
@@ -22,6 +12,7 @@ import { MsgResponseDto } from '@/utils/response-dto'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
 import { Operation, OperationType } from '@/common/decorators/operation.decorator'
 import { EnvHelper } from '@/utils/env-helper'
+import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 
 @Controller('/admin-api/operations/file')
 @UseInterceptors(TransformInterceptor)
@@ -70,7 +61,7 @@ export class FileController {
   @ApiOperation({ summary: '刪除檔案' })
   @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('刪除檔案成功')
-  delete(@Param('id', ParseUUIDPipe) id: string) {
+  delete(@Param('id', ParseBigIntPipe) id: string) {
     return this.fileService.delete(id)
   }
 }
