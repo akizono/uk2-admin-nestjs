@@ -10,11 +10,7 @@ import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator'
 import { TokenBlacklistService } from '@/modules/admin-api/system/token-blacklist/token-blacklist.service'
 import { UserService } from '@/modules/admin-api/system/user/user.service'
 import { EnvHelper } from '@/utils/env-helper'
-
-function getToken(request, tokenType: 'authorization' | 'refresh-token') {
-  const [type, token] = request.headers[tokenType]?.split(' ') ?? []
-  return type === 'Bearer' ? token : undefined
-}
+import { getToken } from '@/utils/token-helper'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -147,7 +143,18 @@ export class AuthGuard implements CanActivate {
       }
 
       // 驗證 accessToken 是否有效
-      const accessPayload = await this.jwtService.verifyAsync(getToken(request, 'authorization') ?? '')
+      const accessToken = getToken(request, 'authorization')
+      const accessPayload = await this.jwtService.verifyAsync(accessToken)
+      // 將驗證後的資料附加到 request 上
+      request['accessPayload'] = accessPayload
+
+      // 如果存在 refreshToken ，則驗證 refreshToken 是否有效
+      const refreshToken = getToken(request, 'refresh-token')
+      if (refreshToken) {
+        const refreshPayload = await this.jwtService.verifyAsync(refreshToken)
+        // 將驗證後的資料附加到 request 上
+        request['refreshPayload'] = refreshPayload
+      }
 
       // 驗證 accessToken 是否在黑名單中
       const isAccessTokenBlacklisted = await this.tokenBlacklistService.findByJwtId(accessPayload.jti)
@@ -156,8 +163,6 @@ export class AuthGuard implements CanActivate {
         throw new UnauthorizedException()
       }
 
-      // 將驗證後的資料附加到 request 上
-      request['accessPayload'] = accessPayload
       return true
     } catch {
       // if (!(error instanceof UnauthorizedException)) {

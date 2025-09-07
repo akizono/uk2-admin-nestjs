@@ -27,6 +27,7 @@ import { VerifyCodeUtils } from '@/utils/verify-code-utils'
 import { UserService } from '@/modules/admin-api/system/user/user.service'
 import { VerifyCodeService } from '@/modules/admin-api/system/verify-code/verify-code.service'
 import { TokenBlacklistService } from '@/modules/admin-api/system/token-blacklist/token-blacklist.service'
+import { getToken } from '@/utils/token-helper'
 
 @Injectable()
 export class AuthService {
@@ -106,6 +107,20 @@ export class AuthService {
         refreshToken: await this.generateToken(user.id, 'refresh'),
       },
     }
+  }
+
+  /** 登出（作用：將 token 加入黑名單） */
+  async logout(request: JwtRequest) {
+    // console.log('====================')
+    // console.log('accessToken', accessToken)
+    // console.log('refreshToken', refreshToken)
+    // console.log('\r\n')
+    // console.log('accessPayload', request.accessPayload)
+    // console.log('refreshPayload', request.refreshPayload)
+
+    // 將 token 加入黑名單
+    await this.tokenBlacklistService.create(request.accessPayload)
+    await this.tokenBlacklistService.create(request.refreshPayload)
   }
 
   /** 刷新 Token */

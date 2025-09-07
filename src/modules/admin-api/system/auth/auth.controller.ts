@@ -19,6 +19,7 @@ import { Public } from '@/common/decorators/public.decorator'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { Operation, OperationType } from '@/common/decorators/operation.decorator'
+import { MsgResponseDto } from '@/utils/response-dto'
 
 @Controller('/admin-api/system/auth')
 @UseInterceptors(TransformInterceptor)
@@ -35,6 +36,15 @@ export class AuthController {
     return await this.authService.login(loginReqDto)
   }
 
+  @Get('/logout')
+  @Operation({ type: OperationType.OTHER, name: '登出', module: 'system-auth' })
+  @ApiOperation({ summary: '登出' })
+  @ApiResponse({ type: MsgResponseDto() })
+  @ResponseMessage('登出成功')
+  async logout(@Req() request) {
+    return await this.authService.logout(request)
+  }
+
   @ApiHeader({ name: 'authorization' })
   @ApiHeader({ name: 'refresh-token' })
   @Post('/refreshTokenMethod') // 注意：此端點路徑與 auth.guard.ts:validateRefreshToken() 存在耦合關係
@@ -49,7 +59,7 @@ export class AuthController {
   @Post('/send-register-email')
   @Operation({ type: OperationType.OTHER, name: '發送「驗證碼」到使用者信箱', module: 'system-auth' })
   @ApiOperation({ summary: '發送「驗證碼」到使用者信箱' })
-  @ApiResponse({ type: String })
+  @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('發送成功')
   async sendRegisterEmail(@Body() sendRegisterEmailReqDto: SendRegisterEmailReqDto) {
     return await this.authService.sendRegisterEmail(sendRegisterEmailReqDto)
@@ -59,7 +69,7 @@ export class AuthController {
   @Post('/send-register-mobile')
   @Operation({ type: OperationType.OTHER, name: '發送「驗證碼」到使用者手機', module: 'system-auth' })
   @ApiOperation({ summary: '發送「驗證碼」到使用者手機' })
-  @ApiResponse({ type: String })
+  @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('發送成功')
   async sendRegisterMobile(@Body() sendRegisterMobileReqDto: SendRegisterMobileReqDto) {
     return await this.authService.sendRegisterMobile(sendRegisterMobileReqDto)
@@ -69,7 +79,7 @@ export class AuthController {
   @Post('/register')
   @Operation({ type: OperationType.OTHER, name: '註冊', module: 'system-auth' })
   @ApiOperation({ summary: '註冊' })
-  @ApiResponse({ type: String })
+  @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('註冊成功')
   async register(@Body() registerReqDto: RegisterReqDto) {
     return await this.authService.register(registerReqDto)
@@ -89,7 +99,7 @@ export class AuthController {
   @Post('/send-reset-password-email')
   @Operation({ type: OperationType.OTHER, name: '發送「驗證碼」到使用者信箱', module: 'system-auth' })
   @ApiOperation({ summary: '發送「驗證碼」到使用者信箱' })
-  @ApiResponse({ type: String })
+  @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('發送成功')
   async sendResetPasswordEmail(@Body() sendResetPasswordEmailReqDto: SendResetPasswordEmailReqDto) {
     return await this.authService.sendResetPasswordEmail(sendResetPasswordEmailReqDto)
@@ -99,7 +109,7 @@ export class AuthController {
   @Post('/send-reset-password-mobile')
   @Operation({ type: OperationType.OTHER, name: '發送「驗證碼」到使用者手機', module: 'system-auth' })
   @ApiOperation({ summary: '發送「驗證碼」到使用者手機' })
-  @ApiResponse({ type: String })
+  @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('發送成功')
   async sendResetPasswordMobile(@Body() sendResetPasswordMobileReqDto: SendResetPasswordMobileReqDto) {
     return await this.authService.sendResetPasswordMobile(sendResetPasswordMobileReqDto)
@@ -109,7 +119,7 @@ export class AuthController {
   @Post('/update-password')
   @Operation({ type: OperationType.OTHER, name: '修改密碼', module: 'system-auth' })
   @ApiOperation({ summary: '修改密碼' })
-  @ApiResponse({ type: String })
+  @ApiResponse({ type: MsgResponseDto() })
   @ResponseMessage('修改成功')
   async updatePassword(@Body() updatePasswordReqDto: UpdatePasswordReqDto) {
     return await this.authService.updatePassword(updatePasswordReqDto)
