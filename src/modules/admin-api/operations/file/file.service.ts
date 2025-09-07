@@ -88,8 +88,9 @@ export class FileService {
     // console.log('Decoded filename:', originalName)
 
     // 生成唯一檔案名稱
+    const uuid = uuidv4()
     const fileExtension = path.extname(originalName) // 副檔名
-    const fileName = `${uuidv4()}${fileExtension}` // 使用 「uuid + 副檔名」 作為 path 中的檔案名稱
+    const fileName = `${uuid}${fileExtension}` // 使用 「uuid + 副檔名」 作為 path 中的檔案名稱
     const relativePath = `./${fileName}` // 相對路徑
     const filePath = path.join(fileStoragePath, fileName) // 檔案的完整路徑
 
@@ -115,6 +116,7 @@ export class FileService {
 
     // 建立檔案記錄
     const fileEntity = this.fileRepository.create({
+      uuid,
       name: originalName || null,
       path: relativePath,
       url: `/${fileName}`,

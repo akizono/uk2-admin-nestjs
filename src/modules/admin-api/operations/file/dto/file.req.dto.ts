@@ -12,6 +12,11 @@ export class FileReqDto extends PartialType(OmitType(BaseReqDto, ['multilingualF
   @Transform(({ value }) => new ParseBigIntPipe().transform(value))
   id: string
 
+  @ApiProperty({ description: 'UUID' })
+  @IsNotEmpty()
+  @IsString()
+  uuid: string
+
   @ApiProperty({ description: '檔案名稱' })
   @IsNotEmpty()
   @IsString()

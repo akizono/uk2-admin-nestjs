@@ -4,8 +4,11 @@ import { BaseEntity } from '@/common/entities/base.entity'
 
 @Entity('operations_file')
 export class FileEntity extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid', { comment: '主鍵ID' })
+  @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
   id: string
+
+  @Column({ type: 'uuid', comment: 'UUID' })
+  uuid: string
 
   @Column({ length: 255, comment: '檔案名稱', nullable: true })
   name: string
