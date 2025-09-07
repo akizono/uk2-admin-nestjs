@@ -30,7 +30,7 @@ export interface ValidateVerifyCodeParams {
 
   verifyCodeService: VerifyCodeService
   inputCode: string // 使用者輸入的驗證碼
-  expireMs?: number // 驗證碼過期時間(毫秒)
+  expireSeconds?: number // 驗證碼過期時間(秒)
 }
 
 /**
@@ -115,7 +115,7 @@ export class VerifyCodeUtils {
       type,
       scene,
       inputCode,
-      expireMs = EnvHelper.getNumber('VERIFICATION_CODE_EXPIRE_MS'),
+      expireSeconds = EnvHelper.getNumber('VERIFICATION_CODE_EXPIRE_SECONDS'),
       userEmail,
       userMobile,
     } = params
@@ -142,7 +142,7 @@ export class VerifyCodeUtils {
 
       // 檢查驗證碼是否過期
 
-      if (verifyCodeData.createTime < new Date(Date.now() - expireMs)) {
+      if (verifyCodeData.createTime < new Date(Date.now() - expireSeconds * 1000)) {
         throw new BadRequestException('驗證碼錯誤')
       }
 

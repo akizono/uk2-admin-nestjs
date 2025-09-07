@@ -18,6 +18,8 @@ process.env.NODE_ENV = 'dev'
 // process.env.NODE_ENV = 'test'
 
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` })
+console.log('\r\n============ 環境變數 ===========')
+console.log('process.env.NODE_ENV: ', process.env.NODE_ENV)
 
 // 自動載入所有實體
 async function loadAllEntities() {

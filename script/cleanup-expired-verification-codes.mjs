@@ -10,24 +10,21 @@ import { EnvHelper } from './common/env-helper.mjs'
 
 // 定義要執行的腳本邏輯
 async function script(dataSource) {
-  console.log('Hello, world !')
-  console.log('process.env.NODE_ENV: ', process.env.NODE_ENV)
-
   // 獲取驗證碼資料庫實體
   const verifyCodeRepository = dataSource.getRepository('VerifyCodeEntity')
 
   // 讀取所有未過期的驗證碼
-  const verificationCodeExpireMs = EnvHelper.getNumber('VERIFICATION_CODE_EXPIRE_MS')
+  const verificationCodeExpireSeconds = EnvHelper.getNumber('VERIFICATION_CODE_EXPIRE_SECONDS')
   const verifyCodeResponse = await verifyCodeRepository.find({
     where: {
-      createTime: MoreThan(new Date(Date.now() - verificationCodeExpireMs)),
+      createTime: MoreThan(new Date(Date.now() - verificationCodeExpireSeconds * 1000)),
     },
   })
   const verifyCodeList = verifyCodeResponse.map(item => {
     delete item.id
     return item
   })
-  console.log(`讀取到 ${verifyCodeResponse.length} 條未過期的驗證碼`)
+  console.log(`讀取到 ${verifyCodeList.length} 條未過期的驗證碼`)
 
   // 清空驗證碼資料庫
   await verifyCodeRepository.clear()
