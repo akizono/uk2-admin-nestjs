@@ -25,14 +25,23 @@ async function script(dataSource) {
   const users = await systemUserRepository.find({ take: 1 })
   console.log('\r\n' + '已讀取到的用戶(DEMO): ', users)
 
-  return 'demo.mjs executed successfully'
+  return 'executed successfully'
 }
 
-// 定義記錄參數
-const recordParams = {
-  name: 'demo.mjs',
-  environment: process.env.NODE_ENV,
-}
+// 可以透過定義記錄參數來自訂記錄的內容
+// const recordParams = {
+//   name: '自訂name', // 腳本名稱
+//   environment: '自訂environment', // 環境變數
+//   result: '自訂result', // 執行結果
+//   error: null, // 錯誤資訊
+//   exitCode: 0, // 狀態碼
+//   startTime: null, // 開始時間
+//   endTime: null, // 結束時間
+//   duration: 0, // 執行時間
+// }
 
 // 執行腳本並自動記錄
-executeScriptWithRecord(script, recordParams)
+executeScriptWithRecord(
+  script,
+  //  recordParams
+)

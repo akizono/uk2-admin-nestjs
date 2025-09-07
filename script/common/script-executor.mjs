@@ -70,19 +70,20 @@ async function loadAllEntities() {
  * 腳本執行記錄的參數介面
  */
 export class ScriptLogParams {
-  constructor({
-    name,
-    environment = 'testing',
-    result = '',
-    error = null,
-    exitCode = 0,
-    startTime = null,
-    endTime = null,
-    duration = 0,
-  }) {
-    this.name = name
+  constructor(params = {}) {
+    const {
+      name = null, // 改為 null，將自動從路徑獲取檔案名
+      environment = null, // 將自動從 process.env.NODE_ENV 讀取
+      result = '',
+      error = null,
+      exitCode = 0,
+      startTime = null,
+      endTime = null,
+      duration = 0,
+    } = params
     this.path = this.getCurrentScriptPath()
-    this.environment = environment
+    this.name = name || this.getCurrentFileName() // 自動從路徑獲取檔案名
+    this.environment = environment || process.env.NODE_ENV // 自動從環境變數讀取
     this.type = 'mjs' // 固定為 mjs
     this.result = result
     this.error = error
@@ -126,6 +127,14 @@ export class ScriptLogParams {
 
     // 最後的備用方案
     return '/script/unknown.mjs'
+  }
+
+  /**
+   * 從腳本路徑中獲取檔案名
+   */
+  getCurrentFileName() {
+    const scriptPath = this.getCurrentScriptPath()
+    return path.basename(scriptPath)
   }
 }
 
@@ -304,7 +313,7 @@ export class ScriptExecutor {
 }
 
 /**
- * 便捷函數：執行腳本並記錄
+ * 執行腳本並記錄
  * @param {Function} scriptFunction - 要執行的腳本函數
  * @param {Object} logParams - 記錄參數物件
  * @returns {void} 內部會處理所有邏輯並退出進程

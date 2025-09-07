@@ -34,14 +34,8 @@ async function script(dataSource) {
   await verifyCodeRepository.insert(verifyCodeList)
   console.log('已還原驗證碼資料庫')
 
-  return 'cleanup-expired-verification-codes.mjs executed successfully'
-}
-
-// 定義記錄參數
-const recordParams = {
-  name: 'cleanup-expired-verification-codes.mjs',
-  environment: process.env.NODE_ENV,
+  return 'executed successfully'
 }
 
 // 執行腳本並自動記錄
-executeScriptWithRecord(script, recordParams)
+executeScriptWithRecord(script)

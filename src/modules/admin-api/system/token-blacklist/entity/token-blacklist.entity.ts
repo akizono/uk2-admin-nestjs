@@ -1,10 +1,13 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
 
 import { BaseEntity } from '@/common/entities/base.entity'
 
 @Entity('system_token_blacklist')
 export class TokenBlacklistEntity extends BaseEntity {
-  @PrimaryColumn({
+  @PrimaryGeneratedColumn({ type: 'bigint', comment: '主鍵ID' })
+  id: string
+
+  @Column({
     name: 'jwt_id',
     type: 'varchar',
     length: 36,

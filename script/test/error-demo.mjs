@@ -13,13 +13,5 @@ async function script() {
   return '這行不會被執行'
 }
 
-// 定義記錄參數
-const recordParams = {
-  name: 'demo-error.js',
-  path: '/script/demo-error.js',
-  environment: 'testing',
-  type: 'js',
-}
-
 // 執行腳本並自動記錄
-executeScriptWithRecord(script, recordParams)
+executeScriptWithRecord(script)
