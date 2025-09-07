@@ -97,14 +97,17 @@ async function bootstrap() {
     })
   })
 
-  // Swagger 設定
-  const options = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
-    .setVersion('1.0')
-    .build()
-  const document = SwaggerModule.createDocument(app, options)
-  SwaggerModule.setup(EnvHelper.getString('SWAGGER_API_DOCS_PATH'), app, document)
+  // Swagger 設定（除了 dev 環境，不建議其他環境開啟 swagger，以免造成資安風險）
+  const swaggerApiDocsPath = EnvHelper.getString('SWAGGER_API_DOCS_PATH')
+  if (swaggerApiDocsPath) {
+    const swaggerOptions = new DocumentBuilder()
+      .setTitle('Cats example')
+      .setDescription('The cats API description')
+      .setVersion('1.0')
+      .build()
+    const document = SwaggerModule.createDocument(app, swaggerOptions)
+    SwaggerModule.setup(swaggerApiDocsPath, app, document)
+  }
 
   // 配置靜態檔案服務
   const fileServeAccessPath = EnvHelper.getString('FILE_SERVE_ACCESS_PATH') // 檔案服務訪問路徑
@@ -124,7 +127,9 @@ async function bootstrap() {
   console.log('          /  ☁️')
   console.log('         /   》》》')
   console.log('📡 伺服器正在愉快奔跑喵: http://localhost:' + port)
-  console.log('📚 API說明書在這裡喵: http://localhost:' + port + '/' + EnvHelper.getString('SWAGGER_API_DOCS_PATH'))
+  if (swaggerApiDocsPath) {
+    console.log('📚 API說明書在這裡喵: http://localhost:' + port + '/' + swaggerApiDocsPath)
+  }
   console.log('📁 靜態文件小倉庫喵: http://localhost:' + port + fileServeAccessPath)
   console.log('📦 環境變數: ', process.env.NODE_ENV)
   console.log('')
