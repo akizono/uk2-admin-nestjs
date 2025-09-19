@@ -15,8 +15,8 @@ import { Operation, OperationType } from '@/common/decorators/operation.decorato
 export class ScriptExecutionLogController {
   constructor(private readonly scriptExecutionLogService: ScriptExecutionLogService) {}
 
-  @Get('/page')
-  @HasPermission('operations:script-execution-log:page')
+  @Get('/list')
+  @HasPermission('operations:script-execution-log:query')
   @Operation({
     type: OperationType.READ,
     name: '取得腳本執行記錄分頁列表',

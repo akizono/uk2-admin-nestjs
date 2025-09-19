@@ -27,8 +27,8 @@ export class DictTypeController {
     return this.dictTypeService.create(createDictTypeReqDto)
   }
 
-  @Get('/page')
-  @HasPermission('system:dict-type:page')
+  @Get('/list')
+  @HasPermission('system:dict-type:query')
   @Operation({ type: OperationType.READ, name: '分頁查詢字典類型', module: 'system-dict-type' })
   @ApiOperation({ summary: '分頁查詢字典類型' })
   @ApiResponse({ type: FindDictTypeResDto })

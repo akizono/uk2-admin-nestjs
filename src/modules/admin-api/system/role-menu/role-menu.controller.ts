@@ -26,8 +26,8 @@ export class RoleMenuController {
     await this.roleMenuService.create(createRoleMenuReqDto)
   }
 
-  @Get('/page')
-  @HasPermission('system:role-menu:page')
+  @Get('/list')
+  @HasPermission('system:role-menu:query')
   @Operation({ type: OperationType.READ, name: '分頁查詢角色綁定選單', module: 'system-role-menu' })
   @ApiOperation({ summary: '分頁查詢角色綁定選單' })
   @ApiResponse({ type: FindRoleMenuResDto })

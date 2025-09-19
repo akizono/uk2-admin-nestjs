@@ -27,8 +27,8 @@ export class RoleController {
     return this.roleService.create(createRoleReqDto)
   }
 
-  @Get('/page')
-  @HasPermission('system:role:page')
+  @Get('/list')
+  @HasPermission('system:role:query')
   @Operation({ type: OperationType.READ, name: '取得角色分頁列表', module: 'system-role' })
   @ApiOperation({ summary: '取得角色分頁列表' })
   @ApiResponse({ type: FindRoleResDto })

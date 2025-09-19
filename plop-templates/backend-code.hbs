@@ -104,8 +104,8 @@ export class {{ classNamePrefix }}Controller {
     return this.{{ camelName }}Service.create(create{{ classNamePrefix }}ReqDto)
   }
 
-  @Get('/page')
-  @HasPermission('{{ splitName.[1] }}:{{ splitName.[2] }}:page')
+  @Get('/list')
+  @HasPermission('{{ splitName.[1] }}:{{ splitName.[2] }}:query')
   @ApiOperation({ summary: '取得{{ unitName }}分頁列表' })
   @ApiResponse({ type: Find{{ classNamePrefix }}ResDto })
   @ResponseMessage('取得{{ unitName }}分頁列表成功')

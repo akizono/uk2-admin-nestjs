@@ -42,8 +42,8 @@ export class MultilingualFieldsController {
     return this.multilingualFieldsService.createBatch(createMultilingualFieldsReqDtoArr)
   }
 
-  @Get('/page')
-  @HasPermission('system:multilingual-fields:page')
+  @Get('/list')
+  @HasPermission('system:multilingual-fields:query')
   @Operation({ type: OperationType.READ, name: '取得多語言欄位分頁列表', module: 'system-multilingual-fields' })
   @ApiOperation({ summary: '取得多語言欄位分頁列表' })
   @ApiResponse({ type: FindMultilingualFieldsResDto })

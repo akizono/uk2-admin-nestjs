@@ -36,8 +36,8 @@ export class UserController {
     return this.userService.create(createUserReqDto)
   }
 
-  @Get('/page')
-  @HasPermission('system:user:page')
+  @Get('/list')
+  @HasPermission('system:user:query')
   @Operation({ type: OperationType.READ, name: '取得使用者分頁列表', module: 'system-user' })
   @ApiOperation({ summary: '取得使用者分頁列表' })
   @ApiResponse({ type: FindUserResDto })

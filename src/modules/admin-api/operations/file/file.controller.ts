@@ -45,8 +45,8 @@ export class FileController {
     return this.fileService.upload(files)
   }
 
-  @Get('/page')
-  @HasPermission('operations:file:page')
+  @Get('/list')
+  @HasPermission('operations:file:query')
   @Operation({ type: OperationType.READ, name: '取得檔案分頁列表', module: 'operations-file' })
   @ApiOperation({ summary: '取得檔案分頁列表' })
   @ApiResponse({ type: FindFileResDto })

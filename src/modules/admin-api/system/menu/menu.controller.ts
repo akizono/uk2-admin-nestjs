@@ -28,8 +28,8 @@ export class MenuController {
     return this.menuService.create(createMenuReqDto)
   }
 
-  @Get('/page')
-  @HasPermission('system:menu:page')
+  @Get('/list')
+  @HasPermission('system:menu:query')
   @Operation({ type: OperationType.READ, name: '取得選單分頁列表', module: 'system-menu' })
   @ApiOperation({ summary: '取得選單分頁列表' })
   @ApiResponse({ type: FindMenuResDto })

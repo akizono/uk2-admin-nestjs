@@ -27,8 +27,8 @@ export class DeptController {
     return this.deptService.create(createDeptReqDto)
   }
 
-  @Get('/page')
-  @HasPermission('system:dept:page')
+  @Get('/list')
+  @HasPermission('system:dept:query')
   @Operation({ type: OperationType.READ, name: '取得部門分頁列表', module: 'system-dept' })
   @ApiOperation({ summary: '取得部門分頁列表' })
   @ApiResponse({ type: FindDeptResDto })

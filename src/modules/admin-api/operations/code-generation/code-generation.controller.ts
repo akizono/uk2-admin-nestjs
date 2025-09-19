@@ -44,8 +44,8 @@ export class CodeGenerationController {
     return this.codeGenerationService.create(createCodeGenerationReqDto)
   }
 
-  @Get('/page')
-  @HasPermission('operations:code-generation:page')
+  @Get('/list')
+  @HasPermission('operations:code-generation:query')
   @Operation({ type: OperationType.READ, name: '取得模組分頁列表', module: 'operations-code-generation' })
   @ApiOperation({ summary: '取得模組分頁列表' })
   @ApiResponse({ type: FindCodeGenerationResDto })

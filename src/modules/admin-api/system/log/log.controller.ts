@@ -15,8 +15,8 @@ import { Operation, OperationType } from '@/common/decorators/operation.decorato
 export class LogController {
   constructor(private readonly logService: LogService) {}
 
-  @Get('/page')
-  @HasPermission('system:log:page')
+  @Get('/list')
+  @HasPermission('system:log:query')
   @Operation({ type: OperationType.READ, name: '取得日誌分頁列表', module: 'system-log' })
   @ApiOperation({ summary: '取得日誌分頁列表' })
   @ApiResponse({ type: FindLogResDto })

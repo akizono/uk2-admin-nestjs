@@ -27,8 +27,8 @@ export class DictDataController {
     return this.dictDataService.create(createDictDataReqDto)
   }
 
-  @Get('/page')
-  @HasPermission('system:dict-data:page')
+  @Get('/list')
+  @HasPermission('system:dict-data:query')
   @Operation({ type: OperationType.READ, name: '分頁查詢字典數據', module: 'system-dict-data' })
   @ApiOperation({ summary: '分頁查詢字典數據' })
   @ApiResponse({ type: FindDictDataResDto })
