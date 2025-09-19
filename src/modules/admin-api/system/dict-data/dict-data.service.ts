@@ -7,7 +7,7 @@ import { DictTypeService } from '../dict-type/dict-type.service'
 import { DictDataEntity } from './entity/dict-data.entity'
 import { CreateDictDataReqDto, FindDictDataReqDto, UpdateDictDataReqDto } from './dto/dict-data.req.dto'
 
-import { create, find, update, _delete } from '@/common/services/base.service'
+import { create, find, update, _delete, findOne } from '@/common/services/base.service'
 
 @Injectable()
 export class DictDataService {
@@ -56,6 +56,11 @@ export class DictDataService {
     })
 
     return { total, list }
+  }
+
+  // 查詢單一字典數據
+  async findOne(id: string) {
+    return await findOne({ id, repository: this.dictDataRepository })
   }
 
   // 更新字典數據

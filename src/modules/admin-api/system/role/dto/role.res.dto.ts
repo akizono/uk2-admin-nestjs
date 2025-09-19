@@ -4,7 +4,7 @@ export class CreateRoleResDto extends SingleResponseDto({
   id: '100',
 }) {}
 
-export class FindRoleResDto extends PaginatedResponseDto({
+const RoleResDtoReturn = {
   'remark': null,
   'status': 1,
   'isDeleted': 0,
@@ -17,4 +17,8 @@ export class FindRoleResDto extends PaginatedResponseDto({
   'name': 'super_admin',
   'description': '超級管理員',
   'sort': 1,
-}) {}
+}
+
+export class FindRoleResDto extends PaginatedResponseDto(RoleResDtoReturn) {}
+
+export class FindOneRoleResDto extends SingleResponseDto(RoleResDtoReturn) {}

@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 import { DeptService } from './dept.service'
 import { CreateDeptReqDto, FindDeptReqDto, UpdateDeptReqDto } from './dto/dept.req.dto'
-import { CreateDeptResDto, FindDeptResDto } from './dto/dept.res.dto'
+import { CreateDeptResDto, FindDeptResDto, FindOneDeptResDto } from './dto/dept.res.dto'
 
 import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
@@ -35,6 +35,16 @@ export class DeptController {
   @ResponseMessage('取得部門分頁列表成功')
   find(@Query() findDeptReqDto: FindDeptReqDto) {
     return this.deptService.find(findDeptReqDto)
+  }
+
+  @Get('/get/:id')
+  @HasPermission('system:dept:query')
+  @Operation({ type: OperationType.READ, name: '獲取部門資料', module: 'system-dept' })
+  @ApiOperation({ summary: '獲取部門資料' })
+  @ApiResponse({ type: FindOneDeptResDto })
+  @ResponseMessage('獲取部門資料成功')
+  findOne(@Param('id', ParseBigIntPipe) id: string) {
+    return this.deptService.findOne(id)
   }
 
   @Put('/update')

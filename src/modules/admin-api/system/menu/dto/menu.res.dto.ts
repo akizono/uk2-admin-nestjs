@@ -4,7 +4,7 @@ export class CreateMenuResDto extends SingleResponseDto({
   id: '100',
 }) {}
 
-export class FindMenuResDto extends PaginatedResponseDto({
+const MenuResDtoReturn = {
   id: '1',
   parentId: '0',
   title: '建立使用者',
@@ -20,4 +20,8 @@ export class FindMenuResDto extends PaginatedResponseDto({
   createTime: '2025-03-14T04:50:19.000Z',
   updater: null,
   updateTime: null,
-}) {}
+}
+
+export class FindMenuResDto extends PaginatedResponseDto(MenuResDtoReturn) {}
+
+export class FindOneMenuResDto extends SingleResponseDto(MenuResDtoReturn) {}

@@ -12,7 +12,7 @@ import {
   UpdatePersonalPasswordReqDto,
   UpdateUserReqDto,
 } from './dto/user.req.dto'
-import { CreateUserResDto, FindUserResDto } from './dto/user.res.dto'
+import { CreateUserResDto, FindOneUserResDto, FindUserResDto } from './dto/user.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
@@ -44,6 +44,16 @@ export class UserController {
   @ResponseMessage('取得使用者分頁列表成功')
   find(@Query() findUserReqDto: FindUserReqDto) {
     return this.userService.find(findUserReqDto)
+  }
+
+  @Get('/get/:id')
+  @HasPermission('system:user:query')
+  @Operation({ type: OperationType.READ, name: '獲取使用者資料', module: 'system-user' })
+  @ApiOperation({ summary: '獲取使用者資料' })
+  @ApiResponse({ type: FindOneUserResDto })
+  @ResponseMessage('獲取使用者資料成功')
+  findOne(@Param('id', ParseBigIntPipe) id: string) {
+    return this.userService.findOne(id)
   }
 
   @Put('/update')

@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 import { RoleService } from './role.service'
 import { CreateRoleReqDto, FindRoleReqDto, UpdateRoleReqDto } from './dto/role.req.dto'
-import { FindRoleResDto } from './dto/role.res.dto'
+import { FindOneRoleResDto, FindRoleResDto } from './dto/role.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
@@ -35,6 +35,16 @@ export class RoleController {
   @ResponseMessage('取得角色分頁列表成功')
   find(@Query() findRoleReqDto: FindRoleReqDto) {
     return this.roleService.find(findRoleReqDto)
+  }
+
+  @Get('/get/:id')
+  @HasPermission('system:role:query')
+  @Operation({ type: OperationType.READ, name: '獲取角色資料', module: 'system-role' })
+  @ApiOperation({ summary: '獲取角色資料' })
+  @ApiResponse({ type: FindOneRoleResDto })
+  @ResponseMessage('獲取角色資料成功')
+  findOne(@Param('id', ParseBigIntPipe) id: string) {
+    return this.roleService.findOne(id)
   }
 
   @Put('/update')

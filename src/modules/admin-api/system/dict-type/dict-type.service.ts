@@ -5,7 +5,7 @@ import { Repository } from 'typeorm'
 import { DictTypeEntity } from './entity/dict-type.entity'
 import { CreateDictTypeReqDto, FindDictTypeReqDto, UpdateDictTypeReqDto } from './dto/dict-type.req.dto'
 
-import { create, find, update, _delete } from '@/common/services/base.service'
+import { create, find, update, _delete, findOne } from '@/common/services/base.service'
 
 @Injectable()
 export class DictTypeService {
@@ -40,6 +40,11 @@ export class DictTypeService {
       total,
       list,
     }
+  }
+
+  // 查詢單一字典類型
+  async findOne(id: string) {
+    return await findOne({ id, repository: this.dictTypeRepository })
   }
 
   // 更新字典類型

@@ -29,6 +29,13 @@ interface FindParams {
   where?: Record<string, any> // 需要進行查詢的條件
 }
 
+interface FindOneParams {
+  id: string
+  repository: Repository<any>
+  relations?: string[] // 需要進行關聯查詢的欄位
+  where?: Record<string, any> // 需要進行查詢的條件
+}
+
 interface UpdateParams {
   dto: Record<string, any>
   repository: Repository<any>
@@ -246,6 +253,64 @@ export async function find(params: FindParams) {
       list,
       total,
     }
+  } catch (error) {
+    throw error
+  }
+}
+
+export async function findOne(params: FindOneParams) {
+  try {
+    const { id, repository, relations = [], where } = params
+
+    // 注入 MultilingualFieldsEntity
+    const multilingualFieldsRepository = repository.manager.getRepository(MultilingualFieldsEntity)
+
+    // 查詢單一資料
+    const item = await repository.findOne({
+      where: {
+        id,
+        ...where,
+      },
+      relations,
+    })
+
+    if (!item) {
+      return null
+    }
+
+    /** 在返回值中攜帶「多語言欄位」的具體數據  */
+    // 檢查是否存在「多語言欄位」
+    const multilingualFields = []
+    for (const key in item) {
+      if (
+        item[key] !== null &&
+        item[key] !== undefined &&
+        typeof item[key] === 'string' &&
+        item[key].startsWith('multilingual-')
+      ) {
+        multilingualFields.push(key)
+      }
+    }
+
+    // 根據multilingualFields，查詢多語言欄位
+    if (multilingualFields.length > 0) {
+      await Promise.all(
+        multilingualFields.map(async field => {
+          const data = await multilingualFieldsRepository.find({
+            where: {
+              fieldId: item[field],
+              isDeleted: 0,
+              status: 1,
+            },
+          })
+          // 將多語言資訊一併返回
+          if (!item['multilingualFields']) item['multilingualFields'] = {}
+          item['multilingualFields'][field] = data
+        }),
+      )
+    }
+
+    return item
   } catch (error) {
     throw error
   }

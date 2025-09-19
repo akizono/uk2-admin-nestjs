@@ -5,7 +5,7 @@ import { Repository } from 'typeorm'
 import { VerifyCodeEntity } from './entity/verify-code.entity'
 import { CreateVerifyCodeReqDto, FindVerifyCodeReqDto } from './dto/verify-code.req.dto'
 
-import { create, find } from '@/common/services/base.service'
+import { create, find, findOne } from '@/common/services/base.service'
 
 @Injectable()
 export class VerifyCodeService {
@@ -39,6 +39,11 @@ export class VerifyCodeService {
       total,
       list,
     }
+  }
+
+  // 查詢單一驗證碼
+  async findOne(id: string) {
+    return await findOne({ id, repository: this.verifyCodeRepository })
   }
 
   // 刪除某使用者的所有驗證碼

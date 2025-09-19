@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 import { CreateDictDataReqDto, FindDictDataReqDto, UpdateDictDataReqDto } from './dto/dict-data.req.dto'
 import { DictDataService } from './dict-data.service'
-import { CreateDictDataResDto, FindDictDataResDto } from './dto/dict-data.res.dto'
+import { CreateDictDataResDto, FindDictDataResDto, FindOneDictDataResDto } from './dto/dict-data.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
@@ -35,6 +35,16 @@ export class DictDataController {
   @ResponseMessage('分頁查詢字典數據成功')
   find(@Query() findDictDataReqDto: FindDictDataReqDto) {
     return this.dictDataService.find(findDictDataReqDto)
+  }
+
+  @Get('/get/:id')
+  @HasPermission('system:dict-data:query')
+  @Operation({ type: OperationType.READ, name: '獲取字典數據資料', module: 'system-dict-data' })
+  @ApiOperation({ summary: '獲取字典數據資料' })
+  @ApiResponse({ type: FindOneDictDataResDto })
+  @ResponseMessage('獲取字典數據資料成功')
+  findOne(@Param('id', ParseBigIntPipe) id: string) {
+    return this.dictDataService.findOne(id)
   }
 
   @Put('/update')

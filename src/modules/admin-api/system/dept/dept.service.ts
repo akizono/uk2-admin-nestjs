@@ -5,7 +5,7 @@ import { Repository } from 'typeorm'
 import { DeptEntity } from './entity/dept.entity'
 import { CreateDeptReqDto, FindDeptReqDto, UpdateDeptReqDto } from './dto/dept.req.dto'
 
-import { create, find, update, _delete } from '@/common/services/base.service'
+import { create, find, update, _delete, findOne } from '@/common/services/base.service'
 
 @Injectable()
 export class DeptService {
@@ -48,6 +48,11 @@ export class DeptService {
       total,
       list,
     }
+  }
+
+  // 查詢單一部門
+  async findOne(id: string) {
+    return await findOne({ id, repository: this.deptRepository })
   }
 
   // 更新部門

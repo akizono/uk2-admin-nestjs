@@ -27,7 +27,6 @@ import { VerifyCodeUtils } from '@/utils/verify-code-utils'
 import { UserService } from '@/modules/admin-api/system/user/user.service'
 import { VerifyCodeService } from '@/modules/admin-api/system/verify-code/verify-code.service'
 import { TokenBlacklistService } from '@/modules/admin-api/system/token-blacklist/token-blacklist.service'
-import { getToken } from '@/utils/token-helper'
 
 @Injectable()
 export class AuthService {
@@ -62,8 +61,8 @@ export class AuthService {
       true,
     )
     if (list.length === 0) throw new UnauthorizedException('使用者名稱或密碼錯誤')
-
     const user = list[0]
+
     const { hashedPassword } = encryptPassword(inputPassword, user.salt)
     if (user.password === hashedPassword) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars

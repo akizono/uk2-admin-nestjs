@@ -8,7 +8,7 @@ import { RoleMenuService } from '../role-menu/role-menu.service'
 import { MenuEntity } from './entity/menu.entity'
 import { CreateMenuReqDto, FindMenuReqDto, UpdateMenuReqDto } from './dto/menu.req.dto'
 
-import { create, find, update, _delete } from '@/common/services/base.service'
+import { create, find, update, _delete, findOne } from '@/common/services/base.service'
 import { EnvHelper } from '@/utils/env-helper'
 
 @Injectable()
@@ -57,6 +57,11 @@ export class MenuService {
       total,
       list,
     }
+  }
+
+  // 查詢單一選單
+  async findOne(id: string) {
+    return await findOne({ id, repository: this.menuRepository })
   }
 
   /** 獲取使用者有權限的選單 */

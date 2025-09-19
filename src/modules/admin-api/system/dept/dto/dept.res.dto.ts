@@ -4,7 +4,7 @@ export class CreateDeptResDto extends SingleResponseDto({
   id: '100',
 }) {}
 
-export class FindDeptResDto extends PaginatedResponseDto({
+const DeptResDtoReturn = {
   id: '1',
   parentId: '0',
   name: 'string',
@@ -37,4 +37,8 @@ export class FindDeptResDto extends PaginatedResponseDto({
   createTime: '2025-03-14T04:50:19.000Z',
   updater: null,
   updateTime: null,
-}) {}
+}
+
+export class FindDeptResDto extends PaginatedResponseDto(DeptResDtoReturn) {}
+
+export class FindOneDeptResDto extends SingleResponseDto(DeptResDtoReturn) {}

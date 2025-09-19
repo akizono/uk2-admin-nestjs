@@ -7,7 +7,7 @@ import { RoleMenuService } from '../role-menu/role-menu.service'
 import { RoleEntity } from './entity/role.entity'
 import { CreateRoleReqDto, FindRoleReqDto, UpdateRoleReqDto } from './dto/role.req.dto'
 
-import { _delete, create, find, update } from '@/common/services/base.service'
+import { _delete, create, find, findOne, update } from '@/common/services/base.service'
 import { EnvHelper } from '@/utils/env-helper'
 
 @Injectable()
@@ -43,6 +43,11 @@ export class RoleService {
       total,
       list,
     }
+  }
+
+  // 查詢單一角色
+  async findOne(id: string) {
+    return await findOne({ id, repository: this.roleRepository })
   }
 
   // 查詢角色綁定的選單權限標識

@@ -4,7 +4,7 @@ export class CreateDictDataResDto extends SingleResponseDto({
   id: '100',
 }) {}
 
-export class FindDictDataResDto extends PaginatedResponseDto({
+const DictDataResDtoReturn = {
   id: '1',
   dictType: 'system_user_sex',
   label: '女',
@@ -19,4 +19,8 @@ export class FindDictDataResDto extends PaginatedResponseDto({
   createTime: '2025-03-14T04:50:19.000Z',
   updater: null,
   updateTime: null,
-}) {}
+}
+
+export class FindDictDataResDto extends PaginatedResponseDto(DictDataResDtoReturn) {}
+
+export class FindOneDictDataResDto extends SingleResponseDto(DictDataResDtoReturn) {}

@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { FileEntity } from './entity/file.entity'
 import { FindFileReqDto } from './dto/file.req.dto'
 
-import { find, _delete } from '@/common/services/base.service'
+import { find, _delete, findOne } from '@/common/services/base.service'
 import { EnvHelper } from '@/utils/env-helper'
 
 @Injectable()
@@ -149,6 +149,16 @@ export class FileService {
           url: urlPrefix + item.url,
         }
       }),
+    }
+  }
+
+  // 查詢單一檔案
+  async findOne(id: string) {
+    const file = await findOne({ id, repository: this.fileRepository })
+    const urlPrefix = EnvHelper.getString('FILE_SERVE_BASE_URL') + EnvHelper.getString('FILE_SERVE_ACCESS_PATH')
+    return {
+      ...file,
+      url: urlPrefix + file.url,
     }
   }
 

@@ -4,7 +4,7 @@ import { Request } from 'express'
 
 import { MenuService } from './menu.service'
 import { CreateMenuReqDto, FindMenuReqDto, UpdateMenuReqDto } from './dto/menu.req.dto'
-import { CreateMenuResDto, FindMenuResDto } from './dto/menu.res.dto'
+import { CreateMenuResDto, FindMenuResDto, FindOneMenuResDto } from './dto/menu.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
@@ -36,6 +36,16 @@ export class MenuController {
   @ResponseMessage('取得選單分頁列表成功')
   find(@Query() findMenuReqDto: FindMenuReqDto) {
     return this.menuService.find(findMenuReqDto)
+  }
+
+  @Get('/get/:id')
+  @HasPermission('system:menu:query')
+  @Operation({ type: OperationType.READ, name: '獲取選單資料', module: 'system-menu' })
+  @ApiOperation({ summary: '獲取選單資料' })
+  @ApiResponse({ type: FindOneMenuResDto })
+  @ResponseMessage('獲取選單資料成功')
+  findOne(@Param('id', ParseBigIntPipe) id: string) {
+    return this.menuService.findOne(id)
   }
 
   @Get('/user-menus')

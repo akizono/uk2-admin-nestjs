@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 
 import { CreateDictTypeReqDto, FindDictTypeReqDto, UpdateDictTypeReqDto } from './dto/dict-type.req.dto'
 import { DictTypeService } from './dict-type.service'
-import { CreateDictTypeResDto, FindDictTypeResDto } from './dto/dict-type.res.dto'
+import { CreateDictTypeResDto, FindDictTypeResDto, FindOneDictTypeResDto } from './dto/dict-type.res.dto'
 
 import { TransformInterceptor } from '@/common/interceptors/transform.interceptor'
 import { HasPermission } from '@/common/decorators/has-permission.decorator'
@@ -35,6 +35,16 @@ export class DictTypeController {
   @ResponseMessage('分頁查詢字典類型成功')
   find(@Query() findDictTypeReqDto: FindDictTypeReqDto) {
     return this.dictTypeService.find(findDictTypeReqDto)
+  }
+
+  @Get('/get/:id')
+  @HasPermission('system:dict-type:query')
+  @Operation({ type: OperationType.READ, name: '獲取字典類型資料', module: 'system-dict-type' })
+  @ApiOperation({ summary: '獲取字典類型資料' })
+  @ApiResponse({ type: FindOneDictTypeResDto })
+  @ResponseMessage('獲取字典類型資料成功')
+  findOne(@Param('id', ParseBigIntPipe) id: string) {
+    return this.dictTypeService.findOne(id)
   }
 
   @Put('/update')

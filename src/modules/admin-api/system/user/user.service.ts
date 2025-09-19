@@ -182,6 +182,57 @@ export class UserService {
     }
   }
 
+  async findOne(id: string, isShowPassword = false) {
+    // 查詢單一用戶，包含關聯資料
+    const user = await this.userRepository.findOne({
+      where: {
+        id,
+        isDeleted: 0,
+      },
+      relations: {
+        userRoles: {
+          role: true,
+        },
+        dept: true,
+      },
+    })
+
+    if (!user) {
+      return null
+    }
+
+    const { userRoles, ...remain } = user
+
+    // 不顯示密碼
+    if (!isShowPassword) {
+      delete remain['password']
+      delete remain['salt']
+    }
+
+    /* 如果「部門」存在，則需要將「部門名稱」和「部門名稱的多語言欄位」一併返回 */
+    if (remain.dept) {
+      // 如果「multilingualFields」不存在，則需要初始化
+      if (!remain['multilingualFields']) {
+        remain['multilingualFields'] = {}
+      }
+      remain['deptName'] = remain.dept.name
+      remain['multilingualFields']['deptName'] = await this.multilingualFieldsRepository.find({
+        where: {
+          fieldId: remain.dept.name,
+          isDeleted: 0,
+          status: 1,
+        },
+      })
+    }
+
+    return {
+      ...remain,
+      role: userRoles?.map(item => item.role.code),
+      roleIds: userRoles?.map(item => item.role.id),
+      roleNames: userRoles?.map(item => item.role.name),
+    }
+  }
+
   async update(updateUserReqDto: UpdateUserReqDto) {
     const { id, roleIds, ...remain } = updateUserReqDto
 
