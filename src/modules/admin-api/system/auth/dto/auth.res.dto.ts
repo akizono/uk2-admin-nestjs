@@ -24,3 +24,8 @@ export class CheckUserHasMobileOrEmailResDto extends SingleResponseDto({
   hasMobile: true,
   hasEmail: true,
 }) {}
+
+export class SendLoginImageVerifyCodeResDto extends SingleResponseDto({
+  svg: '<svg><text>123456</text></svg>',
+  svgCaptchaId: '1',
+}) {}

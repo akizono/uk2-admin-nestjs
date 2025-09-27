@@ -28,6 +28,8 @@ import { UserService } from '@/modules/admin-api/system/user/user.service'
 import { VerifyCodeService } from '@/modules/admin-api/system/verify-code/verify-code.service'
 import { TokenBlacklistService } from '@/modules/admin-api/system/token-blacklist/token-blacklist.service'
 
+const isLoginCaptchaEnabled = EnvHelper.getBoolean('IS_LOGIN_CAPTCHA_ENABLED')
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -43,13 +45,31 @@ export class AuthService {
     userId,
     username,
     inputPassword,
+    inputVerifyCode,
+    svgCaptchaId,
   }: {
     userId?: string
     username?: string
     inputPassword: string
+    inputVerifyCode?: string
+    svgCaptchaId?: string
   }): Promise<AuthenticatedUser | null> {
     // username 和 userId 必須二選一
     if (!userId && !username) throw new BadRequestException('缺少必要參數')
+
+    // 如果登入驗證碼開啟，則必须传入驗證碼
+    if (isLoginCaptchaEnabled && !inputVerifyCode && !svgCaptchaId) throw new BadRequestException('缺少必要參數')
+
+    // 验证图形验证码
+    if (isLoginCaptchaEnabled) {
+      await VerifyCodeUtils.validateImageVerifyCode({
+        verifyCodeService: this.verifyCodeService,
+        type: 'image',
+        scene: 'login',
+        inputCode: inputVerifyCode,
+        svgCaptchaId,
+      })
+    }
 
     const { list } = await this.userService.find(
       {
@@ -96,6 +116,8 @@ export class AuthService {
     const user = await this.validateUser({
       username: loginReqDto.username,
       inputPassword: loginReqDto.password,
+      inputVerifyCode: loginReqDto.verifyCode,
+      svgCaptchaId: loginReqDto.svgCaptchaId,
     })
     if (!user) throw new UnauthorizedException('密碼錯誤')
 
@@ -105,6 +127,20 @@ export class AuthService {
         accessToken: await this.generateToken(user.id, 'access'),
         refreshToken: await this.generateToken(user.id, 'refresh'),
       },
+    }
+  }
+
+  /** 獲取用於登入的圖形驗證碼 */
+  async getLoginImageVerifyCode() {
+    const { svg, svgCaptchaId } = await VerifyCodeUtils.getImageVerifyCode({
+      verifyCodeService: this.verifyCodeService,
+      scene: 'login',
+      type: 'image',
+    })
+
+    return {
+      svg,
+      svgCaptchaId,
     }
   }
 

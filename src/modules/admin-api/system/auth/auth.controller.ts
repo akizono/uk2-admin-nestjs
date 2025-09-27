@@ -13,7 +13,7 @@ import {
   SendResetPasswordMobileReqDto,
   UpdatePasswordReqDto,
 } from './dto/auth.req.dto'
-import { CheckUserHasMobileOrEmailResDto, LoginResDto } from './dto/auth.res.dto'
+import { CheckUserHasMobileOrEmailResDto, LoginResDto, SendLoginImageVerifyCodeResDto } from './dto/auth.res.dto'
 
 import { Public } from '@/common/decorators/public.decorator'
 import { ResponseMessage } from '@/common/decorators/response-message.decorator'
@@ -34,6 +34,16 @@ export class AuthController {
   @ResponseMessage('登入成功')
   async login(@Body() loginReqDto: LoginReqDto) {
     return await this.authService.login(loginReqDto)
+  }
+
+  @Public()
+  @Get('/get-login-image-verify-code')
+  @Operation({ type: OperationType.OTHER, name: '獲取用於登入的圖形驗證碼', module: 'system-auth' })
+  @ApiOperation({ summary: '獲取用於登入的圖形驗證碼' })
+  @ApiResponse({ type: SendLoginImageVerifyCodeResDto })
+  @ResponseMessage('獲取成功')
+  async getLoginImageVerifyCode() {
+    return await this.authService.getLoginImageVerifyCode()
   }
 
   @Get('/logout')

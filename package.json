@@ -38,6 +38,7 @@
     "openai": "^5.12.2",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
+    "svg-captcha": "^1.4.0",
     "swagger-ui-express": "^5.0.1",
     "typeorm": "^0.3.20",
     "uuid": "^11.0.3"

@@ -6,7 +6,7 @@ import { ParseBigIntPipe } from '@/common/pipes/parse-bigInt-pipe'
 import { BaseReqDto, disableEditFields } from '@/common/dtos/base.req.dto'
 import { EnvHelper } from '@/utils/env-helper'
 
-export type VerifyCodeType = 'email' | 'mobile'
+export type VerifyCodeType = 'email' | 'mobile' | 'image'
 
 export class VerifyCodeReqDto extends BaseReqDto {
   @ApiProperty({ description: '主鍵ID' })
@@ -43,6 +43,11 @@ export class VerifyCodeReqDto extends BaseReqDto {
   @IsNotEmpty()
   @IsString()
   scene: string
+
+  @ApiProperty({ description: '圖形驗證碼id', example: '1' })
+  @IsOptional()
+  @IsString()
+  svgCaptchaId: string
 }
 
 export class CreateVerifyCodeReqDto extends PartialType(

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNotEmpty } from 'class-validator'
+import { IsNotEmpty, IsOptional } from 'class-validator'
 
 import { CreateUserReqDto } from '@/modules/admin-api/system/user/dto/user.req.dto'
 import { VerifyCodeType } from '@/modules/admin-api/system/verify-code/dto/verify-code.req.dto'
@@ -18,6 +18,14 @@ export class LoginReqDto {
   @ApiProperty({ description: '使用者密碼', example: testAuth.password })
   @IsNotEmpty()
   password: string
+
+  @ApiProperty({ description: '验证码', example: 'abcd' })
+  @IsOptional()
+  verifyCode: string
+
+  @ApiProperty({ description: '圖形驗證碼id', example: '1' })
+  @IsOptional()
+  svgCaptchaId: string
 }
 
 // ------------------------------------------------------------

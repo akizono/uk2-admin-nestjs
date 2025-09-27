@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common'
+import { v4 as uuidv4 } from 'uuid'
 
 import { StrGenerator } from './str-generator'
 import { EnvHelper } from './env-helper'
@@ -31,6 +32,7 @@ export interface ValidateVerifyCodeParams {
   verifyCodeService: VerifyCodeService
   inputCode: string // 使用者輸入的驗證碼
   expireSeconds?: number // 驗證碼過期時間(秒)
+  svgCaptchaId?: string // 圖形驗證碼ID
 }
 
 /**
@@ -38,6 +40,8 @@ export interface ValidateVerifyCodeParams {
  * 提供統一的驗證碼生成、發送和驗證邏輯
  */
 export class VerifyCodeUtils {
+  // =============================== 往信箱或者手機發送驗證碼 ===============================
+
   /**
    * 生成驗證碼並發送
    * @param params 生成驗證碼的參數對象
@@ -128,6 +132,9 @@ export class VerifyCodeUtils {
       scene,
       userEmail,
       userMobile,
+
+      status: 1,
+      isDeleted: 0,
     })
 
     // 如果沒有驗證碼
@@ -141,7 +148,6 @@ export class VerifyCodeUtils {
       const verifyCodeData = verifyCodeResponse.list.sort((a, b) => b.createTime - a.createTime)[0]
 
       // 檢查驗證碼是否過期
-
       if (verifyCodeData.createTime < new Date(Date.now() - expireSeconds * 1000)) {
         throw new BadRequestException('驗證碼錯誤')
       }
@@ -150,6 +156,92 @@ export class VerifyCodeUtils {
       if (verifyCodeData.code !== inputCode) {
         throw new BadRequestException('驗證碼錯誤')
       }
+
+      // 走到这一步，则证明验证码正确，此时执行删除验证码的操作
+      await verifyCodeService.delete(verifyCodeData.id)
+
+      return true
+    }
+
+    return false
+  }
+
+  // =============================== 圖形驗證碼 ===============================
+
+  /**
+   * 創建一個圖形驗證碼並返回
+   * @param params 創建一個圖形驗證碼並返回的參數對象
+   *
+   */
+  static async getImageVerifyCode(params: GenerateVerifyCodeParams) {
+    const { verifyCodeService, scene } = params
+    const { svg, text } = await verifyCodeService.createImage()
+
+    const svgCaptchaId = uuidv4()
+
+    // 將驗證碼存儲到資料庫
+    await verifyCodeService.create({
+      code: text.toLowerCase(),
+      type: 'image',
+      scene,
+      svgCaptchaId,
+    })
+
+    return {
+      svg,
+      text,
+      svgCaptchaId,
+    }
+  }
+
+  /**
+   * 驗證圖形驗證碼
+   * @param params 驗證圖形驗證碼的參數對象
+   * @returns Promise<boolean> 驗證是否成功
+   */
+  static async validateImageVerifyCode(params: ValidateVerifyCodeParams) {
+    const {
+      verifyCodeService,
+      type,
+      scene,
+      inputCode,
+      svgCaptchaId,
+      expireSeconds = EnvHelper.getNumber('VERIFICATION_CODE_EXPIRE_SECONDS'),
+    } = params
+
+    // 查詢該使用者在此場景下的所有驗證碼
+    const verifyCodeResponse = await verifyCodeService.find({
+      pageSize: 0,
+      svgCaptchaId,
+      type,
+      scene,
+
+      status: 1,
+      isDeleted: 0,
+    })
+
+    // 如果沒有驗證碼
+    if (verifyCodeResponse.total === 0) {
+      throw new BadRequestException('驗證碼錯誤')
+    }
+
+    // 如果有驗證碼
+    if (verifyCodeResponse.total > 0) {
+      // 則從所有驗證碼中拿到日期最新的那條驗證碼的數據
+      const verifyCodeData = verifyCodeResponse.list.sort((a, b) => b.createTime - a.createTime)[0]
+
+      // 檢查驗證碼是否過期
+      if (verifyCodeData.createTime < new Date(Date.now() - expireSeconds * 1000)) {
+        throw new BadRequestException('驗證碼錯誤')
+      }
+
+      // 檢查驗證碼是否正確
+      if (verifyCodeData.code !== inputCode) {
+        throw new BadRequestException('驗證碼錯誤')
+      }
+
+      // 走到这一步，则证明验证码正确，此时执行删除验证码的操作
+      await verifyCodeService.delete(verifyCodeData.id)
 
       return true
     }
