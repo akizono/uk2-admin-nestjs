@@ -1,99 +1,136 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+<div align="center">
+<img src="https://s2.loli.net/2025/09/27/rN84dp3uh1TWBlJ.png" style="width:150px"/>
+<h1>UK2 Admin Nest</h1>
+</div>
+<div align="center">
+<img src="https://img.shields.io/github/license/akizono/uk2-admin"/>
+<img src="https://badgen.net/github/stars/akizono/uk2-admin?icon=github"/>
+<img src="https://img.shields.io/github/forks/akizono/uk2-admin"/>
+</div>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<div align='center'>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+  [English](./README.md)| Chinese
+</div>
 
-## Description
+# introduce
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Project Introduction
 
-## Project setup
+based on`Nest.js` + `TypeScript` + `TypeORM` + `MySQL`A modern Node.js management system backend built to provide API support for UK2-admin (front-end project).
 
-```bash
-$ pnpm install
+Integrate Swagger file automatic generation, operation log tracking, and supports dynamic column multilingual configuration, ready for use out of the box.
+
+## Project description
+
+This project is the backend part of UK2-admin.
+
+Current development progress:
+
+| Development Status | Functions | Description |
+| ------ | -------- | ------------------------------------------------------------ |
+| ✅ | User Management | The user is the system operator, and this function mainly completes the system user configuration |
+| ✅ | Department Management | Configure the system organization (company, department, group), and the tree structure displays support data permissions |
+| ✅ | Dictionary Management | Maintain some more fixed data that is often used in the system |
+| ✅ | Operation log | System normal operation log recording and query, integrated Swagger to generate log content |
+| ✅ | Menu Management | Configure system menus, operation permissions, button permissions identification, etc., local cache provides performance |
+| ✅ | Role Management | Role menu permission allocation, setting roles to divide data scope permissions by institution |
+| ✅ | Column internationalization | Any column of a data table can be internationalized |
+| ✅ | Swagger | Integrated Swagger Generate API Files |
+| ❌ | Code generation | Generate corresponding addition, deletion, modification and search code according to the database table structure, and generate the front-end page |
+| ❌ | Redis | Integrated Redis Cache Data |
+| ❌ | Notices and Announcements | System Notices and Announcements Information Release and Maintenance |
+| ❌ | Site message | Message notifications within the system, providing in-site message templates and in-site message messages |
+
+# Quick Start
+
+> Before starting the project, make sure your development environment is installed[Node.js](../../dev/nodejs)and[MySQL](../../dev/mysql)
+>
+> Follow the steps below to complete the environment configuration and project launch to ensure that the development environment is fast and ready.
+
+## initialization[MySQL](../../dev/mysql)
+
+### 1. MySQL service starts
+
+This project uses MySQL as a data storage solution, please make sure it is installed and started correctly[MySQL](../../dev/mysql)Database services.
+
+### 2. Development database creation
+
+Create a library dedicated to the development environment in MySQL, named`uk2_admin_dev`(The name can be customized according to actual needs).
+
+### 3. Database initialization script execution
+
+Execute the database initialization script provided by the project to complete the creation of basic data structures and import of basic data
+
+- **Script Path**: sql/uk2_admin_dev.sql
+
+- **Precautions**: This script supports execution in different database name environments and does not need to be strictly consistent with the database name in the configuration.
+
+### 4. **Database connection configuration**
+
+Modify the development environment settings file in the root directory`env.dev`, configure the correct database connection parameters.
+```shell
+# 資料庫類型，不需要修改
+DB_TYPE = 'mysql'
+
+# 資料庫地址
+DB_HOST = '127.0.0.1'
+
+# 資料庫埠
+DB_PORT = 3306
+
+# 資料庫名稱
+DB_NAME = 'uk2_admin_dev'
+
+# 資料庫使用者名稱
+DB_USERNAME = 'root'
+
+# 資料庫密碼
+DB_PASSWORD = '123456'
+```
+>1. Parameter DB_TYPE is a fixed value, no modification is required
+>
+>2. If you use a non-default database name in step 2, make sure that the DB_NAME parameter is exactly the same as the database name you created.
+>
+>3. When deploying in the production environment, be sure to modify the preset database credentials and adopt a safer authentication method.
+>
+
+
+## Start a special project
+
+### Copy project
+
+Please go to the directory where you want to install the project and execute the following Git command on the terminal to obtain the project original code:
+
+```shell
+git clone https://github.com/akizono/uk2-admin-nestjs.git
 ```
 
-## Compile and run the project
+### Dependency kit installation
+After entering the project directory, it is recommended to use pnpm to install the dependency kit (if pnpm is not installed, you can also use npm instead)
 
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+```shell[pnpm]
+cd ./uk2-admin-nestjs
+pnpm install
 ```
 
-## Run tests
+### Project launch
 
-```bash
-# unit tests
-$ pnpm run test
+1. use[VSCode](https://code.visualstudio.com/)Open the project root directory uk2-admin-nestjs
 
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+2. Execute the development startup command through the built-in terminal:
+```shell[pnpm]
+pnpm start:dev
 ```
 
-## Deployment
+# Related projects
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- [UK2-admin](https://github.com/akizono/uk2-admin)UK2-Admin-Nest Supporting Web Project
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+# contribute
 
-```bash
-$ pnpm install -g mau
-$ mau deploy
-```
+If you find any issues or have suggestions for improvement, please create one[issue](uk2-admin-nestjs/issues/new)Or submit a PR. We welcome your contribution!
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+# protocol
 
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+[MIT](LICENSE)
