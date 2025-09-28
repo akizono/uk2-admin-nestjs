@@ -11,5 +11,6 @@ import { DictDataService } from './dict-data.service'
   imports: [TypeOrmModule.forFeature([DictDataEntity]), DictTypeModule],
   controllers: [DictDataController],
   providers: [DictDataService],
+  exports: [DictDataService],
 })
 export class DictDataModule {}

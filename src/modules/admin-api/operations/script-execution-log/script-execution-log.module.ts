@@ -9,5 +9,6 @@ import { ScriptExecutionLogEntity } from './entity/script-execution-log.entity'
   imports: [TypeOrmModule.forFeature([ScriptExecutionLogEntity])],
   controllers: [ScriptExecutionLogController],
   providers: [ScriptExecutionLogService],
+  exports: [ScriptExecutionLogService],
 })
 export class ScriptExecutionLogModule {}

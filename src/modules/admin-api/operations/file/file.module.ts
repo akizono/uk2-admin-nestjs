@@ -28,5 +28,6 @@ import { EnvHelper } from '@/utils/env-helper'
   ],
   controllers: [FileController],
   providers: [FileService],
+  exports: [FileService],
 })
 export class FileModule {}

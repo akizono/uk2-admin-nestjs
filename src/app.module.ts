@@ -6,24 +6,11 @@ import { APP_INTERCEPTOR } from '@nestjs/core'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { EnvHelper } from './utils/env-helper'
-import { UserModule } from './modules/admin-api/system/user/user.module'
-import { AuthModule } from './modules/admin-api/system/auth/auth.module'
-import { TokenBlacklistModule } from './modules/admin-api/system/token-blacklist/token-blacklist.module'
-import { RoleModule } from './modules/admin-api/system/role/role.module'
 import { GlobalSubscriber } from './common/subscribers/global.subscriber'
-import { UserRoleModule } from './modules/admin-api/system/user-role/user-role.module'
-import { MenuModule } from './modules/admin-api/system/menu/menu.module'
-import { DeptModule } from './modules/admin-api/system/dept/dept.module'
-import { RoleMenuModule } from './modules/admin-api/system/role-menu/role-menu.module'
-import { DictTypeModule } from './modules/admin-api/system/dict-type/dict-type.module'
-import { DictDataModule } from './modules/admin-api/system/dict-data/dict-data.module'
-import { MultilingualFieldsModule } from './modules/admin-api/system/multilingual-fields/multilingual-fields.module'
-import { CodeGenerationModule } from './modules/admin-api/operations/code-generation/code-generation.module'
-import { VerifyCodeModule } from './modules/admin-api/system/verify-code/verify-code.module'
-import { LogModule } from './modules/admin-api/system/log/log.module'
 import { LogInterceptor } from './common/interceptors/log.interceptor'
-import { FileModule } from './modules/admin-api/operations/file/file.module'
-import { ScriptExecutionLogModule } from './modules/admin-api/operations/script-execution-log/script-execution-log.module'
+import { systemModules } from './modules/system.modules'
+import { operationsModules } from './modules/operations.modules'
+import { businessModules } from './modules/business.modules'
 
 /** ---- Code generation location: import ---- */ // 請勿刪除此處註解
 
@@ -51,22 +38,9 @@ import { ScriptExecutionLogModule } from './modules/admin-api/operations/script-
         synchronize: EnvHelper.getBoolean('DB_SYNCHRONIZE'),
       }),
     }),
-    LogModule, // LogModule 一定要在其他模組之前引入
-    UserModule,
-    AuthModule,
-    TokenBlacklistModule,
-    RoleModule,
-    UserRoleModule,
-    MenuModule,
-    RoleMenuModule,
-    DeptModule,
-    DictTypeModule,
-    DictDataModule,
-    MultilingualFieldsModule,
-    CodeGenerationModule,
-    VerifyCodeModule,
-    FileModule,
-    ScriptExecutionLogModule,
+    ...systemModules,
+    ...operationsModules,
+    ...businessModules,
 
     /** ---- Code generation location: module ---- */ // 請勿刪除此處註解
   ],

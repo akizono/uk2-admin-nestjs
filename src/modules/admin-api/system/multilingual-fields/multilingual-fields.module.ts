@@ -9,5 +9,6 @@ import { MultilingualFieldsEntity } from './entity/multilingual-fields.entity'
   imports: [TypeOrmModule.forFeature([MultilingualFieldsEntity])],
   controllers: [MultilingualFieldsController],
   providers: [MultilingualFieldsService],
+  exports: [MultilingualFieldsService],
 })
 export class MultilingualFieldsModule {}
