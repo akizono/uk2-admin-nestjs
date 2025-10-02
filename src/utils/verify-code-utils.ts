@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { StrGenerator } from './str-generator'
 import { EnvHelper } from './env-helper'
 
-import { VerifyCodeService } from '@/modules/admin-api/system/verify-code/verify-code.service'
-import { VerifyCodeType } from '@/modules/admin-api/system/verify-code/dto/verify-code.req.dto'
+import { VerifyCodeService } from '@/modules/platform-api/system/verify-code/verify-code.service'
+import { VerifyCodeType } from '@/modules/platform-api/system/verify-code/dto/verify-code.req.dto'
 
 /**
  * 生成驗證碼的參數介面

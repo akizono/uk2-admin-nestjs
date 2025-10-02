@@ -4,8 +4,8 @@ import { tap, catchError } from 'rxjs/operators'
 import { Reflector } from '@nestjs/core'
 import { Request, Response } from 'express'
 
-import { LogService } from '@/modules/admin-api/system/log/log.service'
-import { CreateLogReqDto } from '@/modules/admin-api/system/log/dto/log.req.dto'
+import { LogService } from '@/modules/platform-api/system/log/log.service'
+import { CreateLogReqDto } from '@/modules/platform-api/system/log/dto/log.req.dto'
 import { OPERATION_KEY, OperationType } from '@/common/decorators/operation.decorator'
 import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator'
 
@@ -176,7 +176,7 @@ export class LogInterceptor implements NestInterceptor {
   }
 
   private getModuleFromPath(path: string): string {
-    // 從路徑中提取模組名稱，例如 /admin-api/system/user -> system
+    // 從路徑中提取模組名稱，例如 /platform-api/system/user -> system
     const parts = path.split('/')
     if (parts.length >= 3) {
       return parts[2]

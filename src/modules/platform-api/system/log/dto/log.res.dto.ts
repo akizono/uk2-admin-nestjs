@@ -1,0 +1,61 @@
+import { PaginatedResponseDto, SingleResponseDto } from '@/utils/response-dto'
+
+export class CreateLogResDto extends SingleResponseDto({}) {}
+
+export class FindLogResDto extends PaginatedResponseDto({
+  id: '165',
+  path: '/platform-api/system/dict-data/page',
+  method: 'GET',
+  params: {},
+  body: {},
+  query: {
+    dictType: 'common_status',
+    pageSize: '0',
+    currentPage: '1',
+    dictTypeStatus: '1',
+  },
+  statusCode: 200,
+  responseTime: 17,
+  userId: '1',
+  ip: '::ffff:127.0.0.1',
+  userAgent:
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36',
+  isSuccess: 1,
+  errorMessage: null,
+  errorStack: null,
+  module: 'dict-data',
+  actionType: 'READ',
+  operationName: '分頁查詢字典數據',
+  resourceId: null,
+  user: {
+    id: '1',
+    username: 'admin',
+    nickname: 'Aimi22',
+    age: 2,
+    sex: 1,
+    email: 'admin@uk2-admin.com',
+    mobile: '01 258 6632',
+    avatar: 'https://s2.loli.net/2025/08/14/gVt1CTr46QuhoXz.jpg',
+    deptId: null,
+    dept: null,
+    role: ['super_admin'],
+    roleIds: ['1'],
+    roleNames: ['超級管理員'],
+
+    remark: 'remark',
+    status: 0,
+    isDeleted: 0,
+    creator: '-1',
+    createTime: '2025-03-14T04:50:19.000Z',
+    updater: null,
+    updateTime: null,
+  },
+
+  remark: 'remark',
+  status: 0,
+  isDeleted: 0,
+  creator: '-1',
+  createTime: '2025-03-14T04:50:19.000Z',
+  updater: null,
+  updateTime: null,
+}) {}
